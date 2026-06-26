@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OhOh Fandom — Stream Battle</title>
+<title>OhOh Fandom — Stream Battle (Online)</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -16,13 +21,18 @@
   --radius:12px;--radius-sm:8px;--shadow:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.05);
 }
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;line-height:1.5;}
-h1,h2,h3{font-weight:800;line-height:1.15;letter-spacing:-.02em;}
 .navbar{background:var(--dark);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:400;}
 .nb-logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:15px;}
 .nb-logo span{color:var(--ora-m);}
+.nb-right{display:flex;align-items:center;gap:10px;}
 .live-chip{display:flex;align-items:center;gap:6px;background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4ade80;}
 .live-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pulse-dot 1.8s infinite;}
 @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.6;}}
+.online-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;}
+.online-status.on{background:var(--green-l);color:#15803d;border:1px solid #86efac;}
+.online-status.off{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;}
+.online-status.waiting{background:#fefce8;color:#713f12;border:1px solid #fde047;}
+
 .hero{background:var(--dark);padding:2rem 1.5rem 1rem;position:relative;overflow:hidden;}
 .hero-inner{max-width:800px;margin:0 auto;position:relative;}
 .hero-title{text-align:center;font-size:clamp(20px,4vw,30px);font-weight:800;color:#fff;margin-bottom:1.5rem;}
@@ -35,7 +45,6 @@ h1,h2,h3{font-weight:800;line-height:1.15;letter-spacing:-.02em;}
 .sp-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:700;}
 .sp-name{font-size:16px;font-weight:800;color:#fff;margin:4px 0 8px;}
 .sp-points{font-size:26px;font-weight:800;color:#fbbf24;margin-top:2px;}
-.sp-points span{font-size:12px;font-weight:600;color:rgba(255,255,255,.5);}
 .sp-time{font-size:clamp(20px,3vw,28px);font-weight:700;color:rgba(255,255,255,.8);font-variant-numeric:tabular-nums;}
 .sp-meta{font-size:10px;color:rgba(255,255,255,.45);margin-top:5px;font-weight:600;}
 .vs-badge{width:44px;height:44px;border-radius:50%;background:var(--dark2);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);margin:0 auto;}
@@ -77,9 +86,9 @@ h1,h2,h3{font-weight:800;line-height:1.15;letter-spacing:-.02em;}
 .acc-rm:hover{background:#fee2e2;border-color:#fca5a5;color:var(--red);}
 .add-acc{width:100%;height:36px;border:1.5px dashed var(--border-d);border-radius:var(--radius-sm);background:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit;font-weight:600;transition:all .14s;margin-bottom:1rem;}
 .add-acc:hover{border-color:var(--blue);color:var(--blue);}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:42px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .14s;letter-spacing:-.01em;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:42px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .14s;}
 .btn:active{transform:scale(.97);}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
 .btn-block{width:100%;}
 .btn-primary{background:var(--blue);color:#fff;}
 .btn-primary:hover:not(:disabled){background:var(--blue-d);}
@@ -114,7 +123,6 @@ h1,h2,h3{font-weight:800;line-height:1.15;letter-spacing:-.02em;}
 .open-tab-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);}
 .otr-acc{font-size:13px;font-weight:700;}
 .otr-url{font-size:10px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
-.tag-opened{font-size:10px;font-weight:700;color:var(--green);background:var(--green-l);border:1px solid #86efac;border-radius:6px;padding:2px 8px;}
 .acc-live{display:flex;flex-direction:column;gap:6px;}
 .acc-live-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);}
 .alr-left{display:flex;align-items:center;gap:8px;}
@@ -199,8 +207,9 @@ h1,h2,h3{font-weight:800;line-height:1.15;letter-spacing:-.02em;}
 .info-box.step-box .info-box-title{color:#16a34a;}
 .info-box.verify-box{background:#ede9fe;border-color:#a78bfa;}
 .info-box.verify-box .info-box-title{color:#7c3aed;}
+.info-box.online-box{background:#dbeafe;border-color:#60a5fa;}
+.info-box.online-box .info-box-title{color:#2563eb;}
 footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:2rem;font-weight:500;}
-.verify-timer{font-size:14px;font-weight:800;color:#7c3aed;background:#ede9fe;padding:4px 12px;border-radius:20px;display:inline-block;}
 .verify-box-big{background:#ede9fe;border:2px solid #a78bfa;border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:1rem;}
 .verify-box-big .v-title{font-size:14px;font-weight:800;color:#6d28d9;}
 .verify-box-big .v-timer{font-size:32px;font-weight:800;color:#7c3aed;margin:8px 0;}
@@ -208,8 +217,9 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 .step-counter{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
 .step-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--text2);}
 .step-pill.active{background:var(--blue);color:#fff;border-color:var(--blue);}
-.step-pill.done{background:var(--green);color:#fff;border-color:var(--green);}
 .session-save-indicator{background:var(--green-l);border:1px solid #86efac;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:600;color:#15803d;text-align:center;margin-bottom:1rem;}
+.online-badge{display:inline-block;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px;text-transform:uppercase;}
+.live-count{font-size:11px;color:var(--text3);font-weight:600;}
 @media(max-width:520px){.scoreboard{gap:6px;}.sp-points{font-size:20px;}.sp-time{font-size:18px;}.sh-timer{font-size:42px;}.two-col{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -217,11 +227,16 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 
 <div class="toast" id="toast"></div>
 
+<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nb-logo">OhOh <span>Fandom</span> · Stream Battle</div>
-  <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+  <div class="nb-right">
+    <span class="online-status waiting" id="status-indicator">⏳ Connecting...</span>
+    <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+  </div>
 </nav>
 
+<!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-title"><span class="kt">Team Khem</span> 💙 vs 🧡 <span class="pt">Team Pharan</span></div>
@@ -249,11 +264,11 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
 <!-- STEP: REGISTER -->
 <div id="s-reg" class="step on">
-
   <div class="card">
     <div class="card-header"><span class="card-title">📋 How It Works</span></div>
     <div class="card-body-sm">
@@ -263,6 +278,8 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
         <span class="step-pill">3️⃣ Pick Team</span>
         <span class="step-pill">4️⃣ Stream!</span>
       </div>
+      
+
       <div class="info-box step-box">
         <div class="info-box-title">🎯 Points System</div>
         <div class="info-box-text">
@@ -278,8 +295,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
           <strong>Every 15 minutes, click "I'm Still Streaming!"</strong><br>
           • You'll get a reminder when it's time to verify<br>
           • This ensures you're actually watching the stream<br>
-          • Points only count if you verify within the time window<br>
-          • <em>Optional: Take a screenshot of your stream for proof</em>
+          • Points only count if you verify within the time window
         </div>
       </div>
       <div class="info-box" style="background:var(--ora-l);border-color:var(--ora-m);">
@@ -291,7 +307,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
           <strong>Step 4:</strong> Click "Start Streaming Battle!"<br>
           <strong>Step 5:</strong> Open each tab, log in, then Start Timer!<br>
           <strong>Step 6:</strong> Verify every 15 minutes to keep earning!<br>
-          <strong>💡 You can leave this page and come back!</strong> Your session auto-saves.
+          <strong>🌐 Everyone sees your progress live!</strong>
         </div>
       </div>
     </div>
@@ -303,7 +319,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
       <div class="field-group">
         <label class="field-label">Your username</label>
         <input type="text" class="input" id="username-input" placeholder="e.g. KengFan_Pro" />
-        <div style="font-size:11px;color:var(--text3);margin-top:4px;">This will be your name on the leaderboard</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">This will be your name on the global leaderboard</div>
       </div>
     </div>
   </div>
@@ -349,7 +365,10 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 
   <div class="card">
-    <div class="card-header"><span class="card-title">🏆 Team Leaderboard</span></div>
+    <div class="card-header">
+      <span class="card-title">🏆 Global Leaderboard</span>
+      <span class="live-count" id="live-count">👀 0 live</span>
+    </div>
     <div class="card-body">
       <div class="lb-team-header" id="team-header">
         <div class="lb-team-box lead-k" id="team-k-box">
@@ -373,14 +392,14 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 
   <div class="card">
-    <div class="card-header"><span class="card-title">💬 Fandom Chat</span></div>
+    <div class="card-header"><span class="card-title">💬 Global Chat</span></div>
     <div class="chat-wrap">
       <div class="chat-feed" id="chat-feed-reg">
-        <div class="chat-msg sys"><span class="chat-sys-pill">👋 Welcome to the OhOh Stream Battle!</span></div>
-        <div class="chat-msg sys"><span class="chat-sys-pill">Register above to join the battle!</span></div>
+        <div class="chat-msg sys"><span class="chat-sys-pill">🌐 Welcome to the OhOh Stream Battle!</span></div>
+        <div class="chat-msg sys"><span class="chat-sys-pill">Everyone online can see your messages!</span></div>
       </div>
       <div class="chat-input-row">
-        <input type="text" class="chat-input" id="chat-input-reg" placeholder="Chat with the community..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg('reg')"/>
+        <input type="text" class="chat-input" id="chat-input-reg" placeholder="Chat with everyone watching..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg('reg')"/>
         <button class="chat-send" onclick="sendMsg('reg')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
@@ -391,7 +410,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 
 <!-- STEP: STREAMING -->
 <div id="s-stream" class="step">
-  <div class="session-save-indicator">💾 Your session auto-saves! You can close this page and come back.</div>
+  <div class="session-save-indicator">💾 Your session auto-saves to Firebase! Everyone can see your progress!</div>
   <button class="back-link" onclick="goBack()">← Back to registration</button>
 
   <div class="sess-hero hk" id="sess-hero">
@@ -404,7 +423,6 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 
   <div class="status-bar sb-wait" id="status-bar">⏳ Step 1: Open all tabs above, log in, then Step 2: Start Timer</div>
 
-  <!-- VERIFICATION BOX -->
   <div class="verify-box-big" id="verify-box" style="display:none;">
     <div class="v-title">📸 Verification Required</div>
     <div class="v-timer" id="verify-timer">15:00</div>
@@ -429,7 +447,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
       <button class="btn btn-success btn-block" id="timer-btn" onclick="startTimer()" style="font-size:16px;height:50px;">
         ▶ START TIMER
       </button>
-      <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center;font-weight:500;">Timer starts counting points for your team!</p>
+      <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center;font-weight:500;">Timer starts counting points for your team! Everyone sees it live!</p>
     </div>
   </div>
 
@@ -454,7 +472,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 
   <div class="card">
-    <div class="card-header"><span class="card-title">🏆 Live Leaderboard</span></div>
+    <div class="card-header"><span class="card-title">🏆 Live Global Leaderboard</span></div>
     <div class="card-body">
       <div class="lb-team-header" id="team-header-live">
         <div class="lb-team-box lead-k" id="team-k-box-live">
@@ -478,7 +496,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 
   <div class="card">
-    <div class="card-header"><span class="card-title">💬 Live Chat</span></div>
+    <div class="card-header"><span class="card-title">💬 Global Live Chat</span></div>
     <div class="chat-wrap">
       <div class="quick-reacts">
         <button class="react-btn" onclick="sendReact('💙 Team Khem fighting!')">💙 Khem!</button>
@@ -503,9 +521,251 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 
 </div>
 
-<footer>Made with 💙🧡 by OhOh Fandom · 5 min = 1 point · Verify every 15 min · Auto-saves!</footer>
+<footer>Made with 💙🧡 by OhOh Fandom · 5 min = 1 point · Verify every 15 min · 🌐 Live on Firebase!</footer>
 
 <script>
+// ============================================================
+// 🔥 FIREBASE CONFIG - YOUR CONFIG
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
+  authDomain: "ohoh-stream-battle.firebaseapp.com",
+  projectId: "ohoh-stream-battle",
+  storageBucket: "ohoh-stream-battle.firebasestorage.app",
+  messagingSenderId: "882579620540",
+  appId: "1:882579620540:web:b3a37322c60421120b06b9"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const dbFirestore = firebase.firestore();
+
+// ============================================================
+// 📡 CONNECTION STATUS
+// ============================================================
+let isOnline = false;
+let firebaseReady = false;
+
+function updateConnectionStatus(status, message) {
+  const el = document.getElementById('status-indicator');
+  if (!el) return;
+  el.className = `online-status ${status}`;
+  el.textContent = message;
+}
+
+// Listen for Firestore connection
+dbFirestore.collection('users').onSnapshot(
+  () => {
+    isOnline = true;
+    firebaseReady = true;
+    updateConnectionStatus('on', '🟢 Online');
+    toast('🌐 Connected to Firebase!', 2000);
+  },
+  (error) => {
+    isOnline = false;
+    firebaseReady = false;
+    updateConnectionStatus('off', '🔴 Offline');
+    console.warn('Firebase connection lost:', error);
+  }
+);
+
+// ============================================================
+// 📡 FIREBASE SYNC FUNCTIONS
+// ============================================================
+
+async function syncUserToFirebase(userData) {
+  if (!firebaseReady || !isOnline) return;
+  try {
+    const userRef = dbFirestore.collection('users').doc(userData.name.toLowerCase());
+    await userRef.set({
+      name: userData.name,
+      team: userData.team,
+      totalSecs: userData.totalSecs || 0,
+      sessions: userData.sessions || 0,
+      verifications: userData.verifications || 0,
+      isLive: userData.isLive || false,
+      liveSecs: userData.liveSecs || 0,
+      accounts: userData.accounts || [],
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error('❌ Error syncing user:', error);
+  }
+}
+
+async function syncChatToFirebase(chatData) {
+  if (!firebaseReady || !isOnline) return;
+  try {
+    await dbFirestore.collection('chat').add({
+      sender: chatData.sender,
+      team: chatData.team || 'system',
+      text: chatData.text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    console.error('❌ Error syncing chat:', error);
+  }
+}
+
+// ============================================================
+// 📡 REAL-TIME LISTENERS
+// ============================================================
+
+// Listen for user updates
+function listenUsers(callback) {
+  if (!firebaseReady) return;
+  dbFirestore.collection('users').onSnapshot((snapshot) => {
+    const users = {};
+    snapshot.forEach(doc => {
+      users[doc.id] = doc.data();
+    });
+    callback(users);
+  }, (error) => {
+    console.warn('User listener error:', error);
+  });
+}
+
+// Listen for chat updates
+function listenChat(callback) {
+  if (!firebaseReady) return;
+  dbFirestore.collection('chat')
+    .orderBy('timestamp', 'desc')
+    .limit(50)
+    .onSnapshot((snapshot) => {
+      const messages = [];
+      snapshot.forEach(doc => {
+        messages.push(doc.data());
+      });
+      callback(messages.reverse());
+    }, (error) => {
+      console.warn('Chat listener error:', error);
+    });
+}
+
+// ============================================================
+// 🔄 OVERRIDE LOCAL FUNCTIONS
+// ============================================================
+
+const originalSave = save;
+save = async function() {
+  originalSave();
+  if (myUsername) {
+    const key = myUsername.toLowerCase();
+    if (db[key]) {
+      await syncUserToFirebase(db[key]);
+    }
+  }
+};
+
+const originalSaveChat = saveChat;
+saveChat = async function() {
+  originalSaveChat();
+  if (chat.length > 0) {
+    const lastMsg = chat[chat.length - 1];
+    if (lastMsg && lastMsg.type === 'msg') {
+      await syncChatToFirebase({
+        sender: lastMsg.sender,
+        team: lastMsg.team,
+        text: lastMsg.text
+      });
+    }
+  }
+};
+
+// ============================================================
+// 📡 LOAD FROM FIREBASE
+// ============================================================
+
+async function loadFromFirebase() {
+  if (!firebaseReady || !isOnline) {
+    console.log('📱 Using local mode (offline)');
+    return;
+  }
+
+  try {
+    // Load users
+    const snapshot = await dbFirestore.collection('users').get();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (!db[doc.id] || data.updatedAt > (db[doc.id]?.updatedAt || 0)) {
+        db[doc.id] = data;
+      }
+    });
+    save();
+    renderAll();
+
+    // Load chat
+    const chatSnapshot = await dbFirestore.collection('chat')
+      .orderBy('timestamp', 'desc')
+      .limit(50)
+      .get();
+    const messages = [];
+    chatSnapshot.forEach(doc => {
+      messages.push(doc.data());
+    });
+    chat = messages.reverse();
+    saveChat();
+    renderChat('chat-feed-reg');
+    renderChat('chat-feed');
+
+    // Setup real-time listeners
+    listenUsers((users) => {
+      let changed = false;
+      Object.entries(users).forEach(([key, data]) => {
+        if (!db[key] || data.updatedAt > (db[key]?.updatedAt || 0)) {
+          db[key] = data;
+          changed = true;
+        }
+      });
+      if (changed) {
+        save();
+        renderAll();
+      }
+    });
+
+    listenChat((messages) => {
+      if (messages.length > chat.length) {
+        chat = messages;
+        saveChat();
+        renderChat('chat-feed-reg');
+        renderChat('chat-feed');
+      }
+    });
+
+    console.log('✅ Loaded from Firebase');
+  } catch (error) {
+    console.error('❌ Error loading from Firebase:', error);
+  }
+}
+
+// ============================================================
+// 🚀 STARTUP
+// ============================================================
+
+let loadCalled = false;
+let firebaseInitAttempts = 0;
+const checkFirebaseReady = setInterval(() => {
+  firebaseInitAttempts++;
+  if (firebaseReady || firebaseInitAttempts > 20) {
+    clearInterval(checkFirebaseReady);
+    if (firebaseReady) {
+      console.log('🔥 Firebase ready! Loading data...');
+      loadFromFirebase();
+    } else {
+      console.log('📱 Firebase not available, using local mode');
+    }
+    // Load local data
+    if (!loadCalled) {
+      loadCalled = true;
+      load();
+    }
+  }
+}, 500);
+
+// ============================================================
+// EXISTING APP CODE (Same as before)
+// ============================================================
+
 const LS_DATA = 'ohoh_battle_data';
 const LS_CHAT = 'ohoh_battle_chat';
 const LS_SESSION = 'ohoh_battle_session';
@@ -524,19 +784,16 @@ let verifyInterval = null;
 let verifyTimeLeft = 900;
 let verified = false;
 let lastVerifyTime = null;
-let pointsEarnedSinceVerify = 0;
 
 function load(){
   try{ const r=localStorage.getItem(LS_DATA); if(r) db=JSON.parse(r); }catch(e){ db={}; }
   try{ const r=localStorage.getItem(LS_CHAT); if(r) chat=JSON.parse(r); }catch(e){ chat=[]; }
   
-  // Check for saved session
   try{
     const sessionData = localStorage.getItem(LS_SESSION);
     if(sessionData){
       const session = JSON.parse(sessionData);
       if(session.active && session.username){
-        // Restore session
         myUsername = session.username;
         myTeam = session.team;
         myAccs = session.accounts || [];
@@ -547,10 +804,8 @@ function load(){
         earnedSet = new Set(session.earnedSet || []);
         
         if(timerGoing){
-          // Timer was running when we left
           const elapsed = Math.floor((Date.now() - session.timestamp) / 1000);
           sessSecs += elapsed;
-          // Restore timer
           sessStart = Date.now() - (sessSecs * 1000);
           timerGoing = true;
           document.getElementById('s-reg').classList.remove('on');
@@ -685,7 +940,7 @@ function goStream(){
   myUsername=username;
   myAccs=accs;
   timerGoing=false; sessSecs=0; earnedSet=new Set();
-  verified=false; verifyTimeLeft=900; pointsEarnedSinceVerify=0; lastVerifyTime=null;
+  verified=false; verifyTimeLeft=900; lastVerifyTime=null;
   
   const key=username.toLowerCase();
   if(!db[key]) db[key]={name:username,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
@@ -720,7 +975,6 @@ function startTimer(){
   sessStart=Date.now()-(sessSecs*1000);
   verified=false;
   verifyTimeLeft=900;
-  pointsEarnedSinceVerify=0;
   lastVerifyTime=null;
   
   document.getElementById('sh-eye').textContent='🔴 LIVE — Keep streaming!';
@@ -743,7 +997,6 @@ function startTimer(){
 }
 
 function startTimerFromRestore(){
-  // Timer was already running, just restart the intervals
   if(ticker) clearInterval(ticker);
   ticker=setInterval(tick,1000);
   
@@ -768,7 +1021,6 @@ function verifyTick(){
     
     if(verified){
       verified=false;
-      pointsEarnedSinceVerify = 0;
       saveSession();
     }
   }
@@ -779,7 +1031,6 @@ function verifyStream(){
   
   verified = true;
   verifyTimeLeft = 900;
-  pointsEarnedSinceVerify = 0;
   lastVerifyTime = Date.now();
   
   document.getElementById('verify-timer').textContent='15:00';
@@ -865,7 +1116,6 @@ function stopStream(){
 function goBack(){
   if(timerGoing){ 
     if(!confirm('Going back will pause your timer. Your progress will be saved. Continue?')) return; 
-    // Pause timer but don't stop
     if(ticker){ clearInterval(ticker); ticker=null; }
     if(verifyInterval){ clearInterval(verifyInterval); verifyInterval=null; }
     timerGoing = false;
@@ -964,6 +1214,10 @@ function renderVS(){
   if(kp>pp){ kBox?.classList.add('lead-k'); kBoxLive?.classList.add('lead-k'); }
   else if(pp>kp){ pBox?.classList.add('lead-p'); pBoxLive?.classList.add('lead-p'); }
   
+  // Update live count
+  const liveCount = Object.values(db).filter(u => u.isLive).length;
+  document.getElementById('live-count').textContent = `👀 ${liveCount} live`;
+  
   const total=ks+ps||1;
   const kpct=Math.max(5,Math.min(95,Math.round(ks/total*100)));
   document.getElementById('bp-k').style.width=kpct+'%';
@@ -1024,7 +1278,7 @@ setInterval(() => {
   }
 }, 10000);
 
-// Poll for updates
+// Poll for local updates
 setInterval(()=>{
   try{ const r=localStorage.getItem(LS_DATA); if(r){ const fresh=JSON.parse(r); Object.entries(fresh).forEach(([k,v])=>{ if(k!==myUsername?.toLowerCase()) db[k]=v; }); } }catch(e){}
   try{ const r=localStorage.getItem(LS_CHAT); if(r){ const fresh=JSON.parse(r); if(fresh.length!==chat.length){ chat=fresh; renderChat('chat-feed'); renderChat('chat-feed-reg'); } } }catch(e){}
@@ -1032,7 +1286,7 @@ setInterval(()=>{
 },3000);
 
 let toastTimer;
-load();
+// load() is called from the Firebase init above
 </script>
 </body>
 </html>
