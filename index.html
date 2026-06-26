@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OhOh Fandom — KengNamping Stream Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-900: #042C53;
+    --blue-800: #0C447C;
+    --blue-700: #185FA5;
+    --blue-500: #378ADD;
+    --blue-300: #85B7EB;
+    --blue-100: #B5D4F4;
+    --blue-50:  #E6F1FB;
+    --white: #ffffff;
+    --gray-100: #f5f5f5;
+    --gray-200: #e8e8e8;
+    --gray-400: #9a9a9a;
+    --gray-700: #444;
+    --gray-900: #111;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(160deg, #e6f1fb 0%, #f0f7ff 40%, #ffffff 100%);
+    min-height: 100vh;
+    color: var(--gray-900);
+  }
+
+  header {
+    background: var(--blue-800);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem 1.5rem;
+  }
+  header .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue-100);
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+  }
+  header p {
+    font-size: 14px;
+    color: var(--blue-100);
+    margin-top: 6px;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* TOTAL BANNER */
+  .total-banner {
+    background: var(--blue-800);
+    color: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .total-banner .big-num {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .total-banner .lbl {
+    font-size: 13px;
+    color: var(--blue-100);
+    margin-top: 4px;
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--blue-800);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2 svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* FORM FIELDS */
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 5px;
+  }
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 0 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--gray-900);
+    background: white;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  input:focus { border-color: var(--blue-500); box-shadow: 0 0 0 3px #b5d4f455; }
+
+  .field { margin-bottom: 1rem; }
+
+  .row { display: flex; gap: 10px; }
+  .row .field { flex: 1; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 44px;
+    padding: 0 20px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--blue-800); color: white; width: 100%; }
+  .btn-primary:hover { background: var(--blue-900); }
+  .btn-secondary { background: var(--blue-50); color: var(--blue-800); border: 1.5px solid var(--blue-100); }
+  .btn-secondary:hover { background: var(--blue-100); }
+  .btn-sm { height: 34px; padding: 0 14px; font-size: 13px; }
+
+  /* STEP TOGGLE */
+  .step { display: none; }
+  .step.active { display: block; }
+
+  /* SUMMARY BOX */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .stat-box {
+    background: var(--blue-50);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--blue-100);
+  }
+  .stat-box .num { font-size: 28px; font-weight: 700; color: var(--blue-800); line-height: 1; }
+  .stat-box .lbl { font-size: 12px; color: var(--blue-700); margin-top: 4px; }
+
+  /* BROWSER GUIDE */
+  .browser-tip {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #92400e;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .browser-tip svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* LEADERBOARD */
+  .lb-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 8px;
+    background: white;
+    transition: background 0.1s;
+  }
+  .lb-entry.me { background: var(--blue-50); border-color: var(--blue-300); }
+  .lb-rank { font-size: 14px; font-weight: 700; width: 26px; text-align: center; color: var(--gray-400); flex-shrink: 0; }
+  .lb-rank.r1 { color: #ca8a04; }
+  .lb-rank.r2 { color: #71717a; }
+  .lb-rank.r3 { color: #b45309; }
+  .lb-name { font-size: 14px; font-weight: 500; color: var(--gray-900); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-detail { font-size: 12px; color: var(--gray-400); }
+  .lb-streams { font-size: 14px; font-weight: 600; color: var(--blue-800); flex-shrink: 0; }
+  .you-tag { font-size: 10px; font-weight: 600; background: var(--blue-800); color: white; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+  .empty-lb { text-align: center; color: var(--gray-400); font-size: 14px; padding: 2rem 0; }
+
+  .back-link { background: none; border: none; font-size: 13px; color: var(--blue-700); cursor: pointer; padding: 0; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; }
+  .back-link:hover { color: var(--blue-900); }
+
+  footer { text-align: center; padding: 2rem 1rem; font-size: 12px; color: var(--gray-400); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">OhOh Fandom</div>
+  <h1>KengNamping Stream Tracker</h1>
+  <p>Log your streams, track the fandom total, climb the leaderboard</p>
+</header>
+
+<div class="container">
+
+  <!-- STEP 1: Enter details -->
+  <div id="step1" class="step active">
+    <div class="total-banner">
+      <div class="big-num" id="grand-total">0</div>
+      <div class="lbl">total streams by OhOh fandom</div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Log your streams
+      </h2>
+
+      <div class="field">
+        <label for="uname">Your Twitter/X username</label>
+        <input type="text" id="uname" placeholder="@KengNampingFan" maxlength="40" />
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="num-streams">How many times did you stream?</label>
+          <input type="number" id="num-streams" placeholder="e.g. 50" min="1" max="99999" />
+        </div>
+        <div class="field">
+          <label for="num-browsers">Number of browsers/tabs open</label>
+          <input type="number" id="num-browsers" placeholder="e.g. 4" min="1" max="100" />
+        </div>
+      </div>
+
+      <div id="error-msg" style="color:#dc2626;font-size:13px;margin-bottom:10px;display:none;"></div>
+
+      <button class="btn btn-primary" onclick="submitLog()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Log my streams
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        Fandom leaderboard
+      </h2>
+      <div id="lb1"></div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Confirmation + stats -->
+  <div id="step2" class="step">
+    <button class="back-link" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+
+    <div class="total-banner">
+      <div class="big-num" id="grand-total2">0</div>
+      <div class="lbl">total streams by OhOh fandom</div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="stat-box">
+        <div class="num" id="my-streams-display">0</div>
+        <div class="lbl">your streams logged</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="my-browsers-display">0</div>
+        <div class="lbl">browsers used</div>
+      </div>
+    </div>
+
+    <div class="browser-tip">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><strong>Mass streaming tip:</strong> Open the video in multiple browser windows (Chrome, Firefox, Edge, Brave) simultaneously for maximum count. Make sure each tab plays fully past 30 seconds!</span>
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        Fandom leaderboard
+      </h2>
+      <div id="lb2"></div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="goBack()" style="width:100%">Log more streams</button>
+  </div>
+
+</div>
+
+<footer>Made with love by OhOh fandom for KengNamping &hearts;</footer>
+
+<script>
+  const DB_KEY = 'ohoh_stream_data_v1';
+  let db = {};
+  let currentUser = '';
+
+  async function loadDB() {
+    try {
+      const r = await window.storage.get(DB_KEY, true);
+      if (r && r.value) db = JSON.parse(r.value);
+    } catch(e) { db = {}; }
+    renderAll();
+  }
+
+  async function saveDB() {
+    try { await window.storage.set(DB_KEY, JSON.stringify(db), true); } catch(e) {}
+  }
+
+  function totalStreams() {
+    return Object.values(db).reduce((sum, u) => sum + (u.streams || 0), 0);
+  }
+
+  function renderAll() {
+    const total = totalStreams();
+    document.getElementById('grand-total').textContent = total.toLocaleString();
+    document.getElementById('grand-total2').textContent = total.toLocaleString();
+    renderLB('lb1');
+    renderLB('lb2');
+  }
+
+  function renderLB(id) {
+    const el = document.getElementById(id);
+    const sorted = Object.entries(db).sort((a,b) => (b[1].streams||0) - (a[1].streams||0));
+    if (!sorted.length) { el.innerHTML = '<div class="empty-lb">No streams logged yet — be the first!</div>'; return; }
+    const rankClasses = ['r1','r2','r3'];
+    el.innerHTML = sorted.slice(0,15).map(([name, info], i) => {
+      const isMe = name === currentUser;
+      const rc = i < 3 ? rankClasses[i] : '';
+      return `<div class="lb-entry${isMe ? ' me' : ''}">
+        <div class="lb-rank ${rc}">${i+1}</div>
+        <div>
+          <div class="lb-name">@${name}${isMe ? '<span class="you-tag">you</span>' : ''}</div>
+          <div class="lb-detail">${info.browsers || 1} browser${(info.browsers||1)>1?'s':''} open</div>
+        </div>
+        <div class="lb-streams">${(info.streams||0).toLocaleString()}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  function submitLog() {
+    const uname = document.getElementById('uname').value.trim().replace(/^@/, '');
+    const streams = parseInt(document.getElementById('num-streams').value) || 0;
+    const browsers = parseInt(document.getElementById('num-browsers').value) || 0;
+
+    if (!uname) { showError('Please enter your username.'); return; }
+    if (streams < 1) { showError('Please enter how many times you streamed.'); return; }
+    if (browsers < 1) { showError('Please enter how many browsers you used.'); return; }
+    showError('');
+
+    currentUser = uname;
+    if (!db[uname]) db[uname] = { streams: 0, browsers: 0 };
+    db[uname].streams += streams;
+    db[uname].browsers = Math.max(db[uname].browsers, browsers);
+
+    saveDB();
+    renderAll();
+
+    document.getElementById('my-streams-display').textContent = db[uname].streams.toLocaleString();
+    document.getElementById('my-browsers-display').textContent = db[uname].browsers;
+
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function goBack() {
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+    document.getElementById('num-streams').value = '';
+    document.getElementById('num-browsers').value = '';
+    window.scrollTo(0,0);
+    renderAll();
+  }
+
+  document.getElementById('uname').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('num-streams').focus(); });
+
+  loadDB();
+</script>
+</body>
+</html>
