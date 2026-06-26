@@ -1,858 +1,895 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OhOh Fandom — Stream Party</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #fdf8f2;
-      color: #1e1e1e;
-      min-height: 100vh;
-    }
-    :root {
-      --khem: #1a5fa8;
-      --khem-light: #ddeeff;
-      --khem-mid: #4a8fd4;
-      --pharan: #c0885a;
-      --pharan-light: #fdf0e4;
-      --pharan-mid: #e0a870;
-      --cream: #fdf8f2;
-      --sage: #b8cfc4;
-      --sage-light: #e8f2ee;
-      --white: #ffffff;
-      --text: #2c2c2c;
-      --text-muted: #7a7a6a;
-      --border: #e8e0d4;
-      --radius: 16px;
-      --radius-sm: 10px;
-      --green: #22c55e;
-    }
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      background: white;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: var(--khem);
-      font-style: italic;
-    }
-    .nav-logo span { color: var(--pharan); }
-    .nav-pill {
-      background: var(--sage-light);
-      color: var(--text-muted);
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-    .vs-bar {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 0;
-      background: white;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .vs-side { padding: 1.25rem 1.5rem; text-align: center; }
-    .vs-side.khem { background: var(--khem-light); }
-    .vs-side.pharan { background: var(--pharan-light); }
-    .vs-label {
-      font-size: 10px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .vs-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-    }
-    .vs-name.k { color: var(--khem); }
-    .vs-name.p { color: var(--pharan); }
-    .vs-time {
-      font-size: 24px;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-    .vs-time.k { color: var(--khem); }
-    .vs-time.p { color: var(--pharan); }
-    .vs-divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text-muted);
-      padding: 0 1rem;
-      background: white;
-    }
-    .progress-bar {
-      height: 8px;
-      border-radius: 0;
-      display: flex;
-      overflow: hidden;
-    }
-    .pb-khem { background: var(--khem); transition: width .5s ease; }
-    .pb-pharan { background: var(--pharan); transition: width .5s ease; }
-    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
-    .sec-head { text-align: center; margin-bottom: 1.5rem; }
-    .sec-head h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .sec-head p { font-size: 13px; color: var(--text-muted); }
-    .card {
-      background: white;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      padding: 1.5rem;
-      margin-bottom: 1.25rem;
-    }
-    #step-join, #step-stream { display: none; }
-    #step-join.active, #step-stream.active { display: block; }
-    .team-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 1.25rem;
-    }
-    .team-btn {
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1rem;
-      text-align: center;
-      cursor: pointer;
-      background: white;
-      transition: all .15s;
-      font-family: inherit;
-    }
-    .team-btn:hover { transform: translateY(-2px); }
-    .team-btn.khem-btn:hover,
-    .team-btn.khem-btn.selected { border-color: var(--khem); background: var(--khem-light); }
-    .team-btn.pharan-btn:hover,
-    .team-btn.pharan-btn.selected { border-color: var(--pharan); background: var(--pharan-light); }
-    .team-btn .t-icon { font-size: 28px; margin-bottom: 6px; }
-    .team-btn .t-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px;
-      font-weight: 700;
-    }
-    .team-btn.khem-btn .t-name { color: var(--khem); }
-    .team-btn.pharan-btn .t-name { color: var(--pharan); }
-    .team-btn .t-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .accounts-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
-    .account-row {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 12px;
-      background: var(--sage-light);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--sage);
-      position: relative;
-    }
-    .account-row .row-header {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .account-row .row-header input[type="text"] {
-      flex: 1;
-      height: 40px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0 12px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: white;
-      outline: none;
-    }
-    .account-row .row-header input:focus { border-color: var(--khem); }
-    .account-row .rm-btn {
-      width: 32px;
-      height: 32px;
-      border: 1.5px solid var(--border);
-      border-radius: 50%;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-    .account-row .rm-btn:hover {
-      background: #fee2e2;
-      border-color: #fca5a5;
-      color: #dc2626;
-    }
-    .account-row .yt-input {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .account-row .yt-input input {
-      flex: 1;
-      height: 36px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0 12px;
-      font-size: 12px;
-      font-family: inherit;
-      color: var(--text);
-      background: white;
-      outline: none;
-    }
-    .account-row .yt-input input:focus { border-color: var(--khem); }
-    .account-row .yt-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
-      min-width: 60px;
-    }
-    .add-account-btn {
-      background: none;
-      border: 1.5px dashed var(--border);
-      border-radius: var(--radius-sm);
-      width: 100%;
-      height: 38px;
-      font-size: 13px;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-family: inherit;
-      transition: all .15s;
-    }
-    .add-account-btn:hover { border-color: var(--khem); color: var(--khem); }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-    }
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      height: 42px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0 12px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: white;
-      outline: none;
-      transition: border-color .15s;
-    }
-    input:focus { border-color: var(--khem); }
-    .field { margin-bottom: 1rem; }
-    .error {
-      color: #dc2626;
-      font-size: 13px;
-      margin-bottom: 10px;
-      display: none;
-    }
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 46px;
-      width: 100%;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      transition: all .15s;
-    }
-    .btn:active { transform: scale(.97); }
-    .btn-khem { background: var(--khem); color: white; }
-    .btn-khem:hover { background: #154e8c; }
-    .btn-pharan { background: var(--pharan); color: white; }
-    .btn-pharan:hover { background: #a8744a; }
-    .btn-outline {
-      background: white;
-      color: var(--text);
-      border: 1.5px solid var(--border);
-    }
-    .btn-outline:hover { border-color: var(--khem); color: var(--khem); }
-    .btn-green {
-      background: var(--green);
-      color: white;
-    }
-    .btn-green:hover { background: #16a34a; }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .timer-hero {
-      text-align: center;
-      padding: 2rem 1rem;
-      background: white;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      margin-bottom: 1.25rem;
-    }
-    .timer-lbl {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .timer-display {
-      font-size: 56px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -2px;
-      line-height: 1;
-    }
-    .timer-display.k { color: var(--khem); }
-    .timer-display.p { color: var(--pharan); }
-    .session-lbl {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 8px;
-    }
-    .session-lbl strong { color: var(--text); }
-    .pulse { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.5;} }
-    .acc-active-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
-    .acc-active-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      background: var(--sage-light);
-      border: 1px solid var(--sage);
-    }
-    .acc-name { font-size: 14px; font-weight: 500; }
-    .acc-time {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-variant-numeric: tabular-nums;
-    }
-    .acc-status {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 2px 10px;
-      border-radius: 12px;
-    }
-    .acc-status.opened { background: var(--green); color: white; }
-    .acc-status.not-opened { background: #fbbf24; color: #713f12; }
-    .lb-entry {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      margin-bottom: 8px;
-      background: white;
-    }
-    .lb-entry.khem-entry { border-color: var(--khem-mid); background: var(--khem-light); }
-    .lb-entry.pharan-entry { border-color: var(--pharan-mid); background: var(--pharan-light); }
-    .lb-rank {
-      font-size: 15px;
-      font-weight: 700;
-      width: 28px;
-      text-align: center;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-    .lb-rank.r1 { color: #ca8a04; }
-    .lb-rank.r2 { color: #71717a; }
-    .lb-rank.r3 { color: #b45309; }
-    .lb-info { flex: 1; min-width: 0; }
-    .lb-uname {
-      font-size: 14px;
-      font-weight: 600;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .lb-team-tag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
-    .tag-k { background: var(--khem); color: white; }
-    .tag-p { background: var(--pharan); color: white; }
-    .lb-time {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      flex-shrink: 0;
-    }
-    .lb-acc { font-size: 12px; color: var(--text-muted); }
-    .empty-lb {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    .back-btn {
-      background: none;
-      border: none;
-      font-size: 13px;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-family: inherit;
-      padding: 0;
-      margin-bottom: 1rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .back-btn:hover { color: var(--khem); }
-    .badges-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 1rem;
-    }
-    .badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--sage-light);
-      border: 1px solid var(--sage);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-    .badge.earned { background: #fef9c3; border-color: #fde047; color: #713f12; }
-    .badge-icon { font-size: 14px; }
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 12px;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      margin-top: 2rem;
-    }
-    .status-banner {
-      padding: 12px;
-      border-radius: var(--radius-sm);
-      margin-bottom: 12px;
-      text-align: center;
-      font-weight: 500;
-    }
-    .status-banner.waiting {
-      background: #fef9c3;
-      border: 1px solid #fde047;
-      color: #713f12;
-    }
-    .status-banner.live {
-      background: #dcfce7;
-      border: 1px solid #86efac;
-      color: #166534;
-    }
-    @media (max-width: 480px) {
-      .vs-side { padding: 0.8rem 0.5rem; }
-      .vs-time { font-size: 18px; }
-      .timer-display { font-size: 38px; }
-      .account-row .row-header {
-        flex-direction: column;
-      }
-      .account-row .yt-input {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .account-row .yt-label {
-        min-width: auto;
-      }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OhOh Fandom — KengNamping Stream Battle</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1565c0;--blue-d:#0d47a1;--blue-l:#e3f2fd;--blue-m:#42a5f5;
+  --ora:#e65100;--ora-d:#bf360c;--ora-l:#fff3e0;--ora-m:#ff8a65;
+  --dark:#0f1923;--dark2:#1a2535;--dark3:#243044;
+  --surface:#f8fafc;--card:#ffffff;
+  --border:#e2e8f0;--border-d:#cbd5e1;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --green:#16a34a;--green-l:#dcfce7;
+  --red:#dc2626;--yellow:#d97706;
+  --radius:12px;--radius-sm:8px;--radius-lg:18px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.05);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.08),0 4px 6px -2px rgba(0,0,0,.04);
+  --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+/* ── TYPOGRAPHY ───────────────────────────────────────────── */
+h1,h2,h3{font-weight:800;line-height:1.15;letter-spacing:-.02em;}
+.serif{font-family:'Playfair Display',serif;}
+
+/* ── NAVBAR ───────────────────────────────────────────────── */
+.navbar{background:var(--dark);border-bottom:1px solid rgba(255,255,255,.05);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:400;}
+.nb-logo{display:flex;align-items:center;gap:10px;}
+.nb-logo-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue-m),var(--blue));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;}
+.nb-logo-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.02em;}
+.nb-logo-text span{color:var(--ora-m);}
+.nb-right{display:flex;align-items:center;gap:10px;}
+.live-chip{display:flex;align-items:center;gap:6px;background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4ade80;letter-spacing:.06em;text-transform:uppercase;}
+.live-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pulse-dot 1.8s infinite;}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.6;}}
+.nb-time{font-size:12px;font-weight:600;color:var(--text3);font-variant-numeric:tabular-nums;}
+
+/* ── BATTLE HERO ──────────────────────────────────────────── */
+.hero{background:var(--dark);padding:2rem 1.5rem 0;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(21,101,192,.25) 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 50%,rgba(230,81,0,.2) 0%,transparent 70%);}
+.hero-inner{max-width:800px;margin:0 auto;position:relative;}
+.hero-eyebrow{text-align:center;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:10px;}
+.hero-title{text-align:center;font-size:clamp(20px,4vw,30px);font-weight:800;color:#fff;margin-bottom:1.5rem;letter-spacing:-.03em;}
+.hero-title .kt{color:var(--blue-m);}
+.hero-title .pt{color:var(--ora-m);}
+
+/* SCOREBOARD */
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:1rem;}
+.score-panel{border-radius:var(--radius);padding:1.25rem 1rem;text-align:center;border:1px solid rgba(255,255,255,.08);}
+.score-panel.sk{background:linear-gradient(145deg,rgba(13,71,161,.8),rgba(21,101,192,.6));backdrop-filter:blur(12px);}
+.score-panel.sp{background:linear-gradient(145deg,rgba(191,54,12,.8),rgba(230,81,0,.6));backdrop-filter:blur(12px);}
+.sp-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:700;margin-bottom:4px;}
+.sp-name{font-size:16px;font-weight:800;color:#fff;margin-bottom:10px;letter-spacing:-.02em;}
+.sp-time{font-size:clamp(24px,4vw,34px);font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-2px;line-height:1;}
+.sp-meta{font-size:10px;color:rgba(255,255,255,.45);margin-top:5px;font-weight:600;}
+.vs-badge{width:44px;height:44px;border-radius:50%;background:var(--dark3);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);margin:0 auto;}
+
+/* BATTLE PROGRESS */
+.battle-progress{background:rgba(255,255,255,.06);border-radius:6px;height:6px;overflow:hidden;margin-bottom:10px;}
+.bp-fill{height:100%;display:flex;}
+.bp-k{background:linear-gradient(90deg,var(--blue-d),var(--blue-m));transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.bp-p{background:linear-gradient(90deg,var(--ora-m),var(--ora-d));transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.battle-verdict{text-align:center;padding:.6rem 0 1.5rem;font-size:12px;font-weight:700;}
+.verdict-k{color:var(--blue-m);}
+.verdict-p{color:var(--ora-m);}
+.verdict-tie{color:rgba(255,255,255,.35);}
+
+/* ── MAIN LAYOUT ──────────────────────────────────────────── */
+.main{max-width:800px;margin:0 auto;padding:1.5rem 1rem;}
+
+/* ── CARDS ────────────────────────────────────────────────── */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:1rem;overflow:hidden;}
+.card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+.card-body{padding:1.25rem;}
+.card-body-sm{padding:1rem;}
+
+/* ── STEPS ────────────────────────────────────────────────── */
+.step{display:none;}
+.step.on{display:block;}
+
+/* ── HOW IT WORKS ─────────────────────────────────────────── */
+.steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.step-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.9rem .75rem;text-align:center;box-shadow:var(--shadow-sm);}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--dark);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 7px;}
+.step-txt{font-size:11px;color:var(--text2);line-height:1.55;font-weight:500;}
+
+/* ── FORM ELEMENTS ────────────────────────────────────────── */
+.field-group{margin-bottom:.85rem;}
+.field-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:5px;}
+.input{width:100%;height:40px;border:1.5px solid var(--border-d);border-radius:var(--radius-sm);padding:0 12px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .14s,box-shadow .14s;font-weight:500;}
+.input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.1);}
+.input::placeholder{color:var(--text3);}
+.input-sm{height:36px;font-size:12px;}
+
+/* ── TEAM PICKER ──────────────────────────────────────────── */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.team-card{border:2px solid var(--border-d);border-radius:var(--radius);padding:1.1rem .9rem;text-align:center;cursor:pointer;background:#fff;transition:all .16s;font-family:inherit;position:relative;}
+.team-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.team-card.sel-k{border-color:var(--blue);background:var(--blue-l);}
+.team-card.sel-p{border-color:var(--ora);background:var(--ora-l);}
+.tc-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:800;}
+.team-card.sel-k .tc-check{display:flex;background:var(--blue);}
+.team-card.sel-p .tc-check{display:flex;background:var(--ora);}
+.tc-icon{font-size:24px;display:block;margin-bottom:6px;}
+.tc-name{font-size:14px;font-weight:800;display:block;letter-spacing:-.01em;}
+.tc-name.nk{color:var(--blue);}
+.tc-name.np{color:var(--ora);}
+.tc-count{font-size:11px;color:var(--text3);margin-top:3px;display:block;font-weight:500;}
+
+/* ── ACCOUNT ROWS ─────────────────────────────────────────── */
+.acc-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.acc-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:grid;grid-template-columns:1fr 32px;gap:8px;align-items:start;}
+.acc-fields{display:flex;flex-direction:column;gap:6px;}
+.acc-rm{width:28px;height:28px;border:1.5px solid var(--border-d);border-radius:50%;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text3);transition:all .14s;margin-top:4px;flex-shrink:0;}
+.acc-rm:hover{background:#fee2e2;border-color:#fca5a5;color:var(--red);}
+.add-acc{width:100%;height:36px;border:1.5px dashed var(--border-d);border-radius:var(--radius-sm);background:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit;font-weight:600;transition:all .14s;margin-bottom:1rem;}
+.add-acc:hover{border-color:var(--blue);color:var(--blue);}
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:42px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .14s;letter-spacing:-.01em;white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;}
+.btn-block{width:100%;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--blue-d);}
+.btn-ora{background:var(--ora);color:#fff;}
+.btn-ora:hover:not(:disabled){background:var(--ora-d);}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover:not(:disabled){filter:brightness(1.1);}
+.btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border-d);}
+.btn-outline:hover:not(:disabled){border-color:var(--blue);color:var(--blue);}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid #fca5a5;}
+.btn-danger:hover:not(:disabled){background:#fee2e2;}
+.btn-dark{background:var(--dark);color:#fff;}
+.btn-dark:hover:not(:disabled){background:var(--dark2);}
+.btn-sm{height:34px;font-size:12px;padding:0 14px;}
+.btn-xs{height:28px;font-size:11px;padding:0 10px;border-radius:6px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.err-msg{background:#fee2e2;color:var(--red);border-radius:var(--radius-sm);padding:9px 12px;font-size:12px;font-weight:600;margin-bottom:.75rem;display:none;border:1px solid #fca5a5;}
+
+/* ── SESSION HERO ─────────────────────────────────────────── */
+.sess-hero{border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden;}
+.sess-hero.hk{background:linear-gradient(145deg,var(--blue-d),var(--blue));}
+.sess-hero.hp{background:linear-gradient(145deg,var(--ora-d),var(--ora));}
+.sh-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:700;margin-bottom:6px;}
+.sh-timer{font-size:clamp(52px,12vw,80px);font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-4px;line-height:1;}
+.sh-accs{font-size:12px;color:rgba(255,255,255,.7);margin-top:8px;font-weight:600;}
+.sh-team{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;}
+.sh-status-live{display:inline-flex;align-items:center;gap:5px;background:rgba(22,163,74,.2);border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:#4ade80;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+
+/* ── STATUS BAR ───────────────────────────────────────────── */
+.status-bar{border-radius:var(--radius-sm);padding:9px 14px;font-size:12px;font-weight:600;margin-bottom:1rem;text-align:center;border:1px solid;}
+.sb-wait{background:#fefce8;border-color:#fde047;color:#713f12;}
+.sb-live{background:var(--green-l);border-color:#86efac;color:#15803d;}
+
+/* ── TABS LIST ────────────────────────────────────────────── */
+.open-tabs{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;}
+.open-tab-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);}
+.otr-left{flex:1;min-width:0;}
+.otr-acc{font-size:13px;font-weight:700;color:var(--text);}
+.otr-url{font-size:10px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+.otr-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.tag-opened{font-size:10px;font-weight:700;color:var(--green);background:var(--green-l);border:1px solid #86efac;border-radius:6px;padding:2px 8px;}
+
+/* ── ACC LIVE LIST ────────────────────────────────────────── */
+.acc-live{display:flex;flex-direction:column;gap:6px;}
+.acc-live-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);}
+.alr-left{display:flex;align-items:center;gap:8px;}
+.alr-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+.alr-avatar.ak{background:var(--blue);}
+.alr-avatar.ap{background:var(--ora);}
+.alr-name{font-size:13px;font-weight:700;}
+.alr-time{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);}
+
+/* ── BADGES ───────────────────────────────────────────────── */
+.badges{display:flex;flex-wrap:wrap;gap:6px;}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;border:1.5px solid var(--border-d);color:var(--text3);background:#fff;transition:all .35s;}
+.badge.got{border-color:#fde047;background:#fef9c3;color:#713f12;box-shadow:0 0 0 3px rgba(253,224,71,.15);}
+
+/* ── LEADERBOARD ──────────────────────────────────────────── */
+.lb-tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin-bottom:.85rem;}
+.lb-tab{flex:1;height:30px;border:none;border-radius:6px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;background:none;color:var(--text3);transition:all .14s;letter-spacing:.01em;}
+.lb-tab.on{background:#fff;color:var(--text);box-shadow:var(--shadow-sm);}
+.lb-entry{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:5px;background:#fff;transition:box-shadow .14s;}
+.lb-entry:hover{box-shadow:var(--shadow);}
+.lb-entry.ek{border-left:3px solid var(--blue);}
+.lb-entry.ep{border-left:3px solid var(--ora);}
+.lb-rank{font-size:13px;font-weight:800;width:24px;text-align:center;flex-shrink:0;color:var(--text3);}
+.lb-rank.r1{color:#d97706;}
+.lb-rank.r2{color:#64748b;}
+.lb-rank.r3{color:#92400e;}
+.lb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+.lb-avatar.lk{background:var(--blue);}
+.lb-avatar.lp{background:var(--ora);}
+.lb-body{flex:1;min-width:0;}
+.lb-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-detail{font-size:10px;color:var(--text3);margin-top:1px;font-weight:500;}
+.lb-time-col{text-align:right;flex-shrink:0;}
+.lb-time{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;}
+.lb-time.tk{color:var(--blue);}
+.lb-time.tp{color:var(--ora);}
+.lb-sessions{font-size:10px;color:var(--text3);margin-top:1px;}
+.pill{display:inline-block;font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;vertical-align:middle;margin-left:3px;letter-spacing:.04em;text-transform:uppercase;}
+.pill-k{background:var(--blue);color:#fff;}
+.pill-p{background:var(--ora);color:#fff;}
+.pill-live{background:var(--green);color:#fff;}
+.pill-you{background:var(--dark);color:#fff;}
+.lb-empty{text-align:center;padding:2.5rem;color:var(--text3);font-size:13px;font-weight:500;}
+
+/* ── HYPE CHAT ────────────────────────────────────────────── */
+.chat-wrap{display:flex;flex-direction:column;height:320px;}
+.chat-feed{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;}
+.chat-feed::-webkit-scrollbar{width:4px;}
+.chat-feed::-webkit-scrollbar-track{background:transparent;}
+.chat-feed::-webkit-scrollbar-thumb{background:var(--border-d);border-radius:2px;}
+.chat-msg{display:flex;align-items:flex-start;gap:8px;animation:msgIn .2s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.chat-msg.sys{justify-content:center;}
+.chat-sys-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 12px;font-size:11px;color:var(--text3);font-weight:500;}
+.chat-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;}
+.chat-avatar.ck{background:var(--blue);}
+.chat-avatar.cp{background:var(--ora);}
+.chat-bubble-wrap{display:flex;flex-direction:column;gap:2px;max-width:calc(100% - 38px);}
+.chat-meta{display:flex;align-items:center;gap:5px;}
+.chat-sender{font-size:11px;font-weight:700;color:var(--text);}
+.chat-sender.ck{color:var(--blue);}
+.chat-sender.cp{color:var(--ora);}
+.chat-ts{font-size:10px;color:var(--text3);}
+.chat-bubble{background:var(--surface);border:1px solid var(--border);border-radius:0 10px 10px 10px;padding:7px 10px;font-size:13px;color:var(--text);line-height:1.45;font-weight:500;word-break:break-word;}
+.chat-bubble.bk{background:var(--blue-l);border-color:rgba(21,101,192,.15);}
+.chat-bubble.bp{background:var(--ora-l);border-color:rgba(230,81,0,.15);}
+.chat-input-row{border-top:1px solid var(--border);padding:.75rem;display:flex;gap:8px;align-items:center;background:#fff;}
+.chat-input{flex:1;height:36px;border:1.5px solid var(--border-d);border-radius:20px;padding:0 14px;font-size:13px;font-family:inherit;color:var(--text);outline:none;background:#fff;transition:border-color .14s;font-weight:500;}
+.chat-input:focus{border-color:var(--blue);}
+.chat-input::placeholder{color:var(--text3);}
+.chat-send{width:36px;height:36px;border-radius:50%;border:none;background:var(--blue);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s;}
+.chat-send:hover{background:var(--blue-d);}
+.chat-send svg{width:14px;height:14px;}
+.chat-login-notice{padding:1.25rem;text-align:center;color:var(--text3);font-size:13px;font-weight:500;}
+
+/* ── QUICK REACT ──────────────────────────────────────────── */
+.quick-reacts{display:flex;gap:6px;padding:.5rem .75rem;border-top:1px solid var(--border);background:var(--surface);flex-wrap:wrap;}
+.react-btn{height:28px;padding:0 10px;border-radius:20px;border:1px solid var(--border-d);background:#fff;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;color:var(--text2);transition:all .12s;}
+.react-btn:hover{border-color:var(--blue);color:var(--blue);transform:scale(1.05);}
+
+/* ── TOAST NOTIFICATION ───────────────────────────────────── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--dark);color:#fff;border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:600;box-shadow:var(--shadow-xl);z-index:999;opacity:0;transition:all .26s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── MISC ─────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:.75rem 0;}
+.back-link{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit;padding:0;margin-bottom:1rem;display:inline-flex;align-items:center;gap:4px;font-weight:600;transition:color .14s;}
+.back-link:hover{color:var(--blue);}
+.section-gap{margin-bottom:1rem;}
+footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:2rem;font-weight:500;}
+
+@media(max-width:520px){
+  .steps-row{grid-template-columns:1fr;}
+  .team-grid{gap:8px;}
+  .scoreboard{gap:6px;}
+  .sp-time{font-size:22px;}
+  .sh-timer{font-size:50px;}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
-<nav>
-  <div class="nav-logo">OhOh <span>Fandom</span></div>
-  <div class="nav-pill">KengNamping Stream Party</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nb-logo">
+    <div class="nb-logo-mark">O</div>
+    <div class="nb-logo-text">OhOh <span>Fandom</span></div>
+  </div>
+  <div class="nb-right">
+    <span class="nb-time" id="nb-clock"></span>
+    <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+  </div>
 </nav>
 
-<div class="vs-bar">
-  <div class="vs-side khem">
-    <div class="vs-label">Team</div>
-    <div class="vs-name k">Khem</div>
-    <div class="vs-time k" id="khem-total">0:00:00</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="khem-members">0 members</div>
-  </div>
-  <div class="vs-divider">VS</div>
-  <div class="vs-side pharan">
-    <div class="vs-label">Team</div>
-    <div class="vs-name p">Pharan</div>
-    <div class="vs-time p" id="pharan-total">0:00:00</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="pharan-members">0 members</div>
-  </div>
-</div>
-<div class="progress-bar">
-  <div class="pb-khem" id="pb-khem" style="width:50%"></div>
-  <div class="pb-pharan" id="pb-pharan" style="width:50%"></div>
-</div>
-
-<div class="container">
-  <div id="step-join" class="active">
-    <div class="sec-head" style="margin-top:1rem;">
-      <h2>Join the stream party</h2>
-      <p>Pick your team, add your accounts with their YouTube links</p>
-    </div>
-
-    <div class="card">
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Choose your team</div>
-      <div class="team-grid">
-        <button class="team-btn khem-btn" onclick="selectTeam('khem', this)">
-          <div class="t-icon">💙</div>
-          <div class="t-name">Team Khem</div>
-          <div class="t-sub">Blue side</div>
-        </button>
-        <button class="team-btn pharan-btn" onclick="selectTeam('pharan', this)">
-          <div class="t-icon">🧡</div>
-          <div class="t-name">Team Pharan</div>
-          <div class="t-sub">Orange side</div>
-        </button>
+<!-- BATTLE HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">KengNamping Stream Battle</div>
+    <div class="hero-title"><span class="kt">Team Khem</span> 💙 vs 🧡 <span class="pt">Team Pharan</span></div>
+    <div class="scoreboard">
+      <div class="score-panel sk">
+        <div class="sp-label">Team</div>
+        <div class="sp-name">Khem 💙</div>
+        <div class="sp-time" id="k-time">0:00:00</div>
+        <div class="sp-meta" id="k-meta">0 streamers · 0 sessions</div>
       </div>
+      <div><div class="vs-badge">VS</div></div>
+      <div class="score-panel sp">
+        <div class="sp-label">Team</div>
+        <div class="sp-name">Pharan 🧡</div>
+        <div class="sp-time" id="p-time">0:00:00</div>
+        <div class="sp-meta" id="p-meta">0 streamers · 0 sessions</div>
+      </div>
+    </div>
+    <div style="max-width:800px;margin:0 auto;padding:0 0 0;">
+      <div class="battle-progress"><div class="bp-fill"><div class="bp-k" id="bp-k" style="width:50%"></div><div class="bp-p" id="bp-p" style="width:50%"></div></div></div>
+      <div class="battle-verdict"><span id="verdict" class="verdict-tie">⚔️ Tied — every second counts!</span></div>
+    </div>
+  </div>
+</div>
 
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:8px;">Your streaming accounts</div>
-      <div class="accounts-list" id="accounts-list">
-        <div class="account-row">
-          <div class="row-header">
-            <input type="text" placeholder="@account1 (main)" />
-            <button class="rm-btn" onclick="removeAccount(this)">×</button>
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══ STEP: REGISTER ══ -->
+<div id="s-reg" class="step on">
+
+  <div class="steps-row">
+    <div class="step-box"><div class="step-num">1</div><div class="step-txt">Enter each account + its YouTube link</div></div>
+    <div class="step-box"><div class="step-num">2</div><div class="step-txt">Pick your team and start the session</div></div>
+    <div class="step-box"><div class="step-num">3</div><div class="step-txt">Open your tabs, log in, hit Start Timer</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Your streaming accounts</span><span style="font-size:11px;color:var(--text3);font-weight:500;">Use one browser per account</span></div>
+    <div class="card-body">
+      <div class="acc-list" id="acc-list">
+        <div class="acc-item">
+          <div class="acc-fields">
+            <input type="text" class="input input-sm acc-name" placeholder="@account1 (e.g. @KengFan_main)"/>
+            <input type="text" class="input input-sm acc-url" placeholder="YouTube link — https://youtube.com/watch?v=..."/>
           </div>
-          <div class="yt-input">
-            <span class="yt-label">YouTube URL</span>
-            <input type="text" placeholder="https://youtube.com/watch?v=..." />
-          </div>
+          <button class="acc-rm" onclick="rmAcc(this)">×</button>
         </div>
       </div>
-      <button class="add-account-btn" onclick="addAccount()">+ Add another account</button>
+      <button class="add-acc" onclick="addAcc()">+ Add another account</button>
 
-      <div class="error" id="join-error"></div>
-      <button class="btn btn-khem" id="join-btn" onclick="startSession()" style="margin-top:.5rem;">
-        🎬 Start streaming
-      </button>
-    </div>
-
-    <div class="card">
-      <div class="sec-head" style="margin-bottom:1rem;">
-        <h2>Leaderboard</h2>
-        <p>Top streamers across both teams</p>
+      <div class="field-group">
+        <label class="field-label">Choose your team</label>
+        <div class="team-grid">
+          <button class="team-card" onclick="pickTeam('khem',this)">
+            <div class="tc-check">✓</div>
+            <span class="tc-icon">💙</span>
+            <span class="tc-name nk">Team Khem</span>
+            <span class="tc-count" id="k-count">0 members streaming</span>
+          </button>
+          <button class="team-card" onclick="pickTeam('pharan',this)">
+            <div class="tc-check">✓</div>
+            <span class="tc-icon">🧡</span>
+            <span class="tc-name np">Team Pharan</span>
+            <span class="tc-count" id="p-count">0 members streaming</span>
+          </button>
+        </div>
       </div>
-      <div id="lb-join"></div>
+
+      <div class="err-msg" id="reg-err"></div>
+      <button class="btn btn-primary btn-block" id="go-btn" onclick="goStream()">🎬 Set up my stream session</button>
     </div>
   </div>
 
-  <div id="step-stream">
-    <button class="back-btn" onclick="stopSession()">← Stop & save session</button>
-
-    <div class="timer-hero">
-      <div class="status-banner waiting" id="status-banner">⏳ Open your tabs below to start the timer</div>
-      <div class="timer-lbl" id="live-dot">⏱️ Session timer</div>
-      <div class="timer-display" id="timer-display" style="color:var(--khem);">0:00:00</div>
-      <div class="session-lbl">Streaming as <strong id="session-accounts-lbl"></strong> — <strong id="session-team-lbl"></strong></div>
-    </div>
-
-    <div class="card" style="padding:1rem 1.25rem;">
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Open each tab, log in, and start watching</div>
-      <div id="open-tabs-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <button class="btn btn-outline" onclick="openAllTabs()">
-          🔗 Open all tabs
-        </button>
-        <button class="btn btn-green" id="start-timer-btn" onclick="startTimerManually()">
-          ▶️ Start timer
-        </button>
+  <!-- LEADERBOARD -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">🏆 Leaderboard</span></div>
+    <div class="card-body-sm">
+      <div class="lb-tabs">
+        <button class="lb-tab on" onclick="lbSwitch(this,'all','lb-reg')">All streamers</button>
+        <button class="lb-tab" onclick="lbSwitch(this,'khem','lb-reg')">💙 Khem</button>
+        <button class="lb-tab" onclick="lbSwitch(this,'pharan','lb-reg')">🧡 Pharan</button>
       </div>
-      <p style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center;">⚠️ Make sure you're logged in on each tab before starting the timer</p>
+      <div id="lb-reg"></div>
     </div>
+  </div>
 
-    <div class="card" style="padding:1rem 1.25rem;">
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Your accounts this session</div>
-      <div class="acc-active-list" id="acc-active-list"></div>
+  <!-- HYPE CHAT (on register page) -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">💬 Fandom Hype Chat</span>
+      <span style="font-size:11px;color:var(--text3);font-weight:500;">Log in first to chat</span>
     </div>
+    <div class="chat-wrap">
+      <div class="chat-feed" id="chat-feed-reg">
+        <div class="chat-msg sys"><span class="chat-sys-pill">👋 Welcome to the OhOh stream battle!</span></div>
+        <div class="chat-msg sys"><span class="chat-sys-pill">Register above to join the battle and chat</span></div>
+      </div>
+      <div class="chat-login-notice">Register above to join the chat 💙🧡</div>
+    </div>
+  </div>
 
-    <div class="card" style="padding:1rem 1.25rem;">
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:8px;">Session badges</div>
-      <div class="badges-row" id="badges-row">
-        <div class="badge" id="badge-15"><span class="badge-icon">⏱️</span>15 min warrior</div>
-        <div class="badge" id="badge-30"><span class="badge-icon">🔥</span>30 min streamer</div>
-        <div class="badge" id="badge-60"><span class="badge-icon">👑</span>1 hour legend</div>
-        <div class="badge" id="badge-multi"><span class="badge-icon">🖥️</span>Multi-account pro</div>
+</div><!-- end s-reg -->
+
+<!-- ══ STEP: STREAMING ══ -->
+<div id="s-stream" class="step">
+
+  <button class="back-link" onclick="goBack()">← Back to registration</button>
+
+  <div class="sess-hero hk" id="sess-hero">
+    <div class="sh-eyebrow" id="sh-eye">⏳ Ready — open your tabs below</div>
+    <div class="sh-timer" id="sh-timer">0:00:00</div>
+    <div class="sh-accs" id="sh-accs"></div>
+    <div class="sh-team" id="sh-team"></div>
+  </div>
+
+  <div class="status-bar sb-wait" id="status-bar">⏳ Open your YouTube tabs, log in to each account, then click Start Timer</div>
+
+  <div class="card section-gap">
+    <div class="card-header"><span class="card-title">Open your tabs</span></div>
+    <div class="card-body-sm">
+      <div class="open-tabs" id="open-tabs"></div>
+      <div class="two-col">
+        <button class="btn btn-outline" onclick="openAll()">🔗 Open all tabs</button>
+        <button class="btn btn-success" id="timer-btn" onclick="startTimer()">▶ Start timer</button>
+      </div>
+      <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center;font-weight:500;">Log in to each account before starting the timer!</p>
+    </div>
+  </div>
+
+  <div class="card section-gap">
+    <div class="card-header"><span class="card-title">Your accounts</span></div>
+    <div class="card-body-sm">
+      <div class="acc-live" id="acc-live"></div>
+    </div>
+  </div>
+
+  <div class="card section-gap">
+    <div class="card-header"><span class="card-title">🎖 Session badges</span></div>
+    <div class="card-body-sm">
+      <div class="badges">
+        <div class="badge" id="b15">⏱ 15 min warrior</div>
+        <div class="badge" id="b30">🔥 30 min streamer</div>
+        <div class="badge" id="b60">👑 1 hour legend</div>
+        <div class="badge" id="b120">🏆 2 hour champion</div>
+        <div class="badge" id="bmulti">🖥 Multi-account pro</div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="sec-head" style="margin-bottom:1rem;">
-        <h2>Live leaderboard</h2>
+  <!-- LIVE LEADERBOARD -->
+  <div class="card section-gap">
+    <div class="card-header"><span class="card-title">🏆 Live leaderboard</span></div>
+    <div class="card-body-sm">
+      <div class="lb-tabs">
+        <button class="lb-tab on" onclick="lbSwitch(this,'all','lb-stream')">All</button>
+        <button class="lb-tab" onclick="lbSwitch(this,'khem','lb-stream')">💙 Khem</button>
+        <button class="lb-tab" onclick="lbSwitch(this,'pharan','lb-stream')">🧡 Pharan</button>
       </div>
       <div id="lb-stream"></div>
     </div>
-
-    <button class="btn btn-outline" onclick="stopSession()" style="margin-top:.5rem;">⏹ Stop session & save</button>
   </div>
-</div>
 
-<footer>Made with 💙🧡 by OhOh Fandom for KengNamping</footer>
+  <!-- HYPE CHAT (on stream page) -->
+  <div class="card section-gap">
+    <div class="card-header">
+      <span class="card-title">💬 Fandom Hype Chat</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="live-dot" style="width:6px;height:6px;background:var(--green);border-radius:50%;"></div>
+        <span style="font-size:11px;color:var(--green);font-weight:700;" id="chat-online-count">0 online</span>
+      </div>
+    </div>
+    <div class="chat-wrap">
+      <div class="quick-reacts">
+        <button class="react-btn" onclick="sendReact('💙 Team Khem fighting!')">💙 Khem!</button>
+        <button class="react-btn" onclick="sendReact('🧡 Team Pharan fighting!')">🧡 Pharan!</button>
+        <button class="react-btn" onclick="sendReact('🔥 Let\'s gooo!')">🔥 Let's go!</button>
+        <button class="react-btn" onclick="sendReact('👑 KengNamping forever!')">👑 KengNamping</button>
+        <button class="react-btn" onclick="sendReact('📺 Keep streaming everyone!')">📺 Keep streaming</button>
+        <button class="react-btn" onclick="sendReact('⚡ Almost there!')">⚡ Almost!</button>
+      </div>
+      <div class="chat-feed" id="chat-feed"></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Hype up your team..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg()"/>
+        <button class="chat-send" onclick="sendMsg()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-danger btn-block" onclick="stopStream()" style="margin-bottom:1rem;">⏹ Stop session & save my time</button>
+
+</div><!-- end s-stream -->
+
+</div><!-- main -->
+<footer>Made with 💙🧡 by OhOh Fandom · KengNamping Stream Battle · All times saved locally</footer>
 
 <script>
-  const DB_KEY = 'ohoh_v3';
-  let db = {};
-  let selectedTeam = null;
-  let sessionAccounts = [];
-  let sessionStart = null;
-  let timerInterval = null;
-  let sessionSeconds = 0;
-  let timerStarted = false;
+const LS_DATA = 'ohoh_v6_data';
+const LS_CHAT = 'ohoh_v6_chat';
+let db = {};
+let chat = [];
+let myTeam = null;
+let myAccs = [];
+let myKey = '';
+let sessStart = null;
+let sessSecs = 0;
+let ticker = null;
+let timerGoing = false;
+let lbFilter = {'lb-reg':'all','lb-stream':'all'};
+let earnedSet = new Set();
+let openedSet = new Set();
+let chatPollInterval = null;
+let lastChatLen = 0;
 
-  // Load from localStorage
-  function loadDB() {
-    try {
-      const raw = localStorage.getItem(DB_KEY);
-      if (raw) db = JSON.parse(raw);
-    } catch(e) { db = {}; }
-    renderAll();
-  }
+// ── CLOCK ─────────────────────────────────────────────────
+function updateClock(){
+  const now = new Date();
+  document.getElementById('nb-clock').textContent =
+    now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
 
-  function saveDB() {
-    try {
-      localStorage.setItem(DB_KEY, JSON.stringify(db));
-    } catch(e) {}
-  }
+// ── STORAGE ───────────────────────────────────────────────
+function load(){
+  try{ const r=localStorage.getItem(LS_DATA); if(r) db=JSON.parse(r); }catch(e){ db={}; }
+  try{ const r=localStorage.getItem(LS_CHAT); if(r) chat=JSON.parse(r); }catch(e){ chat=[]; }
+  renderAll(); renderChat('chat-feed-reg'); renderChat('chat-feed');
+}
+function save(){ try{ localStorage.setItem(LS_DATA,JSON.stringify(db)); }catch(e){} }
+function saveChat(){ try{ localStorage.setItem(LS_CHAT,JSON.stringify(chat.slice(-200))); }catch(e){} }
 
-  function fmtTime(secs) {
-    if (secs < 0) secs = 0;
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = Math.floor(secs % 60);
-    return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }
+// ── FORMAT ────────────────────────────────────────────────
+function fmt(s){
+  if(s<0)s=0;
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function initials(n){ return n.replace(/^@/,'').slice(0,2).toUpperCase()||'??'; }
+function tsNow(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 
-  function selectTeam(team, el) {
-    selectedTeam = team;
-    document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
-    const joinBtn = document.getElementById('join-btn');
-    joinBtn.className = `btn btn-${team}`;
-    joinBtn.textContent = team === 'khem' ? '💙 Start streaming for Team Khem' : '🧡 Start streaming for Team Pharan';
-  }
+// ── TOAST ─────────────────────────────────────────────────
+let toastTimer;
+function toast(msg,ms=3500){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),ms);
+}
 
-  function addAccount() {
-    const list = document.getElementById('accounts-list');
-    const row = document.createElement('div');
-    row.className = 'account-row';
-    row.innerHTML = `
-      <div class="row-header">
-        <input type="text" placeholder="@account${list.children.length+1}" />
-        <button class="rm-btn" onclick="removeAccount(this)">×</button>
+// ── TEAM PICK ─────────────────────────────────────────────
+function pickTeam(team,el){
+  myTeam=team;
+  document.querySelectorAll('.team-card').forEach(b=>{ b.classList.remove('sel-k','sel-p'); });
+  el.classList.add(team==='khem'?'sel-k':'sel-p');
+  const btn=document.getElementById('go-btn');
+  btn.className='btn btn-block '+(team==='khem'?'btn-primary':'btn-ora');
+  btn.textContent=team==='khem'?'💙 Join as Team Khem':'🧡 Join as Team Pharan';
+}
+
+// ── ADD/REMOVE ACCOUNTS ───────────────────────────────────
+function addAcc(){
+  const list=document.getElementById('acc-list');
+  const n=list.children.length+1;
+  const d=document.createElement('div'); d.className='acc-item';
+  d.innerHTML=`<div class="acc-fields">
+    <input type="text" class="input input-sm acc-name" placeholder="@account${n}"/>
+    <input type="text" class="input input-sm acc-url" placeholder="YouTube link — https://youtube.com/watch?v=..."/>
+  </div><button class="acc-rm" onclick="rmAcc(this)">×</button>`;
+  list.appendChild(d);
+}
+function rmAcc(btn){
+  const list=document.getElementById('acc-list');
+  if(list.children.length>1) btn.closest('.acc-item').remove();
+}
+function showErr(id,msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display=msg?'block':'none'; }
+
+// ── GO STREAM ─────────────────────────────────────────────
+function goStream(){
+  const err=document.getElementById('reg-err');
+  if(!myTeam){ showErr('reg-err','Please choose your team first!'); return; }
+  const names=[...document.querySelectorAll('.acc-name')].map(i=>i.value.trim().replace(/^@/,''));
+  const urls=[...document.querySelectorAll('.acc-url')].map(i=>i.value.trim());
+  const accs=names.map((n,i)=>({name:n,url:urls[i]||''})).filter(a=>a.name);
+  if(!accs.length){ showErr('reg-err','Enter at least one account name.'); return; }
+  showErr('reg-err','');
+
+  myAccs=accs; myKey=accs[0].name.toLowerCase();
+  timerGoing=false; sessSecs=0; earnedSet=new Set(); openedSet=new Set();
+
+  // Switch step
+  document.getElementById('s-reg').classList.remove('on');
+  document.getElementById('s-stream').classList.add('on');
+  window.scrollTo(0,0);
+
+  // Hero
+  const hero=document.getElementById('sess-hero');
+  hero.className='sess-hero '+(myTeam==='khem'?'hk':'hp');
+  document.getElementById('sh-timer').textContent='0:00:00';
+  document.getElementById('sh-accs').textContent=accs.map(a=>'@'+a.name).join(' · ');
+  document.getElementById('sh-team').textContent='Streaming for Team '+(myTeam==='khem'?'Khem 💙':'Pharan 🧡');
+  document.getElementById('sh-eye').textContent='⏳ Ready — open your tabs below';
+  document.getElementById('status-bar').className='status-bar sb-wait';
+  document.getElementById('status-bar').textContent='⏳ Open your YouTube tabs, log in, then click Start Timer';
+  document.getElementById('timer-btn').disabled=false;
+  document.getElementById('timer-btn').textContent='▶ Start timer';
+
+  // Open tabs
+  const ot=document.getElementById('open-tabs');
+  ot.innerHTML=accs.map((a,i)=>`
+    <div class="open-tab-row" id="otr-${i}">
+      <div class="otr-left">
+        <div class="otr-acc">@${a.name}</div>
+        <div class="otr-url">${a.url||'No link entered'}</div>
       </div>
-      <div class="yt-input">
-        <span class="yt-label">YouTube URL</span>
-        <input type="text" placeholder="https://youtube.com/watch?v=..." />
+      <div class="otr-right">
+        ${a.url?`<button class="btn btn-dark btn-xs" onclick="openTab(${i},'${encodeURIComponent(a.url)}')">Open ↗</button>`:'<span style="font-size:11px;color:var(--text3);">No link</span>'}
       </div>
-    `;
-    list.appendChild(row);
-  }
+    </div>`).join('');
 
-  function removeAccount(btn) {
-    const list = document.getElementById('accounts-list');
-    if (list.children.length > 1) {
-      btn.closest('.account-row').remove();
+  // Acc live
+  const al=document.getElementById('acc-live');
+  al.innerHTML=accs.map(a=>`
+    <div class="acc-live-row">
+      <div class="alr-left">
+        <div class="alr-avatar a${myTeam==='khem'?'k':'p'}">${initials(a.name)}</div>
+        <div class="alr-name">@${a.name}</div>
+      </div>
+      <div class="alr-time" id="alt-${safe(a.name)}">0:00:00</div>
+    </div>`).join('');
+
+  // Badges reset
+  ['b15','b30','b60','b120','bmulti'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('got'); });
+
+  // Post system chat msg
+  postSysMsg(`🎬 @${accs[0].name} joined Team ${myTeam==='khem'?'Khem 💙':'Pharan 🧡'} and started streaming!`);
+
+  renderAll();
+  startChatPoll();
+}
+
+function safe(n){ return n.replace(/\W/g,'_'); }
+
+function openTab(i,encUrl){
+  window.open(decodeURIComponent(encUrl),'_blank');
+  openedSet.add(i);
+  const row=document.getElementById('otr-'+i);
+  if(row){
+    const btn=row.querySelector('.btn-xs');
+    if(btn) btn.outerHTML='<span class="tag-opened">✅ Opened</span>';
+  }
+}
+function openAll(){ myAccs.forEach((a,i)=>{ if(a.url) openTab(i,encodeURIComponent(a.url)); }); }
+
+// ── TIMER ─────────────────────────────────────────────────
+function startTimer(){
+  if(timerGoing) return;
+  timerGoing=true;
+  sessStart=Date.now()-(sessSecs*1000);
+  document.getElementById('sh-eye').textContent='🔴 Live — keep those tabs open!';
+  document.getElementById('status-bar').className='status-bar sb-live';
+  document.getElementById('status-bar').textContent='🔴 Timer running! Watch the video on all your tabs.';
+  document.getElementById('timer-btn').disabled=true;
+  document.getElementById('timer-btn').textContent='⏱ Running...';
+  if(ticker) clearInterval(ticker);
+  ticker=setInterval(tick,1000);
+  toast('🎬 Stream timer started! Keep those tabs open!');
+  postSysMsg(`⏱ @${myAccs[0].name}'s timer has started!`);
+}
+
+function tick(){
+  sessSecs=Math.floor((Date.now()-sessStart)/1000);
+  document.getElementById('sh-timer').textContent=fmt(sessSecs);
+  myAccs.forEach(a=>{ const el=document.getElementById('alt-'+safe(a.name)); if(el) el.textContent=fmt(sessSecs); });
+  tryBadge('b15',900,'⏱ 15 min warrior badge unlocked!');
+  tryBadge('b30',1800,'🔥 30 min streamer badge — you\'re on fire!');
+  tryBadge('b60',3600,'👑 1 hour legend — incredible dedication!');
+  tryBadge('b120',7200,'🏆 2 hour champion — absolute GOAT!');
+  if(myAccs.length>=2&&!earnedSet.has('bmulti')){
+    earnedSet.add('bmulti');
+    const el=document.getElementById('bmulti'); if(el) el.classList.add('got');
+    toast('🖥 Multi-account pro badge unlocked!'); }
+  if(sessSecs%15===0){ saveLive(); renderAll(); }
+}
+
+function tryBadge(id,secs,msg){
+  if(sessSecs>=secs&&!earnedSet.has(id)){
+    earnedSet.add(id);
+    const el=document.getElementById(id); if(el) el.classList.add('got');
+    toast(msg,4500);
+    postSysMsg(`🎖 @${myAccs[0].name} earned the "${el?el.textContent.trim():id}" badge!`);
+  }
+}
+
+function saveLive(){
+  const key=myKey;
+  if(!db[key]) db[key]={name:myAccs[0].name,team:myTeam,totalSecs:0,sessions:0,accounts:myAccs.map(a=>a.name)};
+  db[key].liveSecs=sessSecs; db[key].isLive=true;
+  save();
+}
+
+function stopStream(){
+  if(!confirm('Stop your stream session and save your time?')) return;
+  if(ticker){ clearInterval(ticker); ticker=null; }
+  if(chatPollInterval){ clearInterval(chatPollInterval); chatPollInterval=null; }
+  const elapsed=timerGoing?sessSecs:0;
+  if(elapsed>0){
+    const key=myKey;
+    if(!db[key]) db[key]={name:myAccs[0].name,team:myTeam,totalSecs:0,sessions:0,accounts:[]};
+    db[key].name=myAccs[0].name; db[key].team=myTeam;
+    db[key].totalSecs=(db[key].totalSecs||0)+elapsed;
+    db[key].sessions=(db[key].sessions||0)+1;
+    db[key].accounts=[...new Set([...(db[key].accounts||[]),...myAccs.map(a=>a.name)])];
+    db[key].isLive=false; db[key].liveSecs=0;
+    save();
+    postSysMsg(`✅ @${myAccs[0].name} finished a session — ${fmt(elapsed)} added! Amazing streaming!`);
+    toast(`✅ ${fmt(elapsed)} saved to your total!`,5000);
+  }
+  resetSession();
+}
+
+function goBack(){
+  if(timerGoing){ if(!confirm('Going back will stop your timer. Continue?')) return; stopStream(); return; }
+  resetSession();
+}
+
+function resetSession(){
+  if(ticker){ clearInterval(ticker); ticker=null; }
+  if(chatPollInterval){ clearInterval(chatPollInterval); chatPollInterval=null; }
+  timerGoing=false; sessSecs=0; myTeam=null; myAccs=[]; myKey='';
+  earnedSet=new Set(); openedSet=new Set();
+  document.querySelectorAll('.team-card').forEach(b=>b.classList.remove('sel-k','sel-p'));
+  document.getElementById('go-btn').className='btn btn-primary btn-block';
+  document.getElementById('go-btn').textContent='🎬 Set up my stream session';
+  document.getElementById('s-stream').classList.remove('on');
+  document.getElementById('s-reg').classList.add('on');
+  renderAll(); renderChat('chat-feed-reg');
+  window.scrollTo(0,0);
+}
+
+// ── CHAT ──────────────────────────────────────────────────
+function postSysMsg(txt){
+  chat.push({type:'sys',text:txt,ts:tsNow()});
+  saveChat(); renderChat('chat-feed'); renderChat('chat-feed-reg');
+}
+
+function sendMsg(){
+  if(!myKey){ toast('Register first to chat!'); return; }
+  const inp=document.getElementById('chat-input');
+  const txt=inp.value.trim(); if(!txt) return;
+  inp.value='';
+  chat.push({type:'msg',sender:myAccs[0]?.name||myKey,team:myTeam,text:txt,ts:tsNow()});
+  saveChat(); renderChat('chat-feed'); renderChat('chat-feed-reg');
+}
+
+function sendReact(txt){
+  if(!myKey){ toast('Register first to react!'); return; }
+  chat.push({type:'msg',sender:myAccs[0]?.name||myKey,team:myTeam,text:txt,ts:tsNow()});
+  saveChat(); renderChat('chat-feed'); renderChat('chat-feed-reg');
+}
+
+function renderChat(feedId){
+  const feed=document.getElementById(feedId); if(!feed) return;
+  const atBottom=feed.scrollHeight-feed.scrollTop-feed.clientHeight<60;
+  feed.innerHTML=chat.slice(-60).map(m=>{
+    if(m.type==='sys') return `<div class="chat-msg sys"><span class="chat-sys-pill">${escHtml(m.text)}</span></div>`;
+    const cls=m.team==='khem'?'ck':'cp';
+    const bcls=m.team==='khem'?'bk':'bp';
+    return `<div class="chat-msg">
+      <div class="chat-avatar ${cls}">${initials(m.sender)}</div>
+      <div class="chat-bubble-wrap">
+        <div class="chat-meta">
+          <span class="chat-sender ${cls}">@${escHtml(m.sender)}</span>
+          <span class="chat-ts">${m.ts}</span>
+        </div>
+        <div class="chat-bubble ${bcls}">${escHtml(m.text)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if(atBottom||feed.scrollHeight<400) feed.scrollTop=feed.scrollHeight;
+
+  // Online count (rough)
+  const liveCount=Object.values(db).filter(u=>u.isLive).length;
+  const oc=document.getElementById('chat-online-count');
+  if(oc) oc.textContent=Math.max(liveCount,myKey?1:0)+' online';
+}
+
+function escHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function startChatPoll(){
+  if(chatPollInterval) clearInterval(chatPollInterval);
+  chatPollInterval=setInterval(()=>{
+    try{
+      const r=localStorage.getItem(LS_CHAT);
+      if(r){ const fresh=JSON.parse(r); if(fresh.length!==lastChatLen){ chat=fresh; lastChatLen=chat.length; renderChat('chat-feed'); renderChat('chat-feed-reg'); }}
+    }catch(e){}
+  },2000);
+}
+
+// ── RENDER VS ─────────────────────────────────────────────
+function effSecs(u){
+  let s=u.totalSecs||0;
+  if(u.isLive&&u.liveSecs) s+=u.liveSecs;
+  if(myKey&&u.name&&u.name.toLowerCase()===myKey&&timerGoing) s=(u.totalSecs||0)+sessSecs;
+  return s;
+}
+
+function renderVS(){
+  let ks=0,kn=0,kse=0,ps=0,pn=0,pse=0;
+  Object.values(db).forEach(u=>{
+    const s=effSecs(u);
+    if(u.team==='khem'){ks+=s;kn++;kse+=(u.sessions||0);}
+    else{ps+=s;pn++;pse+=(u.sessions||0);}
+  });
+  if(timerGoing&&myTeam){ if(myTeam==='khem')ks+=sessSecs; else ps+=sessSecs; }
+  document.getElementById('k-time').textContent=fmt(ks);
+  document.getElementById('p-time').textContent=fmt(ps);
+  document.getElementById('k-meta').textContent=`${kn} streamer${kn!==1?'s':''} · ${kse} session${kse!==1?'s':''}`;
+  document.getElementById('p-meta').textContent=`${pn} streamer${pn!==1?'s':''} · ${pse} session${pse!==1?'s':''}`;
+  document.getElementById('k-count').textContent=kn+' member'+(kn!==1?'s':'')+' streaming';
+  document.getElementById('p-count').textContent=pn+' member'+(pn!==1?'s':'')+' streaming';
+  const total=ks+ps||1;
+  const kp=Math.max(5,Math.min(95,Math.round(ks/total*100)));
+  document.getElementById('bp-k').style.width=kp+'%';
+  document.getElementById('bp-p').style.width=(100-kp)+'%';
+  const diff=Math.abs(ks-ps);
+  const vd=document.getElementById('verdict');
+  const fd=diff<60?`${diff}s`:fmt(diff);
+  if(ks===0&&ps===0){vd.className='verdict-tie';vd.textContent='⚔️ Tied — every second counts!';}
+  else if(ks>ps){vd.className='verdict-k';vd.textContent=diff<120?`💙 Khem leads by only ${fd} — fight back Pharan!`:`💙 Team Khem leads by ${fd}!`;}
+  else if(ps>ks){vd.className='verdict-p';vd.textContent=diff<120?`🧡 Pharan leads by only ${fd} — come on Khem!`:`🧡 Team Pharan leads by ${fd}!`;}
+  else{vd.className='verdict-tie';vd.textContent='⚔️ Perfectly tied — every second counts!';}
+}
+
+function renderLB(id){
+  const el=document.getElementById(id); if(!el) return;
+  const f=lbFilter[id]||'all';
+  let entries=Object.entries(db).map(([k,u])=>({...u,key:k,eff:effSecs(u)}));
+  if(f==='khem') entries=entries.filter(u=>u.team==='khem');
+  if(f==='pharan') entries=entries.filter(u=>u.team==='pharan');
+  entries.sort((a,b)=>b.eff-a.eff);
+  if(!entries.length){el.innerHTML='<div class="lb-empty">No streamers yet — be the first! 🎬</div>';return;}
+  const rk=['r1','r2','r3'];
+  const isMe=e=>myKey&&e.key===myKey;
+  el.innerHTML=entries.slice(0,20).map((u,i)=>{
+    const cls=u.team==='khem'?'ek':'ep';
+    const avcls=u.team==='khem'?'lk':'lp';
+    const rc=i<3?rk[i]:'';
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+    const tpill=u.team==='khem'?'<span class="pill pill-k">KHEM</span>':'<span class="pill pill-p">PHARAN</span>';
+    const livepill=u.isLive?'<span class="pill pill-live">LIVE</span>':'';
+    const mepill=isMe(u)?'<span class="pill pill-you">YOU</span>':'';
+    return `<div class="lb-entry ${cls}">
+      <div class="lb-rank ${rc}">${medal}</div>
+      <div class="lb-avatar ${avcls}">${initials(u.name||u.key)}</div>
+      <div class="lb-body">
+        <div class="lb-name">@${u.name||u.key}${tpill}${livepill}${mepill}</div>
+        <div class="lb-detail">${u.sessions||0} session${(u.sessions||0)!==1?'s':''} · ${(u.accounts||[]).length||1} account${((u.accounts||[]).length||1)!==1?'s':''}</div>
+      </div>
+      <div class="lb-time-col">
+        <div class="lb-time t${u.team==='khem'?'k':'p'}">${fmt(u.eff)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAll(){ renderVS(); renderLB('lb-reg'); renderLB('lb-stream'); }
+
+function lbSwitch(el,f,id){
+  lbFilter[id]=f;
+  el.closest('.lb-tabs').querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on'); renderLB(id);
+}
+
+// ── SAVE ON CLOSE ─────────────────────────────────────────
+window.addEventListener('beforeunload',()=>{
+  if(!timerGoing||!myKey) return;
+  if(ticker) clearInterval(ticker);
+  if(!db[myKey]) db[myKey]={name:myAccs[0]?.name||myKey,team:myTeam,totalSecs:0,sessions:0,accounts:[]};
+  db[myKey].totalSecs=(db[myKey].totalSecs||0)+sessSecs;
+  db[myKey].sessions=(db[myKey].sessions||0)+1;
+  db[myKey].isLive=false; db[myKey].liveSecs=0;
+  db[myKey].accounts=[...new Set([...(db[myKey].accounts||[]),...myAccs.map(a=>a.name)])];
+  try{ localStorage.setItem(LS_DATA,JSON.stringify(db)); }catch(e){}
+});
+
+// ── LIVE SYNC POLL ────────────────────────────────────────
+setInterval(()=>{
+  try{
+    const r=localStorage.getItem(LS_DATA);
+    if(r){
+      const fresh=JSON.parse(r);
+      Object.entries(fresh).forEach(([k,v])=>{ if(k!==myKey) db[k]=v; });
     }
-  }
+  }catch(e){}
+  renderAll();
+},4000);
 
-  function showError(id, msg) {
-    const el = document.getElementById(id);
-    el.textContent = msg;
-    el.style.display = msg ? 'block' : 'none';
-  }
-
-  function startSession() {
-    if (!selectedTeam) { 
-      showError('join-error', 'Please choose your team first.'); 
-      return; 
-    }
-    
-    const rows = document.querySelectorAll('#accounts-list .account-row');
-    const accounts = [];
-    const urls = [];
-    
-    rows.forEach(row => {
-      const nameInput = row.querySelector('.row-header input');
-      const urlInput = row.querySelector('.yt-input input');
-      const name = nameInput.value.trim().replace(/^@/, '');
-      const url = urlInput.value.trim();
-      
-      if (name) {
-        accounts.push(name);
-        urls.push(url || '');
-      }
-    });
-      
-    if (!accounts.length) { 
-      showError('join-error', 'Please enter at least one account name.'); 
-      return; 
-    }
-    
-    showError('join-error', '');
-
-    sessionAccounts = accounts.map((name, i) => ({
-      name: name,
-      url: urls[i] || ''
-    }));
-    
-    timerStarted = false;
-    sessionSeconds = 0;
-
-    document.getElementById('step-join').classList.remove('active');
-    document.getElementById('step-stream').classList.add('active');
-    window.scrollTo(0, 0);
-
-    const teamColor = selectedTeam === 'khem' ? 'var(--khem)' : 'var(--pharan)';
-    const timerDisplay = document.getElementById('timer-display');
-    timerDisplay.style.color = teamColor;
-    timerDisplay.textContent = '0:00:00';
-    document.getElementById('session-accounts-lbl').textContent = accounts.map(a => '@' + a).join(', ');
-    document.getElementById('session-team-lbl').textContent = 'Team ' + (selectedTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
-    document.getElementById('status-banner').className = 'status-banner waiting';
-    document.getElementById('status-banner').textContent = '⏳ Open your tabs below to start the timer';
-
-    // Build open-tabs list
-    const tabsList = document.getElementById('open-tabs-list');
-    tabsList.innerHTML = sessionAccounts.map((acc, index) => {
-      const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
-      const urlWithParam = acc.url ? (acc.url.includes('?') ? `${acc.url}&${teamParam}` : `${acc.url}?${teamParam}`) : '';
-      return `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sage-light);border-radius:8px;border:1px solid var(--sage);">
-          <span style="font-size:14px;font-weight:500;">@${acc.name}</span>
-          <div style="display:flex;gap:6px;align-items:center;">
-            ${acc.url ? `<button onclick="window.open('${urlWithParam}','_blank')" style="height:30px;padding:0 12px;border-radius:6px;background:var(--khem);color:white;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Open tab ↗</button>` : '<span style="font-size:12px;color:var(--text-muted);">No link</span>'}
-            <span class="acc-status not-opened" id="status-${index}">⏳ Not opened</span>
-          </div>
-        </div>`;
-    }).join('');
-
-    // Active accounts
-    const accList = document.getElementById('acc-active-list');
-    accList.innerHTML = sessionAccounts.map(acc => `
-      <div class="acc-active-row">
-        <div class="acc-name">@${acc.name}</div>
-        <div class="acc-time" id="acc-time-${acc.name.replace(/\W/g,'_')}">0:00:00</div>
-      </div>`).join('');
-
-    // Reset badges
-    document.querySelectorAll('.badge').forEach(b => b.classList.remove('earned'));
-
-    // Enable start timer button
-    document.getElementById('start-timer-btn').disabled = false;
-  }
-
-  function openAllTabs() {
-    sessionAccounts.forEach((acc, index) => {
-      if (acc.url) {
-        const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
-        const urlWithParam = acc.url.includes('?') ? `${acc.url}&${teamParam}` : `${acc.url}?${teamParam}`;
-        window.open(urlWithParam, '_blank');
-        const statusEl = document.getElementById(`status-${index}`);
-        if (statusEl) {
-          statusEl.className = 'acc-status opened';
-          statusEl.textContent = '✅ Opened';
-        }
-      }
-    });
-  }
-
-  function startTimerManually() {
-    if (timerStarted) return;
-    
-    timerStarted = true;
-    sessionStart = Date.now() - (sessionSeconds * 1000);
-    
-    document.getElementById('status-banner').className = 'status-banner live';
-    document.getElementById('status-banner').textContent = '🔴 Live streaming! Timer is running.';
-    document.getElementById('start-timer-btn').disabled = true;
-    document.getElementById('start-timer-btn').textContent = '⏱️ Timer running...';
-
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(tick, 1000);
-  }
-
-  function tick() {
-    if (!sessionStart) return;
-    sessionSeconds = Math.floor((Date.now() - sessionStart) / 1000);
-    document.getElementById('timer-display').textContent = fmtTime(sessionSeconds);
-
-    sessionAccounts.forEach(acc => {
-      const el = document.getElementById('acc-time-' + acc.name.replace(/\W/g, '_'));
-      if (el) el.textContent = fmtTime(sessionSeconds);
-    });
-
-    if (sessionSeconds >= 900) document.getElementById('badge-15').classList.add('earned');
-    if (sessionSeconds >= 1800) document.getElementById('badge-30').classList.add('earned');
-    if (sessionSeconds >= 3600) document.getElementById('badge-60').classList.add('earned');
-    if (sessionAccounts.length >= 2) document.getElementById('badge-multi').classList.add('earned');
-
-    renderVS();
-    renderLB('lb-stream');
-  }
-
-  function stopSession() {
-    if (timerInterval) { 
-      clearInterval(timerInterval); 
-      timerInterval = null; 
-    }
-    
-    const elapsed = timerStarted ? sessionSeconds : 0;
-
-    if (timerStarted) {
-      sessionAccounts.forEach(acc => {
-        const key = acc.name.toLowerCase().trim();
-        if (!key) return;
-        if (!db[key]) db[key] = { team: selectedTeam, accounts: [], totalSecs: 0, sessions: 0 };
-        db[key].team = selectedTeam;
-        db[key].totalSecs = (db[key].totalSecs || 0) + elapsed;
-        db[key].sessions = (db[key].sessions || 0) + 1;
-        if (!db[key].accounts) db[key].accounts = [];
-        sessionAccounts.forEach(a => { 
-          if (a.name && !db[key].accounts.includes(a.name)) db[key].accounts.push(a.name); 
-        });
-      });
-
-      saveDB();
-    }
-
-    renderAll();
-
-    document.getElementById('step-stream').classList.remove('active');
-    document.getElementById('
+load();
+</script>
+</body>
+</html>
