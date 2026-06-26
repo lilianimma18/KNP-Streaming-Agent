@@ -35,6 +35,7 @@
       --border: #e8e0d4;
       --radius: 16px;
       --radius-sm: 10px;
+      --green: #22c55e;
     }
     nav {
       display: flex;
@@ -161,13 +162,23 @@
     .team-btn.khem-btn .t-name { color: var(--khem); }
     .team-btn.pharan-btn .t-name { color: var(--pharan); }
     .team-btn .t-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .accounts-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .accounts-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
     .account-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: var(--sage-light);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--sage);
+      position: relative;
+    }
+    .account-row .row-header {
       display: flex;
       gap: 8px;
       align-items: center;
     }
-    .account-row input {
+    .account-row .row-header input[type="text"] {
       flex: 1;
       height: 40px;
       border: 1.5px solid var(--border);
@@ -179,7 +190,7 @@
       background: white;
       outline: none;
     }
-    .account-row input:focus { border-color: var(--khem); }
+    .account-row .row-header input:focus { border-color: var(--khem); }
     .account-row .rm-btn {
       width: 32px;
       height: 32px;
@@ -198,6 +209,30 @@
       background: #fee2e2;
       border-color: #fca5a5;
       color: #dc2626;
+    }
+    .account-row .yt-input {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .account-row .yt-input input {
+      flex: 1;
+      height: 36px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 12px;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--text);
+      background: white;
+      outline: none;
+    }
+    .account-row .yt-input input:focus { border-color: var(--khem); }
+    .account-row .yt-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      min-width: 60px;
     }
     .add-account-btn {
       background: none;
@@ -266,6 +301,15 @@
       border: 1.5px solid var(--border);
     }
     .btn-outline:hover { border-color: var(--khem); color: var(--khem); }
+    .btn-green {
+      background: var(--green);
+      color: white;
+    }
+    .btn-green:hover { background: #16a34a; }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .timer-hero {
       text-align: center;
       padding: 2rem 1rem;
@@ -314,6 +358,14 @@
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
     }
+    .acc-status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 12px;
+    }
+    .acc-status.opened { background: var(--green); color: white; }
+    .acc-status.not-opened { background: #fbbf24; color: #713f12; }
     .lb-entry {
       display: flex;
       align-items: center;
@@ -382,31 +434,6 @@
       gap: 4px;
     }
     .back-btn:hover { color: var(--khem); }
-    .yt-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: end;
-      margin-bottom: 1.25rem;
-    }
-    .yt-row .field { margin-bottom: 0; }
-    .yt-open-btn {
-      height: 42px;
-      padding: 0 18px;
-      border-radius: var(--radius-sm);
-      background: var(--khem);
-      color: white;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .yt-open-btn:hover { background: #154e8c; }
     .badges-row {
       display: flex;
       flex-wrap: wrap;
@@ -435,10 +462,37 @@
       border-top: 1px solid var(--border);
       margin-top: 2rem;
     }
+    .status-banner {
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .status-banner.waiting {
+      background: #fef9c3;
+      border: 1px solid #fde047;
+      color: #713f12;
+    }
+    .status-banner.live {
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #166534;
+    }
     @media (max-width: 480px) {
       .vs-side { padding: 0.8rem 0.5rem; }
       .vs-time { font-size: 18px; }
       .timer-display { font-size: 38px; }
+      .account-row .row-header {
+        flex-direction: column;
+      }
+      .account-row .yt-input {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .account-row .yt-label {
+        min-width: auto;
+      }
     }
   </style>
 </head>
@@ -472,18 +526,18 @@
   <div id="step-join" class="active">
     <div class="sec-head" style="margin-top:1rem;">
       <h2>Join the stream party</h2>
-      <p>Pick your team, add your accounts, and start streaming</p>
+      <p>Pick your team, add your accounts with their YouTube links</p>
     </div>
 
     <div class="card">
       <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Choose your team</div>
       <div class="team-grid">
-        <button class="team-btn khem-btn" onclick="selectTeam('khem',this)">
+        <button class="team-btn khem-btn" onclick="selectTeam('khem', this)">
           <div class="t-icon">💙</div>
           <div class="t-name">Team Khem</div>
           <div class="t-sub">Blue side</div>
         </button>
-        <button class="team-btn pharan-btn" onclick="selectTeam('pharan',this)">
+        <button class="team-btn pharan-btn" onclick="selectTeam('pharan', this)">
           <div class="t-icon">🧡</div>
           <div class="t-name">Team Pharan</div>
           <div class="t-sub">Orange side</div>
@@ -493,20 +547,17 @@
       <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:8px;">Your streaming accounts</div>
       <div class="accounts-list" id="accounts-list">
         <div class="account-row">
-          <input type="text" placeholder="@account1 (main)" />
-          <button class="rm-btn" onclick="removeAccount(this)">×</button>
-        </div>
-      </div>
-      <button class="add-account-btn" onclick="addAccount()">+ Add another account</button>
-
-      <div style="margin-top:1rem;">
-        <label for="yt-url">YouTube playlist / video link</label>
-        <div class="yt-row">
-          <div class="field">
-            <input type="text" id="yt-url" placeholder="https://youtube.com/watch?v=..." />
+          <div class="row-header">
+            <input type="text" placeholder="@account1 (main)" />
+            <button class="rm-btn" onclick="removeAccount(this)">×</button>
+          </div>
+          <div class="yt-input">
+            <span class="yt-label">YouTube URL</span>
+            <input type="text" placeholder="https://youtube.com/watch?v=..." />
           </div>
         </div>
       </div>
+      <button class="add-account-btn" onclick="addAccount()">+ Add another account</button>
 
       <div class="error" id="join-error"></div>
       <button class="btn btn-khem" id="join-btn" onclick="startSession()" style="margin-top:.5rem;">
@@ -527,17 +578,24 @@
     <button class="back-btn" onclick="stopSession()">← Stop & save session</button>
 
     <div class="timer-hero">
-      <div class="timer-lbl pulse" id="live-dot">● Live streaming</div>
+      <div class="status-banner waiting" id="status-banner">⏳ Open your tabs below to start the timer</div>
+      <div class="timer-lbl" id="live-dot">⏱️ Session timer</div>
       <div class="timer-display" id="timer-display" style="color:var(--khem);">0:00:00</div>
       <div class="session-lbl">Streaming as <strong id="session-accounts-lbl"></strong> — <strong id="session-team-lbl"></strong></div>
     </div>
 
     <div class="card" style="padding:1rem 1.25rem;">
-      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Open the stream in a new tab for each account</div>
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Open each tab, log in, and start watching</div>
       <div id="open-tabs-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
-      <button class="btn btn-outline" onclick="openAllTabs()">
-        🔗 Open all tabs at once
-      </button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="btn btn-outline" onclick="openAllTabs()">
+          🔗 Open all tabs
+        </button>
+        <button class="btn btn-green" id="start-timer-btn" onclick="startTimerManually()">
+          ▶️ Start timer
+        </button>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center;">⚠️ Make sure you're logged in on each tab before starting the timer</p>
     </div>
 
     <div class="card" style="padding:1rem 1.25rem;">
@@ -576,32 +634,20 @@
   let sessionStart = null;
   let timerInterval = null;
   let sessionSeconds = 0;
-  let ytUrl = '';
+  let timerStarted = false;
 
-  const storage = {
-    get(key) {
-      try {
-        return localStorage.getItem(key);
-      } catch { return null; }
-    },
-    set(key, value) {
-      try {
-        localStorage.setItem(key, value);
-      } catch {}
-    }
-  };
-
-  async function loadDB() {
+  // Load from localStorage
+  function loadDB() {
     try {
-      const raw = storage.get(DB_KEY);
+      const raw = localStorage.getItem(DB_KEY);
       if (raw) db = JSON.parse(raw);
     } catch(e) { db = {}; }
     renderAll();
   }
 
-  async function saveDB() {
+  function saveDB() {
     try {
-      storage.set(DB_KEY, JSON.stringify(db));
+      localStorage.setItem(DB_KEY, JSON.stringify(db));
     } catch(e) {}
   }
 
@@ -626,13 +672,24 @@
     const list = document.getElementById('accounts-list');
     const row = document.createElement('div');
     row.className = 'account-row';
-    row.innerHTML = `<input type="text" placeholder="@account${list.children.length+1}" /><button class="rm-btn" onclick="removeAccount(this)">×</button>`;
+    row.innerHTML = `
+      <div class="row-header">
+        <input type="text" placeholder="@account${list.children.length+1}" />
+        <button class="rm-btn" onclick="removeAccount(this)">×</button>
+      </div>
+      <div class="yt-input">
+        <span class="yt-label">YouTube URL</span>
+        <input type="text" placeholder="https://youtube.com/watch?v=..." />
+      </div>
+    `;
     list.appendChild(row);
   }
 
   function removeAccount(btn) {
     const list = document.getElementById('accounts-list');
-    if (list.children.length > 1) btn.closest('.account-row').remove();
+    if (list.children.length > 1) {
+      btn.closest('.account-row').remove();
+    }
   }
 
   function showError(id, msg) {
@@ -643,73 +700,112 @@
 
   function startSession() {
     if (!selectedTeam) { 
-      showError('join-error','Please choose your team first.'); 
+      showError('join-error', 'Please choose your team first.'); 
       return; 
     }
     
-    const inputs = document.querySelectorAll('#accounts-list input');
-    const accounts = Array.from(inputs)
-      .map(i => i.value.trim().replace(/^@/,''))
-      .filter(Boolean);
+    const rows = document.querySelectorAll('#accounts-list .account-row');
+    const accounts = [];
+    const urls = [];
+    
+    rows.forEach(row => {
+      const nameInput = row.querySelector('.row-header input');
+      const urlInput = row.querySelector('.yt-input input');
+      const name = nameInput.value.trim().replace(/^@/, '');
+      const url = urlInput.value.trim();
+      
+      if (name) {
+        accounts.push(name);
+        urls.push(url || '');
+      }
+    });
       
     if (!accounts.length) { 
-      showError('join-error','Please enter at least one account name.'); 
+      showError('join-error', 'Please enter at least one account name.'); 
       return; 
     }
     
-    ytUrl = document.getElementById('yt-url').value.trim();
-    showError('join-error','');
+    showError('join-error', '');
 
-    sessionAccounts = accounts;
-    sessionStart = Date.now();
+    sessionAccounts = accounts.map((name, i) => ({
+      name: name,
+      url: urls[i] || ''
+    }));
+    
+    timerStarted = false;
     sessionSeconds = 0;
 
     document.getElementById('step-join').classList.remove('active');
     document.getElementById('step-stream').classList.add('active');
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
 
     const teamColor = selectedTeam === 'khem' ? 'var(--khem)' : 'var(--pharan)';
     const timerDisplay = document.getElementById('timer-display');
     timerDisplay.style.color = teamColor;
     timerDisplay.textContent = '0:00:00';
-    document.getElementById('session-accounts-lbl').textContent = accounts.map(a=>'@'+a).join(', ');
+    document.getElementById('session-accounts-lbl').textContent = accounts.map(a => '@' + a).join(', ');
     document.getElementById('session-team-lbl').textContent = 'Team ' + (selectedTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
+    document.getElementById('status-banner').className = 'status-banner waiting';
+    document.getElementById('status-banner').textContent = '⏳ Open your tabs below to start the timer';
 
     // Build open-tabs list
     const tabsList = document.getElementById('open-tabs-list');
-    tabsList.innerHTML = accounts.map(acc => {
+    tabsList.innerHTML = sessionAccounts.map((acc, index) => {
       const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
-      const urlWithParam = ytUrl ? (ytUrl.includes('?') ? `${ytUrl}&${teamParam}` : `${ytUrl}?${teamParam}`) : '';
+      const urlWithParam = acc.url ? (acc.url.includes('?') ? `${acc.url}&${teamParam}` : `${acc.url}?${teamParam}`) : '';
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sage-light);border-radius:8px;border:1px solid var(--sage);">
-          <span style="font-size:14px;font-weight:500;">@${acc}</span>
-          ${ytUrl ? `<button onclick="window.open('${urlWithParam}','_blank')" style="height:30px;padding:0 12px;border-radius:6px;background:var(--khem);color:white;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Open tab ↗</button>` : '<span style="font-size:12px;color:var(--text-muted);">No link added</span>'}
+          <span style="font-size:14px;font-weight:500;">@${acc.name}</span>
+          <div style="display:flex;gap:6px;align-items:center;">
+            ${acc.url ? `<button onclick="window.open('${urlWithParam}','_blank')" style="height:30px;padding:0 12px;border-radius:6px;background:var(--khem);color:white;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Open tab ↗</button>` : '<span style="font-size:12px;color:var(--text-muted);">No link</span>'}
+            <span class="acc-status not-opened" id="status-${index}">⏳ Not opened</span>
+          </div>
         </div>`;
     }).join('');
 
     // Active accounts
     const accList = document.getElementById('acc-active-list');
-    accList.innerHTML = accounts.map(acc => `
+    accList.innerHTML = sessionAccounts.map(acc => `
       <div class="acc-active-row">
-        <div class="acc-name">@${acc}</div>
-        <div class="acc-time" id="acc-time-${acc.replace(/\W/g,'_')}">Streaming...</div>
+        <div class="acc-name">@${acc.name}</div>
+        <div class="acc-time" id="acc-time-${acc.name.replace(/\W/g,'_')}">0:00:00</div>
       </div>`).join('');
 
     // Reset badges
     document.querySelectorAll('.badge').forEach(b => b.classList.remove('earned'));
 
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(tick, 1000);
+    // Enable start timer button
+    document.getElementById('start-timer-btn').disabled = false;
   }
 
   function openAllTabs() {
-    if (!ytUrl) { 
-      alert('Please add a YouTube link first!'); 
-      return; 
-    }
-    const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
-    const urlWithParam = ytUrl.includes('?') ? `${ytUrl}&${teamParam}` : `${ytUrl}?${teamParam}`;
-    sessionAccounts.forEach(() => window.open(urlWithParam, '_blank'));
+    sessionAccounts.forEach((acc, index) => {
+      if (acc.url) {
+        const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
+        const urlWithParam = acc.url.includes('?') ? `${acc.url}&${teamParam}` : `${acc.url}?${teamParam}`;
+        window.open(urlWithParam, '_blank');
+        const statusEl = document.getElementById(`status-${index}`);
+        if (statusEl) {
+          statusEl.className = 'acc-status opened';
+          statusEl.textContent = '✅ Opened';
+        }
+      }
+    });
+  }
+
+  function startTimerManually() {
+    if (timerStarted) return;
+    
+    timerStarted = true;
+    sessionStart = Date.now() - (sessionSeconds * 1000);
+    
+    document.getElementById('status-banner').className = 'status-banner live';
+    document.getElementById('status-banner').textContent = '🔴 Live streaming! Timer is running.';
+    document.getElementById('start-timer-btn').disabled = true;
+    document.getElementById('start-timer-btn').textContent = '⏱️ Timer running...';
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
   }
 
   function tick() {
@@ -718,7 +814,7 @@
     document.getElementById('timer-display').textContent = fmtTime(sessionSeconds);
 
     sessionAccounts.forEach(acc => {
-      const el = document.getElementById('acc-time-'+acc.replace(/\W/g,'_'));
+      const el = document.getElementById('acc-time-' + acc.name.replace(/\W/g, '_'));
       if (el) el.textContent = fmtTime(sessionSeconds);
     });
 
@@ -732,87 +828,31 @@
   }
 
   function stopSession() {
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    const elapsed = sessionSeconds;
+    if (timerInterval) { 
+      clearInterval(timerInterval); 
+      timerInterval = null; 
+    }
+    
+    const elapsed = timerStarted ? sessionSeconds : 0;
 
-    sessionAccounts.forEach(acc => {
-      const key = acc.toLowerCase().trim();
-      if (!key) return;
-      if (!db[key]) db[key] = { team: selectedTeam, accounts: [], totalSecs: 0, sessions: 0 };
-      db[key].team = selectedTeam;
-      db[key].totalSecs = (db[key].totalSecs || 0) + elapsed;
-      db[key].sessions = (db[key].sessions || 0) + 1;
-      if (!db[key].accounts) db[key].accounts = [];
-      sessionAccounts.forEach(a => { if (a && !db[key].accounts.includes(a)) db[key].accounts.push(a); });
-    });
+    if (timerStarted) {
+      sessionAccounts.forEach(acc => {
+        const key = acc.name.toLowerCase().trim();
+        if (!key) return;
+        if (!db[key]) db[key] = { team: selectedTeam, accounts: [], totalSecs: 0, sessions: 0 };
+        db[key].team = selectedTeam;
+        db[key].totalSecs = (db[key].totalSecs || 0) + elapsed;
+        db[key].sessions = (db[key].sessions || 0) + 1;
+        if (!db[key].accounts) db[key].accounts = [];
+        sessionAccounts.forEach(a => { 
+          if (a.name && !db[key].accounts.includes(a.name)) db[key].accounts.push(a.name); 
+        });
+      });
 
-    saveDB();
+      saveDB();
+    }
+
     renderAll();
 
     document.getElementById('step-stream').classList.remove('active');
-    document.getElementById('step-join').classList.add('active');
-    sessionSeconds = 0;
-    selectedTeam = null;
-    document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
-    const joinBtn = document.getElementById('join-btn');
-    joinBtn.className = 'btn btn-khem';
-    joinBtn.textContent = '🎬 Start streaming';
-    window.scrollTo(0,0);
-  }
-
-  function renderVS() {
-    let kSecs = 0, kCount = 0, pSecs = 0, pCount = 0;
-    Object.values(db).forEach(u => {
-      if (u.team === 'khem') { kSecs += u.totalSecs || 0; kCount++; }
-      else { pSecs += u.totalSecs || 0; pCount++; }
-    });
-    if (timerInterval && selectedTeam) {
-      if (selectedTeam === 'khem') kSecs += sessionSeconds;
-      else pSecs += sessionSeconds;
-    }
-    document.getElementById('khem-total').textContent = fmtTime(kSecs);
-    document.getElementById('pharan-total').textContent = fmtTime(pSecs);
-    document.getElementById('khem-members').textContent = kCount + ' member' + (kCount!==1?'s':'');
-    document.getElementById('pharan-members').textContent = pCount + ' member' + (pCount!==1?'s':'');
-    const total = kSecs + pSecs || 1;
-    const kPct = Math.round(kSecs/total*100);
-    document.getElementById('pb-khem').style.width = kPct + '%';
-    document.getElementById('pb-pharan').style.width = (100-kPct) + '%';
-  }
-
-  function renderLB(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const entries = Object.entries(db).sort((a,b)=>(b[1].totalSecs||0)-(a[1].totalSecs||0));
-    if (!entries.length) { 
-      el.innerHTML = '<div class="empty-lb">No streams yet — be the first to start!</div>'; 
-      return; 
-    }
-    const rk = ['r1','r2','r3'];
-    el.innerHTML = entries.slice(0,15).map(([key,u],i)=>{
-      const teamTag = u.team==='khem'?'<span class="lb-team-tag tag-k">Khem</span>':'<span class="lb-team-tag tag-p">Pharan</span>';
-      const cls = u.team==='khem'?'khem-entry':'pharan-entry';
-      const rc = i<3?rk[i]:'';
-      const accs = (u.accounts||[key]);
-      return `<div class="lb-entry ${cls}">
-        <div class="lb-rank ${rc}">${i+1}</div>
-        <div class="lb-info">
-          <div class="lb-uname">@${key}${teamTag}</div>
-          <div class="lb-acc">${accs.length} account${accs.length!==1?'s':''} · ${u.sessions||1} session${(u.sessions||1)!==1?'s':''}</div>
-        </div>
-        <div class="lb-time">${fmtTime(u.totalSecs||0)}</div>
-      </div>`;
-    }).join('');
-  }
-
-  function renderAll() {
-    renderVS();
-    renderLB('lb-join');
-    renderLB('lb-stream');
-  }
-
-  loadDB();
-  setInterval(()=>{ if(timerInterval) renderAll(); }, 10000);
-</script>
-</body>
-</html>
+    document.getElementById('
