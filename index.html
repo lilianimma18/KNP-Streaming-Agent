@@ -424,10 +424,9 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG - Hardcoded (It's okay for this project)
+// 🔥 FIREBASE CONFIG - Direct values (works in browser!)
 // ============================================================
-
-  const firebaseConfig = {
+const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
   projectId: process.env.FIREBASE_PROJECT_ID,
@@ -435,7 +434,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID
 };
-  
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const dbFirestore = firebase.firestore();
@@ -463,10 +462,11 @@ dbFirestore.collection('users').limit(1).onSnapshot(
       loadFromFirebase();
     }
   },
-  () => {
+  (error) => {
     isOnline = false;
     firebaseReady = false;
     updateStatus('off', '🔴 Offline');
+    console.warn('Firebase connection error:', error);
   }
 );
 
@@ -516,6 +516,8 @@ function startListeners() {
       }
     });
     if (changed) { save(); renderAll(); }
+  }, (error) => {
+    console.warn('User listener error:', error);
   });
 
   dbFirestore.collection('chat').orderBy('timestamp', 'desc').limit(50).onSnapshot((snapshot) => {
@@ -534,6 +536,8 @@ function startListeners() {
         });
       }, 100);
     }
+  }, (error) => {
+    console.warn('Chat listener error:', error);
   });
 }
 
@@ -779,7 +783,9 @@ function goStream(){
 }
 
 function openAllTabs(){
-  document.querySelectorAll('.open-btn').forEach(btn => {
+  const btns = document.querySelectorAll('.open-btn');
+  if(btns.length === 0){ toast('No links to open!', 2000); return; }
+  btns.forEach(btn => {
     const url = btn.dataset.url;
     if(url) window.open(url, '_blank');
   });
@@ -1098,6 +1104,9 @@ setInterval(() => {
 
 // Start
 load();
+
+console.log('🔥 Firebase connected!');
+console.log('📡 Real-time sync active!');
 </script>
 </body>
 </html>
