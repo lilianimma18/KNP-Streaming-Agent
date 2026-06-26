@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OhOh Fandom — Stream Party</title>
-  <!-- Fonts & clean reset -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -37,7 +36,6 @@
       --radius: 16px;
       --radius-sm: 10px;
     }
-    /* NAV */
     nav {
       display: flex;
       align-items: center;
@@ -64,36 +62,6 @@
       border-radius: 20px;
       font-weight: 500;
     }
-    /* HERO */
-    .hero {
-      text-align: center;
-      padding: 3rem 1.5rem 2rem;
-      background: white;
-      border-bottom: 1px solid var(--border);
-    }
-    .hero-eyebrow {
-      font-size: 11px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 6vw, 48px);
-      line-height: 1.15;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-    .hero h1 em { color: var(--khem); font-style: italic; }
-    .hero p {
-      font-size: 15px;
-      color: var(--text-muted);
-      max-width: 480px;
-      margin: 0 auto 1.5rem;
-      line-height: 1.6;
-    }
-    /* VS BAR */
     .vs-bar {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -145,7 +113,6 @@
     }
     .pb-khem { background: var(--khem); transition: width .5s ease; }
     .pb-pharan { background: var(--pharan); transition: width .5s ease; }
-    /* CONTAINER */
     .container { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
     .sec-head { text-align: center; margin-bottom: 1.5rem; }
     .sec-head h2 {
@@ -155,7 +122,6 @@
       margin-bottom: 4px;
     }
     .sec-head p { font-size: 13px; color: var(--text-muted); }
-    /* CARD */
     .card {
       background: white;
       border-radius: var(--radius);
@@ -163,10 +129,8 @@
       padding: 1.5rem;
       margin-bottom: 1.25rem;
     }
-    /* STEPS */
     #step-join, #step-stream { display: none; }
     #step-join.active, #step-stream.active { display: block; }
-    /* TEAM PICKER */
     .team-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -197,7 +161,6 @@
     .team-btn.khem-btn .t-name { color: var(--khem); }
     .team-btn.pharan-btn .t-name { color: var(--pharan); }
     .team-btn .t-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    /* ACCOUNTS */
     .accounts-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
     .account-row {
       display: flex;
@@ -249,7 +212,6 @@
       transition: all .15s;
     }
     .add-account-btn:hover { border-color: var(--khem); color: var(--khem); }
-    /* FIELDS */
     label {
       display: block;
       font-size: 13px;
@@ -278,7 +240,6 @@
       margin-bottom: 10px;
       display: none;
     }
-    /* BUTTONS */
     .btn {
       display: flex;
       align-items: center;
@@ -305,7 +266,6 @@
       border: 1.5px solid var(--border);
     }
     .btn-outline:hover { border-color: var(--khem); color: var(--khem); }
-    /* STREAM SCREEN */
     .timer-hero {
       text-align: center;
       padding: 2rem 1rem;
@@ -338,7 +298,6 @@
     .session-lbl strong { color: var(--text); }
     .pulse { animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.5;} }
-    /* ACCOUNTS ACTIVE */
     .acc-active-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
     .acc-active-row {
       display: flex;
@@ -355,7 +314,6 @@
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
     }
-    /* LEADERBOARD */
     .lb-entry {
       display: flex;
       align-items: center;
@@ -410,7 +368,6 @@
       color: var(--text-muted);
       font-size: 14px;
     }
-    /* BACK */
     .back-btn {
       background: none;
       border: none;
@@ -425,7 +382,6 @@
       gap: 4px;
     }
     .back-btn:hover { color: var(--khem); }
-    /* YOUTUBE LINK */
     .yt-row {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -451,7 +407,6 @@
       gap: 6px;
     }
     .yt-open-btn:hover { background: #154e8c; }
-    /* BADGES */
     .badges-row {
       display: flex;
       flex-wrap: wrap;
@@ -480,7 +435,6 @@
       border-top: 1px solid var(--border);
       margin-top: 2rem;
     }
-    /* simple responsiveness */
     @media (max-width: 480px) {
       .vs-side { padding: 0.8rem 0.5rem; }
       .vs-time { font-size: 18px; }
@@ -494,7 +448,6 @@
   <div class="nav-pill">KengNamping Stream Party</div>
 </nav>
 
-<!-- VS BAR -->
 <div class="vs-bar">
   <div class="vs-side khem">
     <div class="vs-label">Team</div>
@@ -516,8 +469,6 @@
 </div>
 
 <div class="container">
-
-  <!-- JOIN STEP -->
   <div id="step-join" class="active">
     <div class="sec-head" style="margin-top:1rem;">
       <h2>Join the stream party</h2>
@@ -572,7 +523,6 @@
     </div>
   </div>
 
-  <!-- STREAM STEP -->
   <div id="step-stream">
     <button class="back-btn" onclick="stopSession()">← Stop & save session</button>
 
@@ -585,7 +535,7 @@
     <div class="card" style="padding:1rem 1.25rem;">
       <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Open the stream in a new tab for each account</div>
       <div id="open-tabs-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
-      <button class="btn btn-outline" id="open-all-btn" onclick="openAllTabs()">
+      <button class="btn btn-outline" onclick="openAllTabs()">
         🔗 Open all tabs at once
       </button>
     </div>
@@ -614,13 +564,11 @@
 
     <button class="btn btn-outline" onclick="stopSession()" style="margin-top:.5rem;">⏹ Stop session & save</button>
   </div>
-
 </div>
 
 <footer>Made with 💙🧡 by OhOh Fandom for KengNamping</footer>
 
 <script>
-  // In-memory DB (persisted via localStorage if available)
   const DB_KEY = 'ohoh_v3';
   let db = {};
   let selectedTeam = null;
@@ -630,25 +578,22 @@
   let sessionSeconds = 0;
   let ytUrl = '';
 
-  // storage fallback
   const storage = {
-    get(key, parse) {
+    get(key) {
       try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return null;
-        return parse ? { value: raw } : raw;
+        return localStorage.getItem(key);
       } catch { return null; }
     },
-    set(key, value, stringify) {
+    set(key, value) {
       try {
-        localStorage.setItem(key, stringify ? value : String(value));
+        localStorage.setItem(key, value);
       } catch {}
     }
   };
 
   async function loadDB() {
     try {
-      const raw = storage.get(DB_KEY, false);
+      const raw = storage.get(DB_KEY);
       if (raw) db = JSON.parse(raw);
     } catch(e) { db = {}; }
     renderAll();
@@ -656,7 +601,7 @@
 
   async function saveDB() {
     try {
-      storage.set(DB_KEY, JSON.stringify(db), false);
+      storage.set(DB_KEY, JSON.stringify(db));
     } catch(e) {}
   }
 
@@ -697,10 +642,21 @@
   }
 
   function startSession() {
-    if (!selectedTeam) { showError('join-error','Please choose your team first.'); return; }
+    if (!selectedTeam) { 
+      showError('join-error','Please choose your team first.'); 
+      return; 
+    }
+    
     const inputs = document.querySelectorAll('#accounts-list input');
-    const accounts = Array.from(inputs).map(i => i.value.trim().replace(/^@/,'')).filter(Boolean);
-    if (!accounts.length) { showError('join-error','Please enter at least one account name.'); return; }
+    const accounts = Array.from(inputs)
+      .map(i => i.value.trim().replace(/^@/,''))
+      .filter(Boolean);
+      
+    if (!accounts.length) { 
+      showError('join-error','Please enter at least one account name.'); 
+      return; 
+    }
+    
     ytUrl = document.getElementById('yt-url').value.trim();
     showError('join-error','');
 
@@ -721,11 +677,15 @@
 
     // Build open-tabs list
     const tabsList = document.getElementById('open-tabs-list');
-    tabsList.innerHTML = accounts.map(acc => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sage-light);border-radius:8px;border:1px solid var(--sage);">
-        <span style="font-size:14px;font-weight:500;">@${acc}</span>
-        ${ytUrl ? `<button onclick="window.open('${ytUrl}','_blank')" style="height:30px;padding:0 12px;border-radius:6px;background:var(--khem);color:white;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Open tab ↗</button>` : '<span style="font-size:12px;color:var(--text-muted);">No link added</span>'}
-      </div>`).join('');
+    tabsList.innerHTML = accounts.map(acc => {
+      const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
+      const urlWithParam = ytUrl ? (ytUrl.includes('?') ? `${ytUrl}&${teamParam}` : `${ytUrl}?${teamParam}`) : '';
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sage-light);border-radius:8px;border:1px solid var(--sage);">
+          <span style="font-size:14px;font-weight:500;">@${acc}</span>
+          ${ytUrl ? `<button onclick="window.open('${urlWithParam}','_blank')" style="height:30px;padding:0 12px;border-radius:6px;background:var(--khem);color:white;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Open tab ↗</button>` : '<span style="font-size:12px;color:var(--text-muted);">No link added</span>'}
+        </div>`;
+    }).join('');
 
     // Active accounts
     const accList = document.getElementById('acc-active-list');
@@ -743,8 +703,13 @@
   }
 
   function openAllTabs() {
-    if (!ytUrl) { alert('Please add a YouTube link first!'); return; }
-    sessionAccounts.forEach(() => window.open(ytUrl, '_blank'));
+    if (!ytUrl) { 
+      alert('Please add a YouTube link first!'); 
+      return; 
+    }
+    const teamParam = selectedTeam === 'khem' ? 'team=khem' : 'team=pharan';
+    const urlWithParam = ytUrl.includes('?') ? `${ytUrl}&${teamParam}` : `${ytUrl}?${teamParam}`;
+    sessionAccounts.forEach(() => window.open(urlWithParam, '_blank'));
   }
 
   function tick() {
@@ -752,13 +717,11 @@
     sessionSeconds = Math.floor((Date.now() - sessionStart) / 1000);
     document.getElementById('timer-display').textContent = fmtTime(sessionSeconds);
 
-    // Update each account display
     sessionAccounts.forEach(acc => {
       const el = document.getElementById('acc-time-'+acc.replace(/\W/g,'_'));
       if (el) el.textContent = fmtTime(sessionSeconds);
     });
 
-    // Badges
     if (sessionSeconds >= 900) document.getElementById('badge-15').classList.add('earned');
     if (sessionSeconds >= 1800) document.getElementById('badge-30').classList.add('earned');
     if (sessionSeconds >= 3600) document.getElementById('badge-60').classList.add('earned');
@@ -772,7 +735,6 @@
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     const elapsed = sessionSeconds;
 
-    // Save each account
     sessionAccounts.forEach(acc => {
       const key = acc.toLowerCase().trim();
       if (!key) return;
@@ -804,7 +766,6 @@
       if (u.team === 'khem') { kSecs += u.totalSecs || 0; kCount++; }
       else { pSecs += u.totalSecs || 0; pCount++; }
     });
-    // Add current session
     if (timerInterval && selectedTeam) {
       if (selectedTeam === 'khem') kSecs += sessionSeconds;
       else pSecs += sessionSeconds;
@@ -823,7 +784,10 @@
     const el = document.getElementById(id);
     if (!el) return;
     const entries = Object.entries(db).sort((a,b)=>(b[1].totalSecs||0)-(a[1].totalSecs||0));
-    if (!entries.length) { el.innerHTML = '<div class="empty-lb">No streams yet — be the first to start!</div>'; return; }
+    if (!entries.length) { 
+      el.innerHTML = '<div class="empty-lb">No streams yet — be the first to start!</div>'; 
+      return; 
+    }
     const rk = ['r1','r2','r3'];
     el.innerHTML = entries.slice(0,15).map(([key,u],i)=>{
       const teamTag = u.team==='khem'?'<span class="lb-team-tag tag-k">Khem</span>':'<span class="lb-team-tag tag-p">Pharan</span>';
@@ -833,4 +797,22 @@
       return `<div class="lb-entry ${cls}">
         <div class="lb-rank ${rc}">${i+1}</div>
         <div class="lb-info">
-          <
+          <div class="lb-uname">@${key}${teamTag}</div>
+          <div class="lb-acc">${accs.length} account${accs.length!==1?'s':''} · ${u.sessions||1} session${(u.sessions||1)!==1?'s':''}</div>
+        </div>
+        <div class="lb-time">${fmtTime(u.totalSecs||0)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderAll() {
+    renderVS();
+    renderLB('lb-join');
+    renderLB('lb-stream');
+  }
+
+  loadDB();
+  setInterval(()=>{ if(timerInterval) renderAll(); }, 10000);
+</script>
+</body>
+</html>
