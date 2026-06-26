@@ -1,417 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>OhOh Fandom — KengNamping Stream Tracker</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OhOh Fandom — Stream Party</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --khem:#1a5fa8;
+  --khem-light:#ddeeff;
+  --khem-mid:#4a8fd4;
+  --pharan:#c0885a;
+  --pharan-light:#fdf0e4;
+  --pharan-mid:#e0a870;
+  --cream:#fdf8f2;
+  --sage:#b8cfc4;
+  --sage-light:#e8f2ee;
+  --white:#ffffff;
+  --text:#2c2c2c;
+  --text-muted:#7a7a6a;
+  --border:#e8e0d4;
+  --radius:16px;
+  --radius-sm:10px;
+}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--khem);font-style:italic;}
+.nav-logo span{color:var(--pharan);}
+.nav-pill{background:var(--sage-light);color:var(--text-muted);font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500;}
 
-  :root {
-    --blue-900: #042C53;
-    --blue-800: #0C447C;
-    --blue-700: #185FA5;
-    --blue-500: #378ADD;
-    --blue-300: #85B7EB;
-    --blue-100: #B5D4F4;
-    --blue-50:  #E6F1FB;
-    --white: #ffffff;
-    --gray-100: #f5f5f5;
-    --gray-200: #e8e8e8;
-    --gray-400: #9a9a9a;
-    --gray-700: #444;
-    --gray-900: #111;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
+/* HERO */
+.hero{text-align:center;padding:3rem 1.5rem 2rem;background:white;border-bottom:1px solid var(--border);}
+.hero-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(28px,6vw,48px);line-height:1.15;color:var(--text);margin-bottom:12px;}
+.hero h1 em{color:var(--khem);font-style:italic;}
+.hero p{font-size:15px;color:var(--text-muted);max-width:480px;margin:0 auto 1.5rem;line-height:1.6;}
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(160deg, #e6f1fb 0%, #f0f7ff 40%, #ffffff 100%);
-    min-height: 100vh;
-    color: var(--gray-900);
-  }
+/* VS BAR */
+.vs-bar{display:grid;grid-template-columns:1fr auto 1fr;gap:0;background:white;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.vs-side{padding:1.25rem 1.5rem;text-align:center;}
+.vs-side.khem{background:var(--khem-light);}
+.vs-side.pharan{background:var(--pharan-light);}
+.vs-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+.vs-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.vs-name.k{color:var(--khem);}
+.vs-name.p{color:var(--pharan);}
+.vs-time{font-size:24px;font-weight:600;margin-top:2px;}
+.vs-time.k{color:var(--khem);}
+.vs-time.p{color:var(--pharan);}
+.vs-divider{display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-muted);padding:0 1rem;background:white;}
+.progress-bar{height:8px;border-radius:0;display:flex;overflow:hidden;}
+.pb-khem{background:var(--khem);transition:width .5s ease;}
+.pb-pharan{background:var(--pharan);transition:width .5s ease;}
 
-  header {
-    background: var(--blue-800);
-    color: white;
-    text-align: center;
-    padding: 2rem 1rem 1.5rem;
-  }
-  header .eyebrow {
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--blue-100);
-    margin-bottom: 8px;
-  }
-  header h1 {
-    font-size: clamp(22px, 5vw, 32px);
-    font-weight: 700;
-    color: white;
-    line-height: 1.2;
-  }
-  header p {
-    font-size: 14px;
-    color: var(--blue-100);
-    margin-top: 6px;
-  }
+/* CONTAINER */
+.container{max-width:720px;margin:0 auto;padding:2rem 1rem;}
 
-  .container {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-  }
+/* SECTION HEADING */
+.sec-head{text-align:center;margin-bottom:1.5rem;}
+.sec-head h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:4px;}
+.sec-head p{font-size:13px;color:var(--text-muted);}
 
-  /* TOTAL BANNER */
-  .total-banner {
-    background: var(--blue-800);
-    color: white;
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  .total-banner .big-num {
-    font-size: 52px;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -2px;
-  }
-  .total-banner .lbl {
-    font-size: 13px;
-    color: var(--blue-100);
-    margin-top: 4px;
-  }
+/* CARD */
+.card{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.25rem;}
 
-  /* CARDS */
-  .card {
-    background: white;
-    border-radius: var(--radius);
-    border: 1px solid var(--gray-200);
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
-  }
-  .card h2 {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--blue-800);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .card h2 svg { width: 18px; height: 18px; flex-shrink: 0; }
+/* STEPS */
+#step-join,#step-stream{display:none;}
+#step-join.active,#step-stream.active{display:block;}
 
-  /* FORM FIELDS */
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray-700);
-    margin-bottom: 5px;
-  }
-  input[type="text"], input[type="number"] {
-    width: 100%;
-    height: 42px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    padding: 0 12px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--gray-900);
-    background: white;
-    transition: border-color 0.15s;
-    outline: none;
-  }
-  input:focus { border-color: var(--blue-500); box-shadow: 0 0 0 3px #b5d4f455; }
+/* TEAM PICKER */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+.team-btn{border:2px solid var(--border);border-radius:var(--radius);padding:1.25rem 1rem;text-align:center;cursor:pointer;background:white;transition:all .15s;font-family:inherit;}
+.team-btn:hover{transform:translateY(-2px);}
+.team-btn.khem-btn:hover,.team-btn.khem-btn.selected{border-color:var(--khem);background:var(--khem-light);}
+.team-btn.pharan-btn:hover,.team-btn.pharan-btn.selected{border-color:var(--pharan);background:var(--pharan-light);}
+.team-btn .t-icon{font-size:28px;margin-bottom:6px;}
+.team-btn .t-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.team-btn.khem-btn .t-name{color:var(--khem);}
+.team-btn.pharan-btn .t-name{color:var(--pharan);}
+.team-btn .t-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 
-  .field { margin-bottom: 1rem; }
+/* ACCOUNTS */
+.accounts-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.account-row{display:flex;gap:8px;align-items:center;}
+.account-row input{flex:1;height:40px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;font-size:14px;font-family:inherit;color:var(--text);background:white;outline:none;}
+.account-row input:focus{border-color:var(--khem);}
+.account-row .rm-btn{width:32px;height:32px;border:1.5px solid var(--border);border-radius:50%;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-muted);flex-shrink:0;}
+.account-row .rm-btn:hover{background:#fee2e2;border-color:#fca5a5;color:#dc2626;}
+.add-account-btn{background:none;border:1.5px dashed var(--border);border-radius:var(--radius-sm);width:100%;height:38px;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s;}
+.add-account-btn:hover{border-color:var(--khem);color:var(--khem);}
 
-  .row { display: flex; gap: 10px; }
-  .row .field { flex: 1; }
+/* FIELDS */
+label{display:block;font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:5px;}
+input[type=text],input[type=number]{width:100%;height:42px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;font-size:14px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border-color .15s;}
+input:focus{border-color:var(--khem);}
+.field{margin-bottom:1rem;}
+.error{color:#dc2626;font-size:13px;margin-bottom:10px;display:none;}
 
-  /* BUTTONS */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 44px;
-    padding: 0 20px;
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--blue-800); color: white; width: 100%; }
-  .btn-primary:hover { background: var(--blue-900); }
-  .btn-secondary { background: var(--blue-50); color: var(--blue-800); border: 1.5px solid var(--blue-100); }
-  .btn-secondary:hover { background: var(--blue-100); }
-  .btn-sm { height: 34px; padding: 0 14px; font-size: 13px; }
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;width:100%;border-radius:var(--radius-sm);font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all .15s;}
+.btn:active{transform:scale(.97);}
+.btn-khem{background:var(--khem);color:white;}
+.btn-khem:hover{background:#154e8c;}
+.btn-pharan{background:var(--pharan);color:white;}
+.btn-pharan:hover{background:#a8744a;}
+.btn-outline{background:white;color:var(--text);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--khem);color:var(--khem);}
 
-  /* STEP TOGGLE */
-  .step { display: none; }
-  .step.active { display: block; }
+/* STREAM SCREEN */
+.timer-hero{text-align:center;padding:2rem 1rem;background:white;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1.25rem;}
+.timer-lbl{font-size:12px;color:var(--text-muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase;}
+.timer-display{font-size:56px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-2px;line-height:1;}
+.timer-display.k{color:var(--khem);}
+.timer-display.p{color:var(--pharan);}
+.session-lbl{font-size:13px;color:var(--text-muted);margin-top:8px;}
+.session-lbl strong{color:var(--text);}
+.pulse{animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
 
-  /* SUMMARY BOX */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 1.25rem;
-  }
-  .stat-box {
-    background: var(--blue-50);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    text-align: center;
-    border: 1px solid var(--blue-100);
-  }
-  .stat-box .num { font-size: 28px; font-weight: 700; color: var(--blue-800); line-height: 1; }
-  .stat-box .lbl { font-size: 12px; color: var(--blue-700); margin-top: 4px; }
+/* ACCOUNTS ACTIVE */
+.acc-active-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem;}
+.acc-active-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:var(--radius-sm);background:var(--sage-light);border:1px solid var(--sage);}
+.acc-name{font-size:14px;font-weight:500;}
+.acc-time{font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums;}
 
-  /* BROWSER GUIDE */
-  .browser-tip {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-size: 13px;
-    color: #92400e;
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-  .browser-tip svg { flex-shrink: 0; margin-top: 1px; }
+/* LEADERBOARD */
+.lb-entry{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:8px;background:white;}
+.lb-entry.khem-entry{border-color:var(--khem-mid);background:var(--khem-light);}
+.lb-entry.pharan-entry{border-color:var(--pharan-mid);background:var(--pharan-light);}
+.lb-rank{font-size:15px;font-weight:700;width:28px;text-align:center;color:var(--text-muted);flex-shrink:0;}
+.lb-rank.r1{color:#ca8a04;}
+.lb-rank.r2{color:#71717a;}
+.lb-rank.r3{color:#b45309;}
+.lb-info{flex:1;min-width:0;}
+.lb-uname{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-team-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+.tag-k{background:var(--khem);color:white;}
+.tag-p{background:var(--pharan);color:white;}
+.lb-time{font-size:14px;font-weight:600;color:var(--text);flex-shrink:0;}
+.lb-acc{font-size:12px;color:var(--text-muted);}
+.empty-lb{text-align:center;padding:2rem;color:var(--text-muted);font-size:14px;}
 
-  /* LEADERBOARD */
-  .lb-entry {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--gray-200);
-    margin-bottom: 8px;
-    background: white;
-    transition: background 0.1s;
-  }
-  .lb-entry.me { background: var(--blue-50); border-color: var(--blue-300); }
-  .lb-rank { font-size: 14px; font-weight: 700; width: 26px; text-align: center; color: var(--gray-400); flex-shrink: 0; }
-  .lb-rank.r1 { color: #ca8a04; }
-  .lb-rank.r2 { color: #71717a; }
-  .lb-rank.r3 { color: #b45309; }
-  .lb-name { font-size: 14px; font-weight: 500; color: var(--gray-900); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .lb-detail { font-size: 12px; color: var(--gray-400); }
-  .lb-streams { font-size: 14px; font-weight: 600; color: var(--blue-800); flex-shrink: 0; }
-  .you-tag { font-size: 10px; font-weight: 600; background: var(--blue-800); color: white; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
-  .empty-lb { text-align: center; color: var(--gray-400); font-size: 14px; padding: 2rem 0; }
+/* BACK */
+.back-btn{background:none;border:none;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:inherit;padding:0;margin-bottom:1rem;display:inline-flex;align-items:center;gap:4px;}
+.back-btn:hover{color:var(--khem);}
 
-  .back-link { background: none; border: none; font-size: 13px; color: var(--blue-700); cursor: pointer; padding: 0; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; }
-  .back-link:hover { color: var(--blue-900); }
+/* YOUTUBE LINK */
+.yt-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:1.25rem;}
+.yt-row .field{margin-bottom:0;}
+.yt-open-btn{height:42px;padding:0 18px;border-radius:var(--radius-sm);background:var(--khem);color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.yt-open-btn:hover{background:#154e8c;}
 
-  footer { text-align: center; padding: 2rem 1rem; font-size: 12px; color: var(--gray-400); }
+/* BADGES */
+.badges-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;}
+.badge{display:flex;align-items:center;gap:6px;background:var(--sage-light);border:1px solid var(--sage);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--text-muted);}
+.badge.earned{background:#fef9c3;border-color:#fde047;color:#713f12;}
+.badge-icon{font-size:14px;}
+
+footer{text-align:center;padding:2rem 1rem;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:2rem;}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="eyebrow">OhOh Fandom</div>
-  <h1>KengNamping Stream Tracker</h1>
-  <p>Log your streams, track the fandom total, climb the leaderboard</p>
-</header>
+<nav>
+  <div class="nav-logo">OhOh <span>Fandom</span></div>
+  <div class="nav-pill">KengNamping Stream Party</div>
+</nav>
+
+<!-- VS BAR -->
+<div class="vs-bar">
+  <div class="vs-side khem">
+    <div class="vs-label">Team</div>
+    <div class="vs-name k">Khem</div>
+    <div class="vs-time k" id="khem-total">0:00:00</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="khem-members">0 members</div>
+  </div>
+  <div class="vs-divider">VS</div>
+  <div class="vs-side pharan">
+    <div class="vs-label">Team</div>
+    <div class="vs-name p">Pharan</div>
+    <div class="vs-time p" id="pharan-total">0:00:00</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="pharan-members">0 members</div>
+  </div>
+</div>
+<div class="progress-bar">
+  <div class="pb-khem" id="pb-khem" style="width:50%"></div>
+  <div class="pb-pharan" id="pb-pharan" style="width:50%"></div>
+</div>
 
 <div class="container">
 
-  <!-- STEP 1: Enter details -->
-  <div id="step1" class="step active">
-    <div class="total-banner">
-      <div class="big-num" id="grand-total">0</div>
-      <div class="lbl">total streams by OhOh fandom</div>
+  <!-- JOIN STEP -->
+  <div id="step-join" class="active">
+    <div class="sec-head" style="margin-top:1rem;">
+      <h2>Join the stream party</h2>
+      <p>Pick your team, add your accounts, and start streaming</p>
     </div>
 
     <div class="card">
-      <h2>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Log your streams
-      </h2>
-
-      <div class="field">
-        <label for="uname">Your Twitter/X username</label>
-        <input type="text" id="uname" placeholder="@KengNampingFan" maxlength="40" />
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Choose your team</div>
+      <div class="team-grid">
+        <button class="team-btn khem-btn" onclick="selectTeam('khem',this)">
+          <div class="t-icon">💙</div>
+          <div class="t-name">Team Khem</div>
+          <div class="t-sub">Blue side</div>
+        </button>
+        <button class="team-btn pharan-btn" onclick="selectTeam('pharan',this)">
+          <div class="t-icon">🧡</div>
+          <div class="t-name">Team Pharan</div>
+          <div class="t-sub">Orange side</div>
+        </button>
       </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="num-streams">How many times did you stream?</label>
-          <input type="number" id="num-streams" placeholder="e.g. 50" min="1" max="99999" />
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:8px;">Your streaming accounts</div>
+      <div class="accounts-list" id="accounts-list">
+        <div class="account-row">
+          <input type="text" placeholder="@account1 (main)" />
+          <button class="rm-btn" onclick="removeAccount(this)">×</button>
         </div>
-        <div class="field">
-          <label for="num-browsers">Number of browsers/tabs open</label>
-          <input type="number" id="num-browsers" placeholder="e.g. 4" min="1" max="100" />
+      </div>
+      <button class="add-account-btn" onclick="addAccount()">+ Add another account</button>
+
+      <div style="margin-top:1rem;">
+        <label for="yt-url">YouTube playlist / video link</label>
+        <div class="yt-row">
+          <div class="field">
+            <input type="text" id="yt-url" placeholder="https://youtube.com/watch?v=..." />
+          </div>
         </div>
       </div>
 
-      <div id="error-msg" style="color:#dc2626;font-size:13px;margin-bottom:10px;display:none;"></div>
-
-      <button class="btn btn-primary" onclick="submitLog()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Log my streams
+      <div class="error" id="join-error"></div>
+      <button class="btn btn-khem" id="join-btn" onclick="startSession()" style="margin-top:.5rem;">
+        🎬 Start streaming
       </button>
     </div>
 
     <div class="card">
-      <h2>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-        Fandom leaderboard
-      </h2>
-      <div id="lb1"></div>
+      <div class="sec-head" style="margin-bottom:1rem;">
+        <h2>Leaderboard</h2>
+        <p>Top streamers across both teams</p>
+      </div>
+      <div id="lb-join"></div>
     </div>
   </div>
 
-  <!-- STEP 2: Confirmation + stats -->
-  <div id="step2" class="step">
-    <button class="back-link" onclick="goBack()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-      Back
-    </button>
+  <!-- STREAM STEP -->
+  <div id="step-stream">
+    <button class="back-btn" onclick="stopSession()">← Stop & save session</button>
 
-    <div class="total-banner">
-      <div class="big-num" id="grand-total2">0</div>
-      <div class="lbl">total streams by OhOh fandom</div>
+    <div class="timer-hero">
+      <div class="timer-lbl pulse" id="live-dot">● Live streaming</div>
+      <div class="timer-display" id="timer-display" style="color:var(--khem);">0:00:00</div>
+      <div class="session-lbl">Streaming as <strong id="session-accounts-lbl"></strong> — <strong id="session-team-lbl"></strong></div>
     </div>
 
-    <div class="summary-grid">
-      <div class="stat-box">
-        <div class="num" id="my-streams-display">0</div>
-        <div class="lbl">your streams logged</div>
-      </div>
-      <div class="stat-box">
-        <div class="num" id="my-browsers-display">0</div>
-        <div class="lbl">browsers used</div>
-      </div>
+    <div class="card" style="padding:1rem 1.25rem;">
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Open the stream in a new tab for each account</div>
+      <div id="open-tabs-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
+      <button class="btn btn-outline" id="open-all-btn" onclick="openAllTabs()">
+        🔗 Open all tabs at once
+      </button>
     </div>
 
-    <div class="browser-tip">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span><strong>Mass streaming tip:</strong> Open the video in multiple browser windows (Chrome, Firefox, Edge, Brave) simultaneously for maximum count. Make sure each tab plays fully past 30 seconds!</span>
+    <div class="card" style="padding:1rem 1.25rem;">
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:10px;">Your accounts this session</div>
+      <div class="acc-active-list" id="acc-active-list"></div>
+    </div>
+
+    <div class="card" style="padding:1rem 1.25rem;">
+      <div style="font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:8px;">Session badges</div>
+      <div class="badges-row" id="badges-row">
+        <div class="badge" id="badge-15"><span class="badge-icon">⏱️</span>15 min warrior</div>
+        <div class="badge" id="badge-30"><span class="badge-icon">🔥</span>30 min streamer</div>
+        <div class="badge" id="badge-60"><span class="badge-icon">👑</span>1 hour legend</div>
+        <div class="badge" id="badge-multi"><span class="badge-icon">🖥️</span>Multi-account pro</div>
+      </div>
     </div>
 
     <div class="card">
-      <h2>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-        Fandom leaderboard
-      </h2>
-      <div id="lb2"></div>
+      <div class="sec-head" style="margin-bottom:1rem;">
+        <h2>Live leaderboard</h2>
+      </div>
+      <div id="lb-stream"></div>
     </div>
 
-    <button class="btn btn-secondary" onclick="goBack()" style="width:100%">Log more streams</button>
+    <button class="btn btn-outline" onclick="stopSession()" style="margin-top:.5rem;">⏹ Stop session & save</button>
   </div>
 
 </div>
 
-<footer>Made with love by OhOh fandom for KengNamping &hearts;</footer>
+<footer>Made with 💙🧡 by OhOh Fandom for KengNamping</footer>
 
 <script>
-  const DB_KEY = 'ohoh_stream_data_v1';
-  let db = {};
-  let currentUser = '';
+const DB_KEY = 'ohoh_v3';
+let db = {};
+let selectedTeam = null;
+let sessionAccounts = [];
+let sessionStart = null;
+let timerInterval = null;
+let sessionSeconds = 0;
+let ytUrl = '';
 
-  async function loadDB() {
-    try {
-      const r = await window.storage.get(DB_KEY, true);
-      if (r && r.value) db = JSON.parse(r.value);
-    } catch(e) { db = {}; }
-    renderAll();
+async function loadDB() {
+  try {
+    const r = await window.storage.get(DB_KEY, true);
+    if (r && r.value) db = JSON.parse(r.value);
+  } catch(e) { db = {}; }
+  renderAll();
+}
+
+async function saveDB() {
+  try { await window.storage.set(DB_KEY, JSON.stringify(db), true); } catch(e) {}
+}
+
+function fmtTime(secs) {
+  const h = Math.floor(secs/3600);
+  const m = Math.floor((secs%3600)/60);
+  const s = secs%60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function selectTeam(team, el) {
+  selectedTeam = team;
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('join-btn').className = `btn btn-${team}`;
+  document.getElementById('join-btn').textContent = team === 'khem' ? '💙 Start streaming for Team Khem' : '🧡 Start streaming for Team Pharan';
+}
+
+function addAccount() {
+  const list = document.getElementById('accounts-list');
+  const row = document.createElement('div');
+  row.className = 'account-row';
+  row.innerHTML = `<input type="text" placeholder="@account${list.children.length+1}" /><button class="rm-btn" onclick="removeAccount(this)">×</button>`;
+  list.appendChild(row);
+}
+
+function removeAccount(btn) {
+  const list = document.getElementById('accounts-list');
+  if (list.children.length > 1) btn.closest('.account-row').remove();
+}
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function startSession() {
+  if (!selectedTeam) { showError('join-error','Please choose your team first.'); return; }
+  const inputs = document.querySelectorAll('#accounts-list input');
+  const accounts = Array.from(inputs).map(i => i.value.trim().replace(/^@/,'')).filter(Boolean);
+  if (!accounts.length) { showError('join-error','Please enter at least one account name.'); return; }
+  ytUrl = document.getElementById('yt-url').value.trim();
+  showError('join-error','');
+
+  sessionAccounts = accounts;
+  sessionStart = Date.now();
+  sessionSeconds = 0;
+
+  document.getElementById('step-join').classList.remove('active');
+  document.getElementById('step-stream').classList.add('active');
+  window.scrollTo(0,0);
+
+  const teamColor = selectedTeam === 'khem' ? 'var(--khem)' : 'var(--pharan)';
+  document.getElementById('timer-display').style.color = teamColor;
+  document.getElementById('session-accounts-lbl').textContent = accounts.map(a=>'@'+a).join(', ');
+  document.getElementById('session-team-lbl').textContent = 'Team ' + (selectedTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
+
+  // Build open-tabs list
+  const tabsList = document.getElementById('open-tabs-list');
+  tabsList.innerHTML = accounts.map(acc => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sage-light);border-radius:8px;border:1px solid var(--sage);">
+      <span style="font-size:14px;font-weight:500;">@${acc}</span>
+      ${ytUrl ? `<button onclick="openTab()" style="height:30px;padding:0 12px;border-radius:6px;background:var(--khem);color:white;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Open tab ↗</button>` : '<span style="font-size:12px;color:var(--text-muted);">No link added</span>'}
+    </div>`).join('');
+
+  // Active accounts
+  const accList = document.getElementById('acc-active-list');
+  accList.innerHTML = accounts.map(acc => `
+    <div class="acc-active-row">
+      <div class="acc-name">@${acc}</div>
+      <div class="acc-time" id="acc-time-${acc.replace(/\W/g,'_')}">Streaming...</div>
+    </div>`).join('');
+
+  timerInterval = setInterval(tick, 1000);
+}
+
+function openTab() {
+  if (ytUrl) window.open(ytUrl, '_blank');
+}
+
+function openAllTabs() {
+  if (!ytUrl) { alert('Please add a YouTube link first!'); return; }
+  sessionAccounts.forEach(() => window.open(ytUrl, '_blank'));
+}
+
+function tick() {
+  sessionSeconds = Math.floor((Date.now() - sessionStart) / 1000);
+  document.getElementById('timer-display').textContent = fmtTime(sessionSeconds);
+
+  // Update each account display
+  sessionAccounts.forEach(acc => {
+    const el = document.getElementById('acc-time-'+acc.replace(/\W/g,'_'));
+    if (el) el.textContent = fmtTime(sessionSeconds);
+  });
+
+  // Badges
+  if (sessionSeconds >= 900) document.getElementById('badge-15').classList.add('earned');
+  if (sessionSeconds >= 1800) document.getElementById('badge-30').classList.add('earned');
+  if (sessionSeconds >= 3600) document.getElementById('badge-60').classList.add('earned');
+  if (sessionAccounts.length >= 2) document.getElementById('badge-multi').classList.add('earned');
+
+  renderVS();
+}
+
+function stopSession() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  const elapsed = sessionSeconds;
+
+  // Save each account
+  sessionAccounts.forEach(acc => {
+    const key = acc.toLowerCase();
+    if (!db[key]) db[key] = { team: selectedTeam, accounts: [], totalSecs: 0, sessions: 0 };
+    db[key].team = selectedTeam;
+    db[key].totalSecs = (db[key].totalSecs || 0) + elapsed;
+    db[key].sessions = (db[key].sessions || 0) + 1;
+    db[key].numAccounts = sessionAccounts.length;
+    if (!db[key].accounts) db[key].accounts = [];
+    sessionAccounts.forEach(a => { if (!db[key].accounts.includes(a)) db[key].accounts.push(a); });
+  });
+
+  saveDB();
+  renderAll();
+
+  document.getElementById('step-stream').classList.remove('active');
+  document.getElementById('step-join').classList.add('active');
+  sessionSeconds = 0;
+  selectedTeam = null;
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('join-btn').className = 'btn btn-khem';
+  document.getElementById('join-btn').innerHTML = '🎬 Start streaming';
+  window.scrollTo(0,0);
+}
+
+function renderVS() {
+  let kSecs = 0, kCount = 0, pSecs = 0, pCount = 0;
+  Object.values(db).forEach(u => {
+    if (u.team === 'khem') { kSecs += u.totalSecs || 0; kCount++; }
+    else { pSecs += u.totalSecs || 0; pCount++; }
+  });
+  // Add current session
+  if (timerInterval && selectedTeam) {
+    if (selectedTeam === 'khem') kSecs += sessionSeconds;
+    else pSecs += sessionSeconds;
   }
+  document.getElementById('khem-total').textContent = fmtTime(kSecs);
+  document.getElementById('pharan-total').textContent = fmtTime(pSecs);
+  document.getElementById('khem-members').textContent = kCount + ' member' + (kCount!==1?'s':'');
+  document.getElementById('pharan-members').textContent = pCount + ' member' + (pCount!==1?'s':'');
+  const total = kSecs + pSecs || 1;
+  const kPct = Math.round(kSecs/total*100);
+  document.getElementById('pb-khem').style.width = kPct + '%';
+  document.getElementById('pb-pharan').style.width = (100-kPct) + '%';
+}
 
-  async function saveDB() {
-    try { await window.storage.set(DB_KEY, JSON.stringify(db), true); } catch(e) {}
-  }
+function renderLB(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const entries = Object.entries(db).sort((a,b)=>(b[1].totalSecs||0)-(a[1].totalSecs||0));
+  if (!entries.length) { el.innerHTML = '<div class="empty-lb">No streams yet — be the first to start!</div>'; return; }
+  const rk = ['r1','r2','r3'];
+  el.innerHTML = entries.slice(0,15).map(([key,u],i)=>{
+    const teamTag = u.team==='khem'?'<span class="lb-team-tag tag-k">Khem</span>':'<span class="lb-team-tag tag-p">Pharan</span>';
+    const cls = u.team==='khem'?'khem-entry':'pharan-entry';
+    const rc = i<3?rk[i]:'';
+    const accs = (u.accounts||[u.name||key]);
+    return `<div class="lb-entry ${cls}">
+      <div class="lb-rank ${rc}">${i+1}</div>
+      <div class="lb-info">
+        <div class="lb-uname">@${key}${teamTag}</div>
+        <div class="lb-acc">${accs.length} account${accs.length!==1?'s':''} · ${u.sessions||1} session${(u.sessions||1)!==1?'s':''}</div>
+      </div>
+      <div class="lb-time">${fmtTime(u.totalSecs||0)}</div>
+    </div>`;
+  }).join('');
+}
 
-  function totalStreams() {
-    return Object.values(db).reduce((sum, u) => sum + (u.streams || 0), 0);
-  }
+function renderAll() {
+  renderVS();
+  renderLB('lb-join');
+  renderLB('lb-stream');
+}
 
-  function renderAll() {
-    const total = totalStreams();
-    document.getElementById('grand-total').textContent = total.toLocaleString();
-    document.getElementById('grand-total2').textContent = total.toLocaleString();
-    renderLB('lb1');
-    renderLB('lb2');
-  }
-
-  function renderLB(id) {
-    const el = document.getElementById(id);
-    const sorted = Object.entries(db).sort((a,b) => (b[1].streams||0) - (a[1].streams||0));
-    if (!sorted.length) { el.innerHTML = '<div class="empty-lb">No streams logged yet — be the first!</div>'; return; }
-    const rankClasses = ['r1','r2','r3'];
-    el.innerHTML = sorted.slice(0,15).map(([name, info], i) => {
-      const isMe = name === currentUser;
-      const rc = i < 3 ? rankClasses[i] : '';
-      return `<div class="lb-entry${isMe ? ' me' : ''}">
-        <div class="lb-rank ${rc}">${i+1}</div>
-        <div>
-          <div class="lb-name">@${name}${isMe ? '<span class="you-tag">you</span>' : ''}</div>
-          <div class="lb-detail">${info.browsers || 1} browser${(info.browsers||1)>1?'s':''} open</div>
-        </div>
-        <div class="lb-streams">${(info.streams||0).toLocaleString()}</div>
-      </div>`;
-    }).join('');
-  }
-
-  function showError(msg) {
-    const el = document.getElementById('error-msg');
-    el.textContent = msg;
-    el.style.display = msg ? 'block' : 'none';
-  }
-
-  function submitLog() {
-    const uname = document.getElementById('uname').value.trim().replace(/^@/, '');
-    const streams = parseInt(document.getElementById('num-streams').value) || 0;
-    const browsers = parseInt(document.getElementById('num-browsers').value) || 0;
-
-    if (!uname) { showError('Please enter your username.'); return; }
-    if (streams < 1) { showError('Please enter how many times you streamed.'); return; }
-    if (browsers < 1) { showError('Please enter how many browsers you used.'); return; }
-    showError('');
-
-    currentUser = uname;
-    if (!db[uname]) db[uname] = { streams: 0, browsers: 0 };
-    db[uname].streams += streams;
-    db[uname].browsers = Math.max(db[uname].browsers, browsers);
-
-    saveDB();
-    renderAll();
-
-    document.getElementById('my-streams-display').textContent = db[uname].streams.toLocaleString();
-    document.getElementById('my-browsers-display').textContent = db[uname].browsers;
-
-    document.getElementById('step1').classList.remove('active');
-    document.getElementById('step2').classList.add('active');
-    window.scrollTo(0,0);
-  }
-
-  function goBack() {
-    document.getElementById('step2').classList.remove('active');
-    document.getElementById('step1').classList.add('active');
-    document.getElementById('num-streams').value = '';
-    document.getElementById('num-browsers').value = '';
-    window.scrollTo(0,0);
-    renderAll();
-  }
-
-  document.getElementById('uname').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('num-streams').focus(); });
-
-  loadDB();
+loadDB();
+setInterval(()=>{ if(timerInterval) renderAll(); }, 10000);
 </script>
 </body>
 </html>
