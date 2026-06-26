@@ -166,7 +166,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:
 .pill-you{background:var(--dark);color:#fff;}
 .pill-verify{background:#7c3aed;color:#fff;}
 .lb-empty{text-align:center;padding:2.5rem;color:var(--text3);font-size:13px;font-weight:500;}
-.chat-wrap{display:flex;flex-direction:column;height:280px;}
+.chat-wrap{display:flex;flex-direction:column;height:300px;}
 .chat-feed{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;}
 .chat-feed::-webkit-scrollbar{width:4px;}
 .chat-feed::-webkit-scrollbar-thumb{background:var(--border-d);border-radius:2px;}
@@ -218,8 +218,8 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 .step-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--text2);}
 .step-pill.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 .session-save-indicator{background:var(--green-l);border:1px solid #86efac;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:600;color:#15803d;text-align:center;margin-bottom:1rem;}
-.online-badge{display:inline-block;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px;text-transform:uppercase;}
 .live-count{font-size:11px;color:var(--text3);font-weight:600;}
+.chat-online-count{font-size:10px;font-weight:600;color:var(--green);background:var(--green-l);padding:2px 8px;border-radius:10px;}
 @media(max-width:520px){.scoreboard{gap:6px;}.sp-points{font-size:20px;}.sp-time{font-size:18px;}.sh-timer{font-size:42px;}.two-col{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -279,6 +279,17 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
         <span class="step-pill">4️⃣ Stream!</span>
       </div>
       
+      <div class="info-box online-box">
+        <div class="info-box-title">🌐 ONLINE MODE — Real-Time!</div>
+        <div class="info-box-text">
+          <strong>Everyone can see each other in real-time!</strong><br>
+          • Live leaderboard updates automatically<br>
+          • Global chat with all streamers<br>
+          • See who's streaming LIVE<br>
+          • All data synced to Firebase<br>
+          <span style="display:inline-block;margin-top:4px;background:var(--green-l);padding:2px 10px;border-radius:4px;font-weight:700;color:#15803d;">✅ Connected to Firebase</span>
+        </div>
+      </div>
 
       <div class="info-box step-box">
         <div class="info-box-title">🎯 Points System</div>
@@ -392,11 +403,13 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 
   <div class="card">
-    <div class="card-header"><span class="card-title">💬 Global Chat</span></div>
+    <div class="card-header">
+      <span class="card-title">💬 Global Chat <span class="chat-online-count" id="chat-online-count">● Live</span></span>
+    </div>
     <div class="chat-wrap">
       <div class="chat-feed" id="chat-feed-reg">
         <div class="chat-msg sys"><span class="chat-sys-pill">🌐 Welcome to the OhOh Stream Battle!</span></div>
-        <div class="chat-msg sys"><span class="chat-sys-pill">Everyone online can see your messages!</span></div>
+        <div class="chat-msg sys"><span class="chat-sys-pill">Everyone online can see your messages in real-time!</span></div>
       </div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chat-input-reg" placeholder="Chat with everyone watching..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg('reg')"/>
@@ -496,7 +509,9 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
   </div>
 
   <div class="card">
-    <div class="card-header"><span class="card-title">💬 Global Live Chat</span></div>
+    <div class="card-header">
+      <span class="card-title">💬 Global Live Chat <span class="chat-online-count" id="chat-online-count-stream">● Live</span></span>
+    </div>
     <div class="chat-wrap">
       <div class="quick-reacts">
         <button class="react-btn" onclick="sendReact('💙 Team Khem fighting!')">💙 Khem!</button>
@@ -525,7 +540,7 @@ footer{text-align:center;padding:2rem 1rem 3rem;font-size:11px;color:var(--text3
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG - YOUR CONFIG
+// 🔥 FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
@@ -540,11 +555,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const dbFirestore = firebase.firestore();
 
+// Enable offline persistence
+dbFirestore.enablePersistence()
+  .catch((err) => {
+    if (err.code == 'failed-precondition') {
+      console.log('Multiple tabs open, persistence disabled');
+    } else if (err.code == 'unimplemented') {
+      console.log('Browser doesn\'t support persistence');
+    }
+  });
+
 // ============================================================
 // 📡 CONNECTION STATUS
 // ============================================================
 let isOnline = false;
 let firebaseReady = false;
+let syncQueue = [];
+let isSyncing = false;
 
 function updateConnectionStatus(status, message) {
   const el = document.getElementById('status-indicator');
@@ -553,13 +580,17 @@ function updateConnectionStatus(status, message) {
   el.textContent = message;
 }
 
-// Listen for Firestore connection
-dbFirestore.collection('users').onSnapshot(
+// Check Firebase connection
+dbFirestore.collection('users').limit(1).onSnapshot(
   () => {
-    isOnline = true;
-    firebaseReady = true;
-    updateConnectionStatus('on', '🟢 Online');
-    toast('🌐 Connected to Firebase!', 2000);
+    if (!firebaseReady) {
+      firebaseReady = true;
+      isOnline = true;
+      updateConnectionStatus('on', '🟢 Online');
+      toast('🌐 Connected to Firebase!', 2000);
+      processSyncQueue();
+      loadFromFirebase();
+    }
   },
   (error) => {
     isOnline = false;
@@ -570,16 +601,51 @@ dbFirestore.collection('users').onSnapshot(
 );
 
 // ============================================================
+// 📡 SYNC QUEUE
+// ============================================================
+
+function addToSyncQueue(operation, data) {
+  syncQueue.push({ operation, data, timestamp: Date.now() });
+  processSyncQueue();
+}
+
+async function processSyncQueue() {
+  if (isSyncing || !firebaseReady || syncQueue.length === 0) return;
+  isSyncing = true;
+  
+  while (syncQueue.length > 0) {
+    const item = syncQueue.shift();
+    try {
+      if (item.operation === 'user') {
+        await syncUserToFirebase(item.data);
+      } else if (item.operation === 'chat') {
+        await syncChatToFirebase(item.data);
+      }
+      console.log('✅ Synced:', item.operation);
+    } catch (error) {
+      console.error('❌ Sync failed, retrying:', error);
+      syncQueue.push(item);
+      break;
+    }
+  }
+  
+  isSyncing = false;
+  if (syncQueue.length > 0) {
+    setTimeout(processSyncQueue, 3000);
+  }
+}
+
+// ============================================================
 // 📡 FIREBASE SYNC FUNCTIONS
 // ============================================================
 
 async function syncUserToFirebase(userData) {
-  if (!firebaseReady || !isOnline) return;
+  if (!userData || !userData.name) return false;
   try {
     const userRef = dbFirestore.collection('users').doc(userData.name.toLowerCase());
     await userRef.set({
       name: userData.name,
-      team: userData.team,
+      team: userData.team || 'khem',
       totalSecs: userData.totalSecs || 0,
       sessions: userData.sessions || 0,
       verifications: userData.verifications || 0,
@@ -588,22 +654,26 @@ async function syncUserToFirebase(userData) {
       accounts: userData.accounts || [],
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
+    return true;
   } catch (error) {
     console.error('❌ Error syncing user:', error);
+    return false;
   }
 }
 
 async function syncChatToFirebase(chatData) {
-  if (!firebaseReady || !isOnline) return;
+  if (!chatData || !chatData.text) return false;
   try {
     await dbFirestore.collection('chat').add({
-      sender: chatData.sender,
+      sender: chatData.sender || 'System',
       team: chatData.team || 'system',
       text: chatData.text,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
+    return true;
   } catch (error) {
     console.error('❌ Error syncing chat:', error);
+    return false;
   }
 }
 
@@ -611,66 +681,82 @@ async function syncChatToFirebase(chatData) {
 // 📡 REAL-TIME LISTENERS
 // ============================================================
 
-// Listen for user updates
-function listenUsers(callback) {
-  if (!firebaseReady) return;
+let userListenerActive = false;
+
+function startUserListener() {
+  if (userListenerActive) return;
+  userListenerActive = true;
+  
   dbFirestore.collection('users').onSnapshot((snapshot) => {
     const users = {};
+    let changed = false;
+    
     snapshot.forEach(doc => {
-      users[doc.id] = doc.data();
+      const data = doc.data();
+      users[doc.id] = data;
+      if (!db[doc.id] || JSON.stringify(db[doc.id]) !== JSON.stringify(data)) {
+        changed = true;
+      }
     });
-    callback(users);
+    
+    if (changed) {
+      Object.entries(users).forEach(([key, data]) => {
+        db[key] = data;
+      });
+      
+      Object.entries(db).forEach(([key, data]) => {
+        if (!users[key] && data.name) {
+          addToSyncQueue('user', data);
+        }
+      });
+      
+      save();
+      renderAll();
+      console.log('📡 Updated from Firebase:', Object.keys(users).length, 'users');
+    }
   }, (error) => {
     console.warn('User listener error:', error);
+    userListenerActive = false;
+    setTimeout(startUserListener, 5000);
   });
 }
 
-// Listen for chat updates
-function listenChat(callback) {
-  if (!firebaseReady) return;
+let chatListenerActive = false;
+
+function startChatListener() {
+  if (chatListenerActive) return;
+  chatListenerActive = true;
+  
   dbFirestore.collection('chat')
     .orderBy('timestamp', 'desc')
-    .limit(50)
+    .limit(100)
     .onSnapshot((snapshot) => {
       const messages = [];
       snapshot.forEach(doc => {
         messages.push(doc.data());
       });
-      callback(messages.reverse());
+      const newMessages = messages.reverse();
+      
+      if (newMessages.length > chat.length) {
+        chat = newMessages;
+        saveChat();
+        renderChat('chat-feed-reg');
+        renderChat('chat-feed');
+        // Auto-scroll to bottom on new messages
+        setTimeout(() => {
+          ['chat-feed-reg', 'chat-feed'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.scrollTop = el.scrollHeight;
+          });
+        }, 100);
+        console.log('📡 Updated chat:', newMessages.length, 'messages');
+      }
     }, (error) => {
       console.warn('Chat listener error:', error);
+      chatListenerActive = false;
+      setTimeout(startChatListener, 5000);
     });
 }
-
-// ============================================================
-// 🔄 OVERRIDE LOCAL FUNCTIONS
-// ============================================================
-
-const originalSave = save;
-save = async function() {
-  originalSave();
-  if (myUsername) {
-    const key = myUsername.toLowerCase();
-    if (db[key]) {
-      await syncUserToFirebase(db[key]);
-    }
-  }
-};
-
-const originalSaveChat = saveChat;
-saveChat = async function() {
-  originalSaveChat();
-  if (chat.length > 0) {
-    const lastMsg = chat[chat.length - 1];
-    if (lastMsg && lastMsg.type === 'msg') {
-      await syncChatToFirebase({
-        sender: lastMsg.sender,
-        team: lastMsg.team,
-        text: lastMsg.text
-      });
-    }
-  }
-};
 
 // ============================================================
 // 📡 LOAD FROM FIREBASE
@@ -683,21 +769,21 @@ async function loadFromFirebase() {
   }
 
   try {
-    // Load users
-    const snapshot = await dbFirestore.collection('users').get();
-    snapshot.forEach(doc => {
+    console.log('📡 Loading from Firebase...');
+    
+    const userSnapshot = await dbFirestore.collection('users').get();
+    let userCount = 0;
+    userSnapshot.forEach(doc => {
       const data = doc.data();
-      if (!db[doc.id] || data.updatedAt > (db[doc.id]?.updatedAt || 0)) {
-        db[doc.id] = data;
-      }
+      db[doc.id] = data;
+      userCount++;
     });
     save();
-    renderAll();
+    console.log('✅ Loaded', userCount, 'users from Firebase');
 
-    // Load chat
     const chatSnapshot = await dbFirestore.collection('chat')
       .orderBy('timestamp', 'desc')
-      .limit(50)
+      .limit(100)
       .get();
     const messages = [];
     chatSnapshot.forEach(doc => {
@@ -705,65 +791,117 @@ async function loadFromFirebase() {
     });
     chat = messages.reverse();
     saveChat();
+    console.log('✅ Loaded', chat.length, 'messages from Firebase');
+
+    startUserListener();
+    startChatListener();
+    
+    renderAll();
     renderChat('chat-feed-reg');
     renderChat('chat-feed');
-
-    // Setup real-time listeners
-    listenUsers((users) => {
-      let changed = false;
-      Object.entries(users).forEach(([key, data]) => {
-        if (!db[key] || data.updatedAt > (db[key]?.updatedAt || 0)) {
-          db[key] = data;
-          changed = true;
-        }
-      });
-      if (changed) {
-        save();
-        renderAll();
-      }
-    });
-
-    listenChat((messages) => {
-      if (messages.length > chat.length) {
-        chat = messages;
-        saveChat();
-        renderChat('chat-feed-reg');
-        renderChat('chat-feed');
-      }
-    });
-
-    console.log('✅ Loaded from Firebase');
+    
+    toast('🌐 Connected! ' + userCount + ' streamers online.', 3000);
+    
   } catch (error) {
     console.error('❌ Error loading from Firebase:', error);
+    setTimeout(loadFromFirebase, 5000);
   }
 }
+
+// ============================================================
+// 🔄 OVERRIDE FUNCTIONS FOR FIREBASE SYNC
+// ============================================================
+
+const originalSave = save;
+save = function() {
+  originalSave();
+  if (firebaseReady && isOnline && myUsername) {
+    const key = myUsername.toLowerCase();
+    if (db[key]) {
+      addToSyncQueue('user', db[key]);
+    }
+  }
+};
+
+const originalSaveChat = saveChat;
+saveChat = function() {
+  originalSaveChat();
+  if (firebaseReady && isOnline && chat.length > 0) {
+    const lastMsg = chat[chat.length - 1];
+    if (lastMsg && lastMsg.type === 'msg') {
+      addToSyncQueue('chat', {
+        sender: lastMsg.sender,
+        team: lastMsg.team,
+        text: lastMsg.text
+      });
+    }
+  }
+};
+
+const originalPostSysMsg = postSysMsg;
+postSysMsg = function(txt) {
+  originalPostSysMsg(txt);
+  if (firebaseReady && isOnline) {
+    addToSyncQueue('chat', {
+      sender: 'System',
+      team: 'system',
+      text: txt
+    });
+  }
+};
+
+// ============================================================
+// 📡 SYNC BUTTON
+// ============================================================
+
+function addSyncButton() {
+  const btn = document.createElement('button');
+  btn.textContent = '🔄 Sync';
+  btn.className = 'btn btn-outline btn-xs';
+  btn.style.marginLeft = '8px';
+  btn.onclick = async function() {
+    toast('🔄 Syncing...', 1500);
+    if (myUsername) {
+      const key = myUsername.toLowerCase();
+      if (db[key]) {
+        await syncUserToFirebase(db[key]);
+      }
+    }
+    await loadFromFirebase();
+    toast('✅ Synced!', 1500);
+  };
+  const header = document.querySelector('.nb-right');
+  if (header) header.appendChild(btn);
+}
+
+setTimeout(addSyncButton, 2000);
 
 // ============================================================
 // 🚀 STARTUP
 // ============================================================
 
-let loadCalled = false;
 let firebaseInitAttempts = 0;
 const checkFirebaseReady = setInterval(() => {
   firebaseInitAttempts++;
-  if (firebaseReady || firebaseInitAttempts > 20) {
+  
+  if (firebaseReady || firebaseInitAttempts > 30) {
     clearInterval(checkFirebaseReady);
+    
     if (firebaseReady) {
       console.log('🔥 Firebase ready! Loading data...');
       loadFromFirebase();
     } else {
       console.log('📱 Firebase not available, using local mode');
-    }
-    // Load local data
-    if (!loadCalled) {
-      loadCalled = true;
-      load();
+      if (!window.loadCalled) {
+        window.loadCalled = true;
+        load();
+      }
     }
   }
 }, 500);
 
 // ============================================================
-// EXISTING APP CODE (Same as before)
+// ⚡ EXISTING APP CODE
 // ============================================================
 
 const LS_DATA = 'ohoh_battle_data';
@@ -850,7 +988,16 @@ function fmtTime(s){ const m=Math.floor(s/60),sec=s%60; return `${String(m).padS
 function initials(n){ return n.replace(/^@/,'').slice(0,2).toUpperCase()||'??'; }
 function tsNow(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function safe(n){ return n.replace(/\W/g,'_'); }
-function toast(msg,ms=3500){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),ms); }
+
+let toastTimer;
+function toast(msg,ms=3500){ 
+  const el=document.getElementById('toast'); 
+  if(!el) return;
+  el.textContent=msg; 
+  el.classList.add('show'); 
+  clearTimeout(toastTimer); 
+  toastTimer=setTimeout(()=>el.classList.remove('show'),ms); 
+}
 
 function pickTeam(team,el){
   myTeam=team;
@@ -871,8 +1018,17 @@ function addAcc(){
   </div><button class="acc-rm" onclick="rmAcc(this)">×</button>`;
   list.appendChild(d);
 }
-function rmAcc(btn){ const list=document.getElementById('acc-list'); if(list.children.length>1) btn.closest('.acc-item').remove(); }
-function showErr(id,msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display=msg?'block':'none'; }
+
+function rmAcc(btn){ 
+  const list=document.getElementById('acc-list'); 
+  if(list.children.length>1) btn.closest('.acc-item').remove(); 
+}
+
+function showErr(id,msg){ 
+  const el=document.getElementById(id); 
+  el.textContent=msg; 
+  el.style.display=msg?'block':'none'; 
+}
 
 function setupStreamUI(){
   const hero=document.getElementById('sess-hero');
@@ -999,10 +1155,8 @@ function startTimer(){
 function startTimerFromRestore(){
   if(ticker) clearInterval(ticker);
   ticker=setInterval(tick,1000);
-  
   if(verifyInterval) clearInterval(verifyInterval);
   verifyInterval=setInterval(verifyTick,1000);
-  
   toast('🔄 Session restored! Timer continuing...',3000);
 }
 
@@ -1146,19 +1300,54 @@ function resetSession(){
   window.scrollTo(0,0);
 }
 
-function postSysMsg(txt){ chat.push({type:'sys',text:txt,ts:tsNow()}); saveChat(); renderChat('chat-feed'); renderChat('chat-feed-reg'); }
+function postSysMsg(txt){ 
+  chat.push({type:'sys',text:txt,ts:tsNow()}); 
+  saveChat(); 
+  renderChat('chat-feed-reg'); 
+  renderChat('chat-feed');
+  // Auto-scroll
+  setTimeout(() => {
+    ['chat-feed-reg', 'chat-feed'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, 100);
+}
+
 function sendMsg(source){
   const inp=document.getElementById(source==='reg'?'chat-input-reg':'chat-input');
   const txt=inp.value.trim(); if(!txt) return;
   if(!myUsername){ toast('Register first to chat!'); return; }
   inp.value='';
   chat.push({type:'msg',sender:myUsername,team:myTeam,text:txt,ts:tsNow()});
-  saveChat(); renderChat('chat-feed'); renderChat('chat-feed-reg');
+  saveChat(); 
+  renderChat('chat-feed-reg'); 
+  renderChat('chat-feed');
+  setTimeout(() => {
+    ['chat-feed-reg', 'chat-feed'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, 100);
 }
-function sendReact(txt){ if(!myUsername){ toast('Register first!'); return; } chat.push({type:'msg',sender:myUsername,team:myTeam,text:txt,ts:tsNow()}); saveChat(); renderChat('chat-feed'); renderChat('chat-feed-reg'); }
+
+function sendReact(txt){ 
+  if(!myUsername){ toast('Register first!'); return; } 
+  chat.push({type:'msg',sender:myUsername,team:myTeam,text:txt,ts:tsNow()}); 
+  saveChat(); 
+  renderChat('chat-feed-reg'); 
+  renderChat('chat-feed');
+  setTimeout(() => {
+    ['chat-feed-reg', 'chat-feed'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, 100);
+}
 
 function renderChat(feedId){
-  const feed=document.getElementById(feedId); if(!feed) return;
+  const feed=document.getElementById(feedId); 
+  if(!feed) return;
   const atBottom=feed.scrollHeight-feed.scrollTop-feed.clientHeight<60;
   feed.innerHTML=chat.slice(-50).map(m=>{
     if(m.type==='sys') return `<div class="chat-msg sys"><span class="chat-sys-pill">${escHtml(m.text)}</span></div>`;
@@ -1174,6 +1363,7 @@ function renderChat(feedId){
   }).join('');
   if(atBottom||feed.scrollHeight<400) feed.scrollTop=feed.scrollHeight;
 }
+
 function escHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
 function getPoints(secs){ return Math.floor(secs/300); }
@@ -1214,7 +1404,6 @@ function renderVS(){
   if(kp>pp){ kBox?.classList.add('lead-k'); kBoxLive?.classList.add('lead-k'); }
   else if(pp>kp){ pBox?.classList.add('lead-p'); pBoxLive?.classList.add('lead-p'); }
   
-  // Update live count
   const liveCount = Object.values(db).filter(u => u.isLive).length;
   document.getElementById('live-count').textContent = `👀 ${liveCount} live`;
   
@@ -1285,8 +1474,53 @@ setInterval(()=>{
   renderAll();
 },3000);
 
-let toastTimer;
-// load() is called from the Firebase init above
+// Override goStream to force sync
+const originalGoStream = goStream;
+goStream = function() {
+  originalGoStream();
+  setTimeout(() => {
+    if (myUsername) {
+      const key = myUsername.toLowerCase();
+      if (db[key]) {
+        addToSyncQueue('user', db[key]);
+        syncUserToFirebase(db[key]);
+      }
+    }
+  }, 1000);
+};
+
+// Override verifyStream to force sync
+const originalVerifyStream = verifyStream;
+verifyStream = function() {
+  originalVerifyStream();
+  setTimeout(() => {
+    if (myUsername) {
+      const key = myUsername.toLowerCase();
+      if (db[key]) {
+        addToSyncQueue('user', db[key]);
+        syncUserToFirebase(db[key]);
+      }
+    }
+  }, 500);
+};
+
+// Override stopStream to force sync
+const originalStopStream = stopStream;
+stopStream = function() {
+  originalStopStream();
+  setTimeout(() => {
+    if (myUsername) {
+      const key = myUsername.toLowerCase();
+      if (db[key]) {
+        addToSyncQueue('user', db[key]);
+        syncUserToFirebase(db[key]);
+      }
+    }
+  }, 500);
+};
+
+console.log('🔥 Firebase integration complete!');
+console.log('📡 Real-time sync is active!');
 </script>
 </body>
 </html>
