@@ -1,390 +1,921 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title id="page-title">OhOh Fandom — Stream Battle</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Dancing+Script:wght@700;800&display=swap" rel="stylesheet"/>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<style>
-:root{
-  --pink:#FF6B9D;--pink2:#ff8ec3;--pink-light:#FFD1DC;--pink-pale:#FFF0F7;
-  --cream:#FFF8F2;--gold:#D4AF37;--gold-light:#FFF8DC;--red:#E8294A;
-  --text:#3D2C2C;--sidebar:220px;--radius:16px;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Nunito',sans-serif;background:var(--pink-pale);color:var(--text);min-height:100vh;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OhOh Fandom · Stream Battle</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Dancing+Script:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <style>
+    :root {
+      --rose: #E84A7A;
+      --rose-light: #FFB6C9;
+      --rose-pale: #FFF0F5;
+      --rose-dark: #C2365E;
+      --cream: #FFF8F5;
+      --gold: #D4AF37;
+      --text: #2D1B1B;
+      --text-light: #6B4A4A;
+      --bg: #FCF6F3;
+      --card: #FFFFFF;
+      --radius: 16px;
+      --shadow: 0 8px 30px rgba(232, 74, 122, 0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.7;
+      font-size: 15px;
+      font-weight: 500;
+    }
 
-/* ── SIDEBAR ── */
-.sidebar{width:var(--sidebar);min-height:100vh;background:var(--cream);border-right:2px solid var(--pink-light);
-  position:fixed;left:0;top:0;z-index:200;display:flex;flex-direction:column;padding:1.5rem 1rem;overflow-y:auto;}
-.sidebar-logo{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--pink-light);}
-.logo-title{font-family:'Dancing Script',cursive;font-size:22px;color:var(--pink);display:block;line-height:1.2;}
-.logo-sub{font-size:10px;color:#b07;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
-.nav-item-s{display:flex;align-items:center;gap:9px;padding:.65rem 1rem;border-radius:12px;
-  color:var(--text);text-decoration:none;font-weight:700;font-size:13.5px;margin-bottom:3px;
-  cursor:pointer;border:none;background:none;width:100%;transition:all .15s;}
-.nav-item-s:hover,.nav-item-s.active{background:var(--pink-light);color:var(--pink);}
-.nav-item-s .ni{font-size:18px;width:24px;text-align:center;}
-.sidebar-bottom{margin-top:auto;padding-top:1rem;border-top:1px solid var(--pink-light);font-size:11px;color:#aaa;text-align:center;}
-.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccc;margin-right:4px;vertical-align:middle;}
-.status-dot.on{background:#22c55e;}
-.status-dot.off{background:#ef4444;}
+    /* ── HAMBURGER MENU ── */
+    .hamburger-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--rose-light);
+      box-shadow: 0 2px 20px rgba(232,74,122,0.08);
+    }
+    .hamburger-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: var(--rose);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .hamburger-btn:hover { background: var(--rose-pale); }
+    .menu-brand {
+      font-family: 'Dancing Script', cursive;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--rose);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .menu-brand .mascot-sm { font-size: 30px; }
 
-/* ── MAIN ── */
-.main-content{margin-left:var(--sidebar);min-height:100vh;}
-.view{display:none;padding:1.5rem;}
-.view.active{display:block;}
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(45, 27, 27, 0.4);
+      z-index: 999;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .menu-overlay.open { display: block; }
 
-/* ── HERO BANNER ── */
-.hero-banner{background:linear-gradient(135deg,#FF6B9D 0%,#FF8E53 60%,#FFD1DC 100%);padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;}
-.hero-banner::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.12);border-radius:50%;}
-.hero-banner::after{content:'';position:absolute;bottom:-30px;left:30%;width:140px;height:140px;background:rgba(255,255,255,.08);border-radius:50%;}
-.hero-title{font-family:'Dancing Script',cursive;font-size:clamp(22px,4vw,34px);color:#fff;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.2);}
-.hero-subtitle{color:rgba(255,255,255,.85);font-size:13px;font-weight:600;margin-top:4px;}
+    .menu-drawer {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 280px;
+      height: 100%;
+      background: #fff;
+      z-index: 1001;
+      padding: 2rem 1.5rem;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 30px rgba(0,0,0,0.08);
+      overflow-y: auto;
+    }
+    .menu-drawer.open { left: 0; }
+    .menu-drawer .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-light);
+      cursor: pointer;
+      float: right;
+      padding: 4px;
+    }
+    .menu-drawer .drawer-brand {
+      text-align: center;
+      padding: 1rem 0 1.5rem;
+      border-bottom: 2px solid var(--rose-light);
+      margin-bottom: 1.5rem;
+    }
+    .menu-drawer .drawer-brand .mascot-big { font-size: 56px; display: block; }
+    .menu-drawer .drawer-brand .brand-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: 26px;
+      color: var(--rose);
+      font-weight: 800;
+    }
+    .menu-drawer .drawer-brand .brand-sub {
+      font-size: 11px;
+      color: var(--text-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+    .menu-item:hover { background: var(--rose-pale); color: var(--rose); }
+    .menu-item.active { background: var(--rose-pale); color: var(--rose); }
+    .menu-item .mi-icon { font-size: 22px; width: 28px; text-align: center; }
+    .menu-item .mi-badge {
+      margin-left: auto;
+      font-size: 10px;
+      background: var(--rose);
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .menu-divider {
+      height: 2px;
+      background: var(--rose-light);
+      margin: 1rem 0;
+      opacity: 0.3;
+    }
+    .menu-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 2px solid var(--rose-light);
+      font-size: 11px;
+      color: var(--text-light);
+      text-align: center;
+      font-weight: 600;
+    }
+    .menu-footer .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .status-dot.on { background: #10b981; }
+    .status-dot.off { background: #ef4444; }
 
-/* ── SCOREBOARD ── */
-.scoreboard{display:grid;gap:10px;margin:1rem 0;max-width:700px;}
-.score-card{background:rgba(255,255,255,.2);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);
-  border-radius:var(--radius);padding:1rem 1.25rem;flex:1;}
-.score-card .sc-label{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.6);letter-spacing:.08em;font-weight:700;}
-.score-card .sc-name{font-size:17px;font-weight:800;color:#fff;margin:3px 0;}
-.score-card .sc-pts{font-size:30px;font-weight:900;color:var(--gold-light);line-height:1;}
-.score-card .sc-time{font-size:14px;color:rgba(255,255,255,.75);font-weight:700;font-variant-numeric:tabular-nums;}
-.score-card .sc-meta{font-size:10px;color:rgba(255,255,255,.5);margin-top:3px;}
-.vs-orb{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;flex-shrink:0;align-self:center;}
-.progress-bar-wrap{height:8px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden;display:flex;margin:.75rem 0 .25rem;}
-.pb-k{transition:width 1s;border-radius:4px 0 0 4px;}
-.pb-p{transition:width 1s;border-radius:0 4px 4px 0;}
-.verdict-text{font-size:13px;color:rgba(255,255,255,.85);font-weight:700;}
+    /* ── MAIN ── */
+    .main-content {
+      padding-top: 80px;
+      min-height: 100vh;
+    }
+    .view { display: none; padding: 2rem 2.5rem; }
+    .view.active { display: block; }
 
-/* ── CARDS ── */
-.card-c{background:#fff;border-radius:var(--radius);border:none;box-shadow:0 4px 20px rgba(255,107,157,.09);padding:1.25rem;margin-bottom:1.1rem;}
-.card-head{font-weight:800;font-size:15px;margin-bottom:.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.card-head-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--pink),var(--pink2));display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0;}
+    /* ── HERO ── */
+    .hero-banner {
+      background: linear-gradient(135deg, var(--rose) 0%, #F28B9E 60%, var(--rose-light) 100%);
+      padding: 2.5rem 3rem;
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .hero-banner .mascot-hero {
+      position: absolute;
+      right: 2rem;
+      bottom: 0;
+      font-size: 90px;
+      filter: drop-shadow(0 8px 30px rgba(0,0,0,0.1));
+      opacity: 0.8;
+    }
+    .hero-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(28px, 4.5vw, 42px);
+      color: #fff;
+      font-weight: 900;
+      text-shadow: 0 3px 16px rgba(0,0,0,0.12);
+      margin-bottom: 0.5rem;
+    }
+    .hero-subtitle {
+      color: rgba(255,255,255,0.92);
+      font-size: 17px;
+      font-weight: 700;
+    }
 
-/* ── INPUTS ── */
-.inp{width:100%;height:42px;border:2px solid var(--pink-light);border-radius:10px;padding:0 13px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border .15s;}
-.inp:focus{border-color:var(--pink);}
-.inp-sm{height:36px;font-size:12px;}
-.lbl{font-size:11px;font-weight:800;color:#b07;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;}
-.field-g{margin-bottom:1rem;}
+    /* ── SCOREBOARD ── */
+    .scoreboard {
+      display: flex;
+      gap: 14px;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .score-card {
+      background: rgba(255,255,255,0.22);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 14px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      transition: all .3s;
+    }
+    .score-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.3); }
+    .score-card .sc-label { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.7); letter-spacing: .1em; font-weight: 700; }
+    .score-card .sc-name { font-size: 17px; font-weight: 800; color: #fff; margin: 6px 0 4px; }
+    .score-card .sc-pts { font-size: 36px; font-weight: 900; color: #fff; line-height: 1; }
+    .score-card .sc-time { font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 700; }
+    .vs-orb {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+      align-self: center;
+    }
+    .progress-bar-wrap {
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      margin: 1rem 0 0.5rem;
+    }
+    .pb-k { transition: width 1s; border-radius: 4px 0 0 4px; }
+    .pb-p { transition: width 1s; border-radius: 0 4px 4px 0; }
+    .verdict-text { font-size: 14px; color: rgba(255,255,255,0.95); font-weight: 700; }
 
-/* ── TEAM BUTTONS ── */
-.team-btn{border:2px solid var(--pink-light);border-radius:var(--radius);padding:1rem;text-align:center;cursor:pointer;
-  background:#fff;font-family:inherit;transition:all .18s;width:100%;}
-.team-btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(255,107,157,.2);}
-.team-btn.selected{border-color:var(--pink);background:var(--pink-pale);box-shadow:0 0 0 3px rgba(255,107,157,.25);}
-.team-btn .t-emoji{font-size:32px;display:block;margin-bottom:5px;}
-.team-btn .t-name{font-weight:800;font-size:15px;display:block;}
-.team-btn .t-count{font-size:11px;color:#b07;margin-top:2px;display:block;font-weight:600;}
+    /* ── CARDS ── */
+    .card-c {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 2px solid #f0e8e5;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 1.75rem;
+    }
+    .card-head {
+      font-weight: 800;
+      font-size: 19px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text);
+    }
+    .card-head .rose { color: var(--rose); }
 
-/* ── BUTTONS ── */
-.btn-pink{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;border:none;border-radius:12px;
-  padding:.6rem 1.5rem;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
-.btn-pink:hover{filter:brightness(1.07);transform:translateY(-1px);}
-.btn-pink:active{transform:scale(.97);}
-.btn-gold{background:linear-gradient(135deg,#D4AF37,#F0D060);color:#fff;border:none;border-radius:12px;
-  padding:.6rem 1.5rem;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
-.btn-gold:hover{filter:brightness(1.07);}
-.btn-red{background:linear-gradient(135deg,#E8294A,#c0162f);color:#fff;border:none;border-radius:12px;
-  padding:.6rem 1.5rem;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
-.btn-outline-pink{background:#fff;color:var(--pink);border:2px solid var(--pink-light);border-radius:12px;
-  padding:.5rem 1.5rem;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;}
-.btn-outline-pink:hover{border-color:var(--pink);background:var(--pink-pale);}
-.btn-full{width:100%;justify-content:center;}
-.btn-sm-p{padding:.35rem 1rem;font-size:12px;}
-.btn-danger-s{background:#fff;color:#dc2626;border:2px solid #fca5a5;border-radius:10px;padding:.45rem 1rem;font-weight:700;font-size:12px;font-family:inherit;cursor:pointer;transition:all .15s;}
-.btn-danger-s:hover{background:#fee2e2;}
+    /* ── TEAM GRID ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
 
-/* ── ACCOUNT LIST ── */
-.acc-item{background:var(--pink-pale);border:1px solid var(--pink-light);border-radius:10px;padding:.85rem;margin-bottom:.6rem;}
-.acc-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
-.acc-row:last-child{margin-bottom:0;}
-.rm-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--pink-light);background:#fff;
-  cursor:pointer;font-size:16px;color:#b07;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.rm-btn:hover{background:#fee2e2;border-color:#fca5a5;color:#dc2626;}
-.add-acc-btn{width:100%;height:38px;border:2px dashed var(--pink-light);border-radius:10px;background:none;
-  font-size:12px;color:var(--pink);cursor:pointer;font-family:inherit;font-weight:700;transition:all .15s;}
-.add-acc-btn:hover{border-color:var(--pink);background:var(--pink-pale);}
+    .team-card {
+      background: #fff;
+      border: 3px solid #e8ddd8;
+      border-radius: 16px;
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      font-family: inherit;
+    }
+    .team-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(232,74,122,0.12); }
+    .team-card .tc-emoji { font-size: 48px; display: block; margin-bottom: 8px; transition: transform .3s; }
+    .team-card:hover .tc-emoji { transform: scale(1.1); }
+    .team-card .tc-name { font-weight: 800; font-size: 19px; display: block; margin-bottom: 4px; }
+    .team-card .tc-count {
+      font-size: 12px;
+      color: var(--text-light);
+      font-weight: 600;
+      background: #f5f0ed;
+      padding: 4px 14px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 6px;
+    }
+    .team-card.selected {
+      border-color: var(--rose);
+      background: var(--rose-pale);
+      box-shadow: 0 8px 28px rgba(232,74,122,0.2);
+    }
+    .team-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 28px;
+      height: 28px;
+      background: var(--rose);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(232,74,122,0.3);
+    }
+    .team-card.khem .tc-name { color: #1a5276; }
+    .team-card.khem.selected { border-color: #1a5276; background: #eaf4fb; }
+    .team-card.khem.selected::after { background: #1a5276; }
+    .team-card.pharan .tc-name { color: #b03a2e; }
+    .team-card.pharan.selected { border-color: #b03a2e; background: #fdedea; }
+    .team-card.pharan.selected::after { background: #b03a2e; }
 
-/* ── INFO BOX ── */
-.info-box{background:var(--pink-pale);border:1.5px solid var(--pink-light);border-radius:10px;padding:1rem;margin-bottom:.85rem;}
-.info-box.gold{background:var(--gold-light);border-color:rgba(212,175,55,.4);}
-.info-box .ib-title{font-weight:800;font-size:13px;color:var(--pink);margin-bottom:4px;}
-.info-box.gold .ib-title{color:var(--gold);}
-.info-box .ib-text{font-size:12px;color:var(--text);line-height:1.65;}
-.fb-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:6px;}
+    /* ── INPUTS ── */
+    .inp {
+      width: 100%;
+      height: 48px;
+      border: 2.5px solid #e8ddd8;
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      background: #faf8f7;
+      transition: all .3s;
+      font-weight: 500;
+    }
+    .inp:focus {
+      border-color: var(--rose);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(232,74,122,0.1);
+    }
+    .inp-sm { height: 42px; font-size: 14px; }
+    .lbl {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      display: block;
+      margin-bottom: 8px;
+    }
 
-/* ── SESS HERO ── */
-.sess-hero{border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden;}
-.sess-hero::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:50%;}
-.sess-hero .sh-eye{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.55);letter-spacing:.1em;font-weight:700;}
-.sess-hero .sh-timer{font-size:clamp(48px,10vw,68px);font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-3px;line-height:1;margin:4px 0;}
-.sess-hero .sh-pts{font-size:22px;font-weight:800;color:var(--gold-light);margin:4px 0;}
-.sess-hero .sh-accs{font-size:12px;color:rgba(255,255,255,.6);}
+    /* ── BUTTONS ── */
+    .btn-rose {
+      background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0.9rem 2rem;
+      font-weight: 800;
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(232,74,122,0.3);
+    }
+    .btn-rose:hover { filter: brightness(1.08); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(232,74,122,0.4); }
+    .btn-rose:active { transform: scale(.95); }
+    .btn-full { width: 100%; justify-content: center; }
 
-/* ── STATUS BARS ── */
-.status-bar{padding:9px 14px;border-radius:10px;font-size:12px;font-weight:700;margin-bottom:1rem;text-align:center;border:1.5px solid;}
-.sb-wait{background:#fefce8;border-color:#fde047;color:#713f12;}
-.sb-live{background:#dcfce7;border-color:#86efac;color:#15803d;}
-.sb-verify{background:#fee2e2;border-color:#fca5a5;color:#dc2626;}
+    .btn-outline-rose {
+      background: transparent;
+      color: var(--rose);
+      border: 2px solid var(--rose-light);
+      border-radius: 12px;
+      padding: 0.7rem 1.5rem;
+      font-weight: 700;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-outline-rose:hover { border-color: var(--rose); background: var(--rose-pale); }
 
-/* ── VERIFY BOX ── */
-.verify-box{background:linear-gradient(135deg,#ede9fe,#fce7f3);border:2px solid #c4b5fd;border-radius:var(--radius);padding:1.25rem;text-align:center;margin-bottom:1rem;}
-.verify-box .vt{font-weight:800;font-size:14px;color:#6d28d9;}
-.verify-box .vtime{font-size:36px;font-weight:900;color:#7c3aed;margin:8px 0;font-variant-numeric:tabular-nums;}
+    .btn-danger-soft {
+      background: #fff;
+      color: #dc2626;
+      border: 2px solid #fca5a5;
+      border-radius: 12px;
+      padding: 0.6rem 1.25rem;
+      font-weight: 700;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-danger-soft:hover { background: #fee2e2; border-color: #fb7185; }
 
-/* ── OPEN TABS ── */
-.open-row{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;
-  background:var(--pink-pale);border:1px solid var(--pink-light);border-radius:10px;margin-bottom:6px;}
-.open-row .or-acc{font-weight:700;font-size:13px;}
-.open-row .or-url{font-size:10px;color:#b07;margin-top:1px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    /* ── ACCOUNT ITEMS ── */
+    .acc-item {
+      background: #faf6f4;
+      border: 1px solid #e8ddd8;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .acc-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .acc-row:last-child { margin-bottom: 0; }
+    .rm-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 2px solid #e8ddd8;
+      background: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+    .rm-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+    .add-acc-btn {
+      width: 100%;
+      height: 42px;
+      border: 2px dashed #e8ddd8;
+      border-radius: 12px;
+      background: none;
+      font-size: 13px;
+      color: var(--rose);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      transition: all .2s;
+    }
+    .add-acc-btn:hover { border-color: var(--rose); background: var(--rose-pale); }
 
-/* ── ACC LIVE ── */
-.acc-live-row{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;
-  background:var(--pink-pale);border:1px solid var(--pink-light);border-radius:10px;margin-bottom:6px;}
-.acc-live-row .al-left{display:flex;align-items:center;gap:10px;}
-.avatar-sm{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
-.al-time{font-weight:800;font-size:13px;font-variant-numeric:tabular-nums;color:var(--pink);}
+    /* ── SESSION CONTROLS ── */
+    .session-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+    .session-controls .btn { flex: 1; min-width: 100px; }
 
-/* ── BADGES ── */
-.badge-grid{display:flex;flex-wrap:wrap;gap:8px;}
-.badge-item{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:5px 14px;
-  font-size:11px;font-weight:700;border:2px solid var(--pink-light);color:#b07;background:#fff;transition:all .35s;}
-.badge-item.got{border-color:var(--gold);background:var(--gold-light);color:#856404;}
+    /* ── ADMIN ── */
+    .admin-card {
+      background: #fcf6f3;
+      border: 2px solid var(--rose-light);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .admin-user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .admin-user-row:last-child { border-bottom: none; }
+    .admin-user-row .uname { font-weight: 600; font-size: 0.9rem; }
+    .admin-user-row .uteam {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.7rem;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    .uteam.k { background: #d6eaf8; color: #1a5276; }
+    .uteam.p { background: #fadbd8; color: #b03a2e; }
+    .btn-admin-del {
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      padding: 0.1rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .btn-admin-del:hover { background: #b91c1c; }
 
-/* ── LEADERBOARD ── */
-.lb-tabs{display:flex;gap:4px;background:var(--pink-pale);border:1.5px solid var(--pink-light);border-radius:10px;padding:3px;margin-bottom:.85rem;}
-.lb-tab{flex:1;height:30px;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:inherit;
-  cursor:pointer;background:none;color:#b07;transition:all .14s;}
-.lb-tab.on{background:#fff;color:var(--pink);box-shadow:0 1px 4px rgba(255,107,157,.15);}
-.lb-entry{display:flex;align-items:center;gap:10px;padding:.65rem .9rem;border-radius:10px;border:1.5px solid var(--pink-light);margin-bottom:5px;background:#fff;transition:all .2s;}
-.lb-entry:hover{border-color:var(--pink);transform:translateX(2px);}
-.lb-rank{font-weight:900;font-size:14px;width:24px;text-align:center;color:#ccc;flex-shrink:0;}
-.lb-rank.r1{color:#D4AF37;}
-.lb-rank.r2{color:#94a3b8;}
-.lb-rank.r3{color:#c8872a;}
-.lb-body{flex:1;min-width:0;}
-.lb-name{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lb-detail{font-size:10px;color:#b07;margin-top:1px;}
-.lb-pts{font-weight:900;font-size:17px;color:var(--gold);}
-.lb-time-s{font-size:10px;color:#b07;text-align:right;}
-.pill{display:inline-block;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:2px;text-transform:uppercase;}
-.pill-live{background:#22c55e;color:#fff;}
-.pill-you{background:var(--pink);color:#fff;}
-.pill-verify{background:#7c3aed;color:#fff;}
-.lb-empty{text-align:center;padding:2rem;color:#b07;font-size:13px;}
-.team-score-box{border-radius:12px;border:2px solid var(--pink-light);padding:1rem;text-align:center;background:#fff;}
-.team-score-box.lead{border-color:var(--gold);background:var(--gold-light);}
-.tsb-name{font-weight:800;font-size:13px;}
-.tsb-pts{font-size:26px;font-weight:900;}
+    /* ── CHAT ── */
+    .chat-wrap {
+      display: flex;
+      flex-direction: column;
+      height: 340px;
+    }
+    .chat-feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #faf8f7;
+      border-radius: 12px 12px 0 0;
+    }
+    .chat-feed::-webkit-scrollbar { width: 5px; }
+    .chat-feed::-webkit-scrollbar-thumb { background: #e8ddd8; border-radius: 3px; }
+    .chat-input-row {
+      border-top: 1px solid #e8ddd8;
+      padding: 0.8rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #fff;
+      border-radius: 0 0 12px 12px;
+    }
+    .chat-inp {
+      flex: 1;
+      height: 40px;
+      border: 2px solid #e8ddd8;
+      border-radius: 21px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: #faf8f7;
+    }
+    .chat-inp:focus { border-color: var(--rose); background: #fff; }
+    .chat-send {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+    .chat-send:hover { filter: brightness(1.08); }
+    .chat-send svg { width: 18px; height: 18px; }
+    .chat-msg { display: flex; align-items: flex-start; gap: 10px; animation: fadeUp .25s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    .chat-msg.sys { justify-content: center; }
+    .chat-sys {
+      background: #f5f0ed;
+      border: 1px solid #e8ddd8;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--text-light);
+      font-weight: 700;
+    }
+    .chat-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .chat-bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      max-width: calc(100% - 52px);
+    }
+    .chat-meta { display: flex; align-items: center; gap: 6px; }
+    .chat-sender { font-size: 12px; font-weight: 700; color: var(--text); }
+    .chat-ts { font-size: 11px; color: #999; }
+    .chat-bubble {
+      background: #f5f0ed;
+      border: 1px solid #e8ddd8;
+      border-radius: 0 12px 12px 12px;
+      padding: 9px 13px;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      font-weight: 500;
+      word-break: break-word;
+    }
 
-/* ── CHAT ── */
-.chat-wrap{display:flex;flex-direction:column;height:340px;}
-.chat-feed{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:6px;}
-.chat-feed::-webkit-scrollbar{width:4px;}
-.chat-feed::-webkit-scrollbar-thumb{background:var(--pink-light);border-radius:2px;}
-.chat-msg{display:flex;align-items:flex-start;gap:8px;animation:fadeUp .2s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-.chat-msg.sys{justify-content:center;}
-.chat-sys{background:var(--pink-pale);border:1px solid var(--pink-light);border-radius:20px;padding:3px 14px;font-size:11px;color:var(--pink);font-weight:600;}
-.chat-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;}
-.chat-bubble-wrap{display:flex;flex-direction:column;gap:2px;max-width:calc(100% - 40px);}
-.chat-meta{display:flex;align-items:center;gap:5px;}
-.chat-sender{font-size:11px;font-weight:800;color:var(--pink);}
-.chat-ts{font-size:10px;color:#ccc;}
-.chat-bubble{background:var(--pink-pale);border:1px solid var(--pink-light);border-radius:0 12px 12px 12px;padding:7px 11px;font-size:13px;color:var(--text);line-height:1.45;font-weight:600;word-break:break-word;}
-.chat-input-row{border-top:1.5px solid var(--pink-light);padding:.75rem;display:flex;gap:8px;align-items:center;background:#fff;border-radius:0 0 var(--radius) var(--radius);}
-.chat-inp{flex:1;height:38px;border:2px solid var(--pink-light);border-radius:20px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:#fff;}
-.chat-inp:focus{border-color:var(--pink);}
-.chat-send{width:38px;height:38px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.chat-send svg{width:15px;height:15px;}
-.quick-reacts{display:flex;gap:6px;padding:.5rem .75rem;border-top:1px solid var(--pink-light);background:var(--pink-pale);flex-wrap:wrap;border-radius:var(--radius) var(--radius) 0 0;}
-.react-btn{height:28px;padding:0 10px;border-radius:20px;border:1.5px solid var(--pink-light);background:#fff;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;color:var(--pink);transition:all .12s;}
-.react-btn:hover{border-color:var(--pink);background:var(--pink-pale);transform:scale(1.06);}
+    /* ── TOAST ── */
+    .toast-c {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 28px rgba(232,74,122,0.25);
+      z-index: 9999;
+      opacity: 0;
+      transition: all .3s;
+      pointer-events: none;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast-c.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ── MY PROFILE ── */
-.profile-hero{background:linear-gradient(135deg,#FF6B9D,#FFB347);border-radius:var(--radius);padding:1.5rem;text-align:center;color:#fff;margin-bottom:1.25rem;}
-.profile-avatar{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.3);border:3px solid rgba(255,255,255,.6);
-  display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;margin:0 auto 10px;}
-.profile-name{font-size:22px;font-weight:900;font-family:'Dancing Script',cursive;}
-.profile-team{font-size:12px;color:rgba(255,255,255,.75);font-weight:700;}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
-.stat-box{background:var(--pink-pale);border:1.5px solid var(--pink-light);border-radius:12px;padding:.85rem;text-align:center;}
-.stat-val{font-size:22px;font-weight:900;color:var(--pink);}
-.stat-val.gold{color:var(--gold);}
-.stat-lbl{font-size:10px;color:#b07;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+    /* ── SESS HERO ── */
+    .sess-hero {
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--rose), var(--rose-light));
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .sess-hero .sh-eye { font-size: 11px; text-transform: uppercase; opacity: 0.7; letter-spacing: .12em; font-weight: 700; }
+    .sess-hero .sh-timer { font-size: clamp(48px, 10vw, 64px); font-weight: 900; line-height: 1; margin: 6px 0; }
+    .sess-hero .sh-pts { font-size: 22px; font-weight: 800; margin: 8px 0; }
+    .sess-hero .sh-accs { font-size: 13px; opacity: 0.8; }
 
-/* ── ADMIN ── */
-.admin-banner{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--radius);padding:1.5rem;color:#fff;margin-bottom:1.25rem;text-align:center;}
-.admin-banner h2{font-family:'Dancing Script',cursive;font-size:26px;color:#D4AF37;}
-.team-config-row{background:var(--pink-pale);border:1.5px solid var(--pink-light);border-radius:10px;padding:.85rem;margin-bottom:.75rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.team-color-dot{width:24px;height:24px;border-radius:50%;border:2px solid rgba(0,0,0,.1);flex-shrink:0;}
+    .status-bar {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      border: 2px solid;
+    }
+    .sb-wait { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+    .sb-live { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
+    .sb-verify { background: #fef2f2; border-color: #fca5a5; color: #be123c; }
+    .sb-paused { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
 
-/* ── TOAST ── */
-.toast-c{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);
-  background:linear-gradient(135deg,#FF6B9D,#FF8E53);color:#fff;border-radius:20px;padding:10px 20px;
-  font-size:13px;font-weight:700;box-shadow:0 20px 40px rgba(255,107,157,.35);z-index:9999;
-  opacity:0;transition:all .26s;pointer-events:none;max-width:90vw;text-align:center;}
-.toast-c.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .verify-box {
+      background: var(--rose-pale);
+      border: 2px solid var(--rose-light);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .verify-box .vt { font-weight: 700; font-size: 15px; color: var(--rose-dark); }
+    .verify-box .vtime { font-size: 38px; font-weight: 900; color: var(--rose); margin: 8px 0; }
 
-/* ── CONFETTI ── */
-.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;overflow:hidden;}
-.cp{position:absolute;top:-10px;animation:fall linear forwards;}
-@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+    .badge-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid #e8ddd8;
+      color: var(--text-light);
+      background: #fff;
+      transition: all .3s;
+    }
+    .badge-item.earned {
+      border-color: var(--gold);
+      background: #fff8e1;
+      color: #b8860b;
+    }
 
-/* ── MASCOT SVG ── */
-.mascot-svg{width:80px;height:90px;margin:0 auto .5rem;display:block;}
-.mascot-hero{width:120px;height:135px;position:absolute;right:2rem;top:50%;transform:translateY(-50%);filter:drop-shadow(0 8px 20px rgba(0,0,0,.2));z-index:1;}
+    .err-box {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 2px solid #fca5a5;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: none;
+    }
 
-/* ── STEP PILLS ── */
-.step-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
-.sp{background:var(--pink-pale);border:1.5px solid var(--pink-light);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#b07;}
-.sp.active{background:var(--pink);color:#fff;border-color:var(--pink);}
+    .lb-entry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.8rem;
+      border-radius: 12px;
+      border: 1px solid #e8ddd8;
+      margin-bottom: 8px;
+      background: #fff;
+      transition: all .2s;
+    }
+    .lb-entry:hover { border-color: var(--rose-light); }
+    .lb-rank {
+      font-weight: 900;
+      font-size: 15px;
+      width: 28px;
+      text-align: center;
+      color: #ddd;
+      flex-shrink: 0;
+    }
+    .lb-rank.r1 { color: #D4AF37; }
+    .lb-rank.r2 { color: #94a3b8; }
+    .lb-rank.r3 { color: #cd7f32; }
+    .lb-body { flex: 1; min-width: 0; }
+    .lb-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lb-detail { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+    .lb-pts { font-weight: 900; font-size: 17px; color: var(--gold); }
+    .lb-time-s { font-size: 11px; color: var(--text-light); text-align: right; }
+    .pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 5px;
+      vertical-align: middle;
+      margin-left: 4px;
+      text-transform: uppercase;
+    }
+    .pill-live { background: #10b981; color: #fff; }
+    .pill-you { background: var(--rose); color: #fff; }
+    .pill-verify { background: #8b5cf6; color: #fff; }
 
-/* ── ERR ── */
-.err-box{background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:10px;padding:9px 13px;font-size:12px;font-weight:700;margin-bottom:.75rem;display:none;}
+    .lb-tabs {
+      display: flex;
+      gap: 6px;
+      background: #f5f0ed;
+      border: 1px solid #e8ddd8;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 1.25rem;
+    }
+    .lb-tab {
+      flex: 1;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: none;
+      color: var(--text-light);
+      transition: all .2s;
+    }
+    .lb-tab.on { background: #fff; color: var(--rose); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
-/* ── MOBILE ── */
-.mobile-topnav{display:none;background:var(--cream);border-bottom:2px solid var(--pink-light);padding:.75rem 1rem;position:sticky;top:0;z-index:200;align-items:center;justify-content:space-between;}
-.mobile-nav-title{font-family:'Dancing Script',cursive;font-size:20px;color:var(--pink);font-weight:800;}
-.hamburger{background:none;border:none;cursor:pointer;font-size:22px;color:var(--pink);}
-.mobile-nav-drawer{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:300;background:rgba(0,0,0,.4);}
-.mobile-nav-drawer.open{display:block;}
-.mnd-inner{width:240px;height:100%;background:var(--cream);padding:1.5rem 1rem;overflow-y:auto;}
-.mnd-close{background:none;border:none;font-size:22px;color:var(--pink);cursor:pointer;float:right;margin-bottom:1rem;}
+    .team-score-box {
+      border-radius: 12px;
+      border: 2px solid #e8ddd8;
+      padding: 1rem;
+      text-align: center;
+      background: #fff;
+      transition: all .2s;
+    }
+    .team-score-box.lead { border-color: var(--gold); background: #fff8e1; }
 
-@media(max-width:768px){
-  .sidebar{display:none;}
-  .main-content{margin-left:0;}
-  .mobile-topnav{display:flex;}
-  .view{padding:1rem;}
-  .hero-banner{padding:1.5rem 1rem;}
-  .mascot-hero{width:80px;height:90px;right:1rem;}
-  .stat-grid{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:480px){
-  .scoreboard{gap:6px;}
-}
+    .open-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1rem;
+      background: #faf6f4;
+      border: 1px solid #e8ddd8;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
 
-/* ── SESSION SAVE BAR ── */
-.save-bar{background:linear-gradient(90deg,var(--pink-pale),var(--gold-light));border:1.5px solid var(--pink-light);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--pink);text-align:center;margin-bottom:1rem;}
-.back-btn{background:none;border:none;font-size:12px;color:#b07;cursor:pointer;font-family:inherit;padding:0;margin-bottom:1rem;display:inline-flex;align-items:center;gap:4px;font-weight:700;}
-.back-btn:hover{color:var(--pink);}
-footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:1px solid var(--pink-light);margin-top:1rem;font-weight:600;}
-</style>
+    footer {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      font-size: 12px;
+      color: var(--text-light);
+      border-top: 2px solid var(--rose-light);
+      margin-top: 2rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .view { padding: 1.25rem; }
+      .hero-banner { padding: 1.5rem; }
+      .hero-banner .mascot-hero { font-size: 60px; right: 0.5rem; }
+      .scoreboard { gap: 8px; }
+    }
+    @media (max-width: 480px) {
+      .view { padding: 0.8rem; }
+      .card-c { padding: 1.25rem; }
+      .team-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="confetti-container" id="confetti-container"></div>
 <div class="toast-c" id="toast"></div>
 
-<!-- MOBILE TOPNAV -->
-<nav class="mobile-topnav">
-  <span class="mobile-nav-title">🐥 OhOh Fandom</span>
-  <button class="hamburger" onclick="toggleMobileNav()">☰</button>
+<!-- ===== HAMBURGER MENU ===== -->
+<nav class="hamburger-menu">
+  <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+  <div class="menu-brand">
+    <span class="mascot-sm">🐰</span>
+    <span>OhOh Fandom</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span class="badge bg-rose text-white" style="background:var(--rose);font-size:10px;padding:4px 10px;">LIVE</span>
+  </div>
 </nav>
-<div class="mobile-nav-drawer" id="mobile-drawer" onclick="closeMobileNavOutside(event)">
-  <div class="mnd-inner">
-    <button class="mnd-close" onclick="closeMobileNav()">✕</button>
-    <div style="clear:both;"></div>
-    <div id="mobile-nav-links"></div>
+
+<!-- Menu Overlay -->
+<div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+
+<!-- Menu Drawer -->
+<div class="menu-drawer" id="menu-drawer">
+  <button class="close-btn" onclick="toggleMenu()">✕</button>
+  <div class="drawer-brand">
+    <span class="mascot-big">🐰</span>
+    <span class="brand-name">OhOh Fandom</span>
+    <span class="brand-sub">Stream Battle</span>
+  </div>
+  <div id="menu-items">
+    <button class="menu-item active" onclick="showView('home');toggleMenu();">
+      <span class="mi-icon">🏠</span> Home
+    </button>
+    <button class="menu-item" onclick="showView('stream');toggleMenu();">
+      <span class="mi-icon">🔴</span> Stream
+    </button>
+    <button class="menu-item" onclick="showView('profile');toggleMenu();">
+      <span class="mi-icon">🐥</span> Profile
+    </button>
+    <button class="menu-item" onclick="showView('leaderboard');toggleMenu();">
+      <span class="mi-icon">🏆</span> Leaderboard
+    </button>
+    <button class="menu-item" onclick="showView('chat');toggleMenu();">
+      <span class="mi-icon">💬</span> Chat
+    </button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" onclick="showView('admin');toggleMenu();">
+      <span class="mi-icon">⚙️</span> Admin
+      <span class="mi-badge">🔒</span>
+    </button>
+    <div class="menu-divider"></div>
+    <div class="menu-footer">
+      <div><span class="status-dot" id="status-dot-menu"></span><span id="status-text-menu">Connecting...</span></div>
+      <div style="margin-top:2px;">5 min = 1 point ⭐</div>
+    </div>
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <svg class="mascot-svg" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="40" cy="22" rx="9" ry="22" fill="#fff" stroke="#f0d0dc" stroke-width="2"/>
-      <ellipse cx="40" cy="22" rx="4.5" ry="15" fill="#FFB3C6"/>
-      <ellipse cx="80" cy="22" rx="9" ry="22" fill="#fff" stroke="#f0d0dc" stroke-width="2"/>
-      <ellipse cx="80" cy="22" rx="4.5" ry="15" fill="#FFB3C6"/>
-      <ellipse cx="60" cy="44" rx="28" ry="19" fill="#fff" stroke="#f0d0dc" stroke-width="2"/>
-      <circle cx="60" cy="62" r="2" fill="#c00" opacity=".7"/>
-      <ellipse cx="60" cy="88" rx="38" ry="44" fill="#fff" stroke="#f0d0dc" stroke-width="2"/>
-      <ellipse cx="60" cy="63" rx="27" ry="26" fill="#fff" stroke="#f0d0dc" stroke-width="2"/>
-      <circle cx="50" cy="58" r="5" fill="#64B5F6"/>
-      <circle cx="70" cy="58" r="5" fill="#64B5F6"/>
-      <circle cx="51" cy="57" r="2.5" fill="#1565C0"/>
-      <circle cx="71" cy="57" r="2.5" fill="#1565C0"/>
-      <ellipse cx="60" cy="70" rx="8" ry="5" fill="#FF9800"/>
-      <rect x="24" y="87" width="72" height="14" rx="7" fill="#E53935"/>
-      <line x1="36" y1="87" x2="36" y2="101" stroke="#fff" stroke-width="1.5" opacity=".4"/>
-      <line x1="47" y1="87" x2="47" y2="101" stroke="#fff" stroke-width="1.5" opacity=".4"/>
-      <line x1="73" y1="87" x2="73" y2="101" stroke="#fff" stroke-width="1.5" opacity=".4"/>
-      <line x1="84" y1="87" x2="84" y2="101" stroke="#fff" stroke-width="1.5" opacity=".4"/>
-      <ellipse cx="20" cy="108" rx="13" ry="8" fill="#fff" stroke="#f0d0dc" stroke-width="2" transform="rotate(-25 20 108)"/>
-      <ellipse cx="100" cy="108" rx="13" ry="8" fill="#fff" stroke="#f0d0dc" stroke-width="2" transform="rotate(25 100 108)"/>
-    </svg>
-    <span class="logo-title" id="sidebar-event-name">OhOh Fandom</span>
-    <span class="logo-sub">Stream Battle</span>
-  </div>
-  <div id="sidebar-nav"></div>
-  <div class="sidebar-bottom">
-    <div><span class="status-dot" id="status-dot"></span><span id="status-text">Connecting...</span></div>
-    <div style="margin-top:4px;">5 min = 1 point ⭐</div>
-  </div>
-</aside>
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
 
-<!-- MAIN CONTENT -->
-<main class="main-content">
-
-  <!-- HERO (always shown) -->
-  <div class="hero-banner" id="hero-banner">
-    <div style="position:relative;z-index:1;max-width:680px;">
-      <div class="hero-title" id="hero-event-name">OhOh Fandom — Stream Battle</div>
-      <div class="hero-subtitle">Support your team · Stream · Earn points · Win!</div>
-      <div class="scoreboard d-flex gap-2 mt-3" id="scoreboard-wrap" style="flex-wrap:wrap;"></div>
-      <div class="progress-bar-wrap" id="progress-bar" style="max-width:500px;"></div>
-      <div class="verdict-text" id="verdict-text">⚔️ Ready for battle!</div>
+  <!-- HERO BANNER -->
+  <div style="padding: 0 2.5rem;">
+    <div class="hero-banner" id="hero-banner">
+      <span class="mascot-hero">🐰</span>
+      <div style="position:relative;z-index:1;max-width:620px;">
+        <div class="hero-title" id="hero-event-name">OhOh Fandom — Stream Battle</div>
+        <div class="hero-subtitle">Team Khem 💙 vs 🧡 Team Pharan · Stream &amp; Win!</div>
+        <div class="scoreboard" id="scoreboard-wrap"></div>
+        <div class="progress-bar-wrap" id="progress-bar"></div>
+        <div class="verdict-text" id="verdict-text">⚔️ Ready for battle!</div>
+      </div>
     </div>
-    <svg class="mascot-hero" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="40" cy="22" rx="9" ry="22" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
-      <ellipse cx="40" cy="22" rx="4.5" ry="15" fill="#FFB3C6"/>
-      <ellipse cx="80" cy="22" rx="9" ry="22" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
-      <ellipse cx="80" cy="22" rx="4.5" ry="15" fill="#FFB3C6"/>
-      <ellipse cx="60" cy="44" rx="28" ry="19" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
-      <circle cx="60" cy="62" r="2" fill="#c00" opacity=".7"/>
-      <ellipse cx="60" cy="88" rx="38" ry="44" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
-      <ellipse cx="60" cy="63" rx="27" ry="26" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2"/>
-      <circle cx="50" cy="58" r="5" fill="#64B5F6"/>
-      <circle cx="70" cy="58" r="5" fill="#64B5F6"/>
-      <circle cx="51" cy="57" r="2.5" fill="#1565C0"/>
-      <circle cx="71" cy="57" r="2.5" fill="#1565C0"/>
-      <ellipse cx="60" cy="70" rx="8" ry="5" fill="#FF9800"/>
-      <rect x="24" y="87" width="72" height="14" rx="7" fill="#E53935"/>
-      <line x1="36" y1="87" x2="36" y2="101" stroke="#fff" stroke-width="1.5" opacity=".5"/>
-      <line x1="47" y1="87" x2="47" y2="101" stroke="#fff" stroke-width="1.5" opacity=".5"/>
-      <line x1="73" y1="87" x2="73" y2="101" stroke="#fff" stroke-width="1.5" opacity=".5"/>
-      <line x1="84" y1="87" x2="84" y2="101" stroke="#fff" stroke-width="1.5" opacity=".5"/>
-      <ellipse cx="20" cy="108" rx="13" ry="8" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2" transform="rotate(-25 20 108)"/>
-      <ellipse cx="100" cy="108" rx="13" ry="8" fill="#fff" stroke="rgba(255,255,255,.4)" stroke-width="2" transform="rotate(25 100 108)"/>
-    </svg>
   </div>
 
-  <!-- VIEW: HOME / REGISTER -->
+  <!-- VIEW: HOME -->
   <div id="view-home" class="view active">
     <div class="card-c">
       <div class="card-head"><span>📋 How It Works</span></div>
-      <div class="step-pills">
-        <span class="sp active">1️⃣ Register</span>
-        <span class="sp">2️⃣ Add Accounts</span>
-        <span class="sp">3️⃣ Pick Team</span>
-        <span class="sp">4️⃣ Stream!</span>
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-dark text-light px-3 py-2">1️⃣ Register</span>
+        <span class="badge bg-secondary text-light px-3 py-2">2️⃣ Add Accounts</span>
+        <span class="badge bg-secondary text-light px-3 py-2">3️⃣ Pick Team</span>
+        <span class="badge bg-secondary text-light px-3 py-2">4️⃣ Stream!</span>
       </div>
-      <div class="info-box">
-        <div class="ib-title">🌐 Real-Time Battle!</div>
-        <div class="ib-text">Live leaderboard · Global chat · See who's LIVE right now!<br>
-          <span class="fb-badge" id="fb-badge" style="background:#fce7f3;color:var(--pink);">⏳ Connecting to Firebase...</span></div>
+      <div class="alert" style="background:var(--rose-pale);border:2px solid var(--rose-light);color:var(--text);">
+        <strong>🐰 Real-Time Battle!</strong> Live leaderboard · Global chat · <span class="fw-bold" id="fb-badge">⏳ Connecting...</span>
       </div>
-      <div class="info-box gold">
-        <div class="ib-title">⭐ Points System</div>
-        <div class="ib-text">1 point = 5 minutes · Multiple accounts = multiplied points · <strong>Verify every 15 min!</strong></div>
+      <div class="alert alert-success" style="background:#d4edda;border-color:#b8daff;">
+        <strong>⭐ Points: 1 point = 5 minutes</strong> · Multiple accounts = multiplied points · <strong>Verify every 15 min!</strong>
       </div>
     </div>
 
@@ -392,7 +923,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
       <div class="card-head"><span>👤 Your Username</span></div>
       <div class="field-g">
         <label class="lbl">Display Name</label>
-        <input type="text" class="inp" id="username-input" placeholder="e.g. KengFan_Pro"/>
+        <input type="text" class="inp" id="username-input" placeholder="e.g. KengFan_Pro" value="kengfan1"/>
       </div>
     </div>
 
@@ -401,27 +932,26 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
       <div id="acc-list">
         <div class="acc-item">
           <div class="acc-row">
-            <input type="text" class="inp inp-sm acc-name" placeholder="Account name (e.g. @MyFanAcc)"/>
+            <input type="text" class="inp inp-sm acc-name" placeholder="Account name (e.g. @MyFanAcc)" value="XXXXX"/>
             <button class="rm-btn" onclick="rmAcc(this)">×</button>
           </div>
           <input type="text" class="inp inp-sm acc-url" placeholder="YouTube / streaming link"/>
         </div>
       </div>
-      <button class="add-acc-btn mt-2" onclick="addAcc()">+ Add another account</button>
+      <button class="add-acc-btn" onclick="addAcc()">+ Add another account</button>
     </div>
 
     <div class="card-c">
       <div class="card-head"><span>🎀 Choose Your Team</span></div>
-      <div class="row g-2 mb-3" id="team-grid"></div>
+      <div class="team-grid" id="team-grid"></div>
       <div class="err-box" id="reg-err"></div>
-      <button class="btn-pink btn-full" id="go-btn" onclick="goStream()" style="height:48px;font-size:15px;">🎬 Start Streaming Battle!</button>
+      <button class="btn-rose btn-full" id="go-btn" onclick="goStream()" style="height:50px;font-size:16px;">🎬 Start Streaming Battle!</button>
     </div>
 
-    <!-- Mini leaderboard on home -->
     <div class="card-c">
       <div class="card-head">
         <span>🏆 Live Leaderboard</span>
-        <span style="font-size:12px;color:#b07;font-weight:700;" id="live-count">👀 0 live</span>
+        <span style="font-size:12px;color:var(--rose);font-weight:700;" id="live-count">👀 0 live</span>
       </div>
       <div class="row g-2 mb-3" id="team-score-home"></div>
       <div class="lb-tabs" id="lb-tabs-home">
@@ -444,73 +974,10 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
     </div>
   </div>
 
-  <!-- VIEW: MY PROFILE -->
-  <div id="view-profile" class="view">
-    <div id="profile-not-logged" style="text-align:center;padding:3rem 1rem;">
-      <div style="font-size:60px;margin-bottom:1rem;">🐥</div>
-      <div style="font-size:18px;font-weight:800;color:var(--pink);margin-bottom:.5rem;">Register first!</div>
-      <div style="font-size:13px;color:#b07;">Head to Home and join the battle to see your profile.</div>
-      <button class="btn-pink mt-3" onclick="showView('home')">Go to Home</button>
-    </div>
-    <div id="profile-content" style="display:none;">
-      <div class="profile-hero">
-        <div class="profile-avatar" id="profile-avatar">?</div>
-        <div class="profile-name" id="profile-name">Username</div>
-        <div class="profile-team" id="profile-team">Team</div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-box">
-          <div class="stat-val gold" id="prof-pts">0</div>
-          <div class="stat-lbl">Total Points</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="prof-time">0:00</div>
-          <div class="stat-lbl">Total Time</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="prof-sessions">0</div>
-          <div class="stat-lbl">Sessions</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="prof-verifs">0</div>
-          <div class="stat-lbl">Verifications</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="prof-accs">0</div>
-          <div class="stat-lbl">Accounts</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="prof-badges">0</div>
-          <div class="stat-lbl">Badges</div>
-        </div>
-      </div>
-      <div class="card-c">
-        <div class="card-head"><span>🎖 My Badges</span></div>
-        <div class="badge-grid" id="prof-badge-grid"></div>
-      </div>
-      <div class="card-c">
-        <div class="card-head"><span>🐥 Fun Corner</span></div>
-        <div style="text-align:center;padding:1rem;">
-          <div style="font-size:14px;font-weight:700;color:#b07;margin-bottom:1rem;">Spin the Quacker Wheel! 🎡</div>
-          <canvas id="spin-wheel" width="220" height="220" style="border-radius:50%;cursor:pointer;box-shadow:0 8px 30px rgba(255,107,157,.25);"></canvas>
-          <div style="margin-top:1rem;">
-            <button class="btn-pink" onclick="spinWheel()">🎰 Spin!</button>
-          </div>
-          <div style="font-size:14px;font-weight:800;color:var(--pink);margin-top:.75rem;min-height:24px;" id="spin-result"></div>
-        </div>
-      </div>
-      <div class="card-c" style="border:2px solid #fca5a5;">
-        <div class="card-head" style="color:#dc2626;"><span>⚠️ Danger Zone</span></div>
-        <div style="font-size:13px;color:#666;margin-bottom:1rem;">Delete your progress permanently. This cannot be undone.</div>
-        <button class="btn-danger-s" onclick="deleteMyData()">🗑 Delete My Progress</button>
-      </div>
-    </div>
-  </div>
-
   <!-- VIEW: STREAM -->
   <div id="view-stream" class="view">
-    <div class="save-bar">💾 Auto-saves every 20s · Everyone sees your progress live!</div>
-    <button class="back-btn" onclick="goBack()">← Back to Home</button>
+    <div class="alert" style="background:var(--rose-pale);border:2px solid var(--rose-light);color:var(--text);">💾 Auto-saves every 20s · Everyone sees your progress live!</div>
+    <button class="btn btn-outline-secondary btn-sm mb-3" onclick="showView('home')">← Back to Home</button>
 
     <div class="sess-hero" id="sess-hero">
       <div class="sh-eye" id="sh-eye">⏳ Ready to stream</div>
@@ -524,18 +991,18 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
     <div class="verify-box" id="verify-box" style="display:none;">
       <div class="vt">📸 Verification Required</div>
       <div class="vtime" id="verify-timer">15:00</div>
-      <button class="btn-pink btn-full" onclick="verifyStream()" style="height:46px;font-size:15px;">✅ I'm Still Streaming!</button>
+      <button class="btn-rose btn-full" onclick="verifyStream()" style="height:48px;">✅ I'm Still Streaming!</button>
     </div>
 
     <div class="card-c">
       <div class="card-head"><span>🔗 Open Your Tabs</span></div>
       <div id="open-tabs"></div>
-      <button class="btn-pink btn-full mt-2" onclick="openAllTabs()">🔗 Open All Tabs</button>
+      <button class="btn-rose btn-full mt-2" onclick="openAllTabs()">🔗 Open All Tabs</button>
     </div>
 
     <div class="card-c">
       <div class="card-head"><span>▶️ Timer Control</span></div>
-      <button class="btn-pink btn-full" id="timer-btn" onclick="startTimer()" style="height:52px;font-size:16px;">▶ START TIMER</button>
+      <button class="btn-rose btn-full" id="timer-btn" onclick="startTimer()" style="height:52px;font-size:16px;">▶ START TIMER</button>
     </div>
 
     <div class="card-c">
@@ -545,16 +1012,47 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
 
     <div class="card-c">
       <div class="card-head"><span>🎖 Badges</span></div>
-      <div class="badge-grid">
-        <div class="badge-item" id="b15">⏱ 15 min</div>
-        <div class="badge-item" id="b30">🔥 30 min</div>
-        <div class="badge-item" id="b60">👑 1 hour</div>
-        <div class="badge-item" id="bmulti">🖥 Multi</div>
-        <div class="badge-item" id="bverify">✅ Verified</div>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="badge-item" id="b15">⏱ 15 min</span>
+        <span class="badge-item" id="b30">🔥 30 min</span>
+        <span class="badge-item" id="b60">👑 1 hour</span>
+        <span class="badge-item" id="bmulti">🖥 Multi</span>
+        <span class="badge-item" id="bverify">✅ Verified</span>
       </div>
     </div>
 
+    <!-- SESSION CONTROLS -->
     <div class="card-c">
+      <div class="card-head"><span>🛠 Session Controls</span></div>
+      <div class="session-controls">
+        <button class="btn btn-warning" id="pause-btn" onclick="pauseSession()" style="font-weight:700;">⏸ Pause</button>
+        <button class="btn btn-success" id="resume-btn" onclick="resumeSession()" style="display:none;font-weight:700;">▶️ Resume</button>
+        <button class="btn btn-outline-secondary" onclick="saveSessionProgress()" style="font-weight:700;">💾 Save</button>
+        <button class="btn btn-danger" onclick="deleteSession()" style="font-weight:700;">🗑 Delete</button>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="admin-card">
+      <div class="card-head" style="margin-bottom:0.5rem;"><span>⚙️ Admin Panel</span></div>
+      <div id="admin-login-area">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <input type="password" class="inp inp-sm" id="admin-pass-input" placeholder="Admin password" style="flex:1;min-width:140px;" onkeydown="if(event.key==='Enter')adminLogin()"/>
+          <button class="btn-rose" onclick="adminLogin()" style="padding:0.5rem 1.5rem;">🔓 Unlock</button>
+        </div>
+        <div class="err-box mt-2" id="admin-err"></div>
+      </div>
+      <div id="admin-panel-area" style="display:none;margin-top:1rem;">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button class="btn btn-outline-danger btn-sm" onclick="adminResetAll()">🗑 Reset All</button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="adminLogout()">🔒 Logout</button>
+        </div>
+        <div id="admin-user-list"></div>
+        <div style="font-size:11px;color:var(--text-light);margin-top:6px;">💡 Click "Delete" to reset a user's session.</div>
+      </div>
+    </div>
+
+    <div class="card-c mt-3">
       <div class="card-head"><span>🏆 Live Leaderboard</span></div>
       <div class="row g-2 mb-3" id="team-score-stream"></div>
       <div class="lb-tabs" id="lb-tabs-stream">
@@ -566,7 +1064,6 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
     <div class="card-c">
       <div class="card-head"><span>💬 Live Chat</span> <span style="font-size:11px;color:#22c55e;font-weight:700;">● Live</span></div>
       <div class="chat-wrap">
-        <div class="quick-reacts" id="quick-reacts"></div>
         <div class="chat-feed" id="chat-feed-stream"></div>
         <div class="chat-input-row">
           <input type="text" class="chat-inp" id="chat-input-stream" placeholder="Hype up your team..." onkeydown="if(event.key==='Enter')sendMsg('stream')"/>
@@ -577,13 +1074,41 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
       </div>
     </div>
 
-    <button class="btn-red btn-full mt-2" onclick="stopStream()">⏹ Stop &amp; Save Session</button>
+    <button class="btn btn-danger btn-full mt-2" onclick="stopStream()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:12px;padding:1rem;font-weight:800;font-size:15px;">⏹ Stop &amp; Save Session</button>
+  </div>
+
+  <!-- VIEW: PROFILE -->
+  <div id="view-profile" class="view">
+    <div id="profile-not-logged" style="text-align:center;padding:3rem 1rem;">
+      <div style="font-size:60px;margin-bottom:1rem;">🐰</div>
+      <div style="font-size:18px;font-weight:800;color:var(--rose);margin-bottom:.5rem;">Register first!</div>
+      <div style="font-size:13px;color:var(--text-light);">Head to Home and join the battle to see your profile.</div>
+      <button class="btn-rose mt-3" onclick="showView('home')">Go to Home</button>
+    </div>
+    <div id="profile-content" style="display:none;">
+      <div style="background:linear-gradient(135deg,var(--rose),var(--rose-light));border-radius:var(--radius);padding:2rem;text-align:center;color:#fff;margin-bottom:1.5rem;">
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.25);border:3px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 10px;" id="profile-avatar">🐰</div>
+        <div style="font-size:24px;font-weight:800;font-family:'Dancing Script',cursive;" id="profile-name">Username</div>
+        <div style="font-size:14px;opacity:0.8;" id="profile-team">Team</div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-4"><div class="card-c" style="padding:1rem;text-align:center;"><div style="font-size:22px;font-weight:900;color:var(--gold);" id="prof-pts">0</div><div style="font-size:10px;text-transform:uppercase;color:var(--text-light);font-weight:700;">Points</div></div></div>
+        <div class="col-4"><div class="card-c" style="padding:1rem;text-align:center;"><div style="font-size:22px;font-weight:900;" id="prof-time">0:00</div><div style="font-size:10px;text-transform:uppercase;color:var(--text-light);font-weight:700;">Time</div></div></div>
+        <div class="col-4"><div class="card-c" style="padding:1rem;text-align:center;"><div style="font-size:22px;font-weight:900;" id="prof-badges">0</div><div style="font-size:10px;text-transform:uppercase;color:var(--text-light);font-weight:700;">Badges</div></div></div>
+      </div>
+      <div class="card-c"><div class="card-head"><span>🎖 My Badges</span></div><div class="d-flex flex-wrap gap-2" id="prof-badge-grid"></div></div>
+      <div class="card-c" style="border:2px solid #fca5a5;">
+        <div class="card-head" style="color:#dc2626;"><span>⚠️ Danger Zone</span></div>
+        <div style="font-size:13px;color:var(--text-light);margin-bottom:1rem;">Delete your progress permanently.</div>
+        <button class="btn-danger-soft" onclick="deleteMyData()">🗑 Delete My Progress</button>
+      </div>
+    </div>
   </div>
 
   <!-- VIEW: LEADERBOARD -->
   <div id="view-leaderboard" class="view">
     <div class="card-c">
-      <div class="card-head"><span>🏆 Global Leaderboard</span> <span style="font-size:12px;color:#b07;" id="live-count-lb">👀 0 live</span></div>
+      <div class="card-head"><span>🏆 Global Leaderboard</span> <span style="font-size:12px;color:var(--rose);font-weight:700;" id="live-count-lb">👀 0 live</span></div>
       <div class="row g-2 mb-3" id="team-score-lb"></div>
       <div class="lb-tabs" id="lb-tabs-lb">
         <button class="lb-tab on" onclick="lbSwitch(this,'all','lb-full')">All</button>
@@ -596,8 +1121,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
   <div id="view-chat" class="view">
     <div class="card-c" style="padding:0;overflow:hidden;">
       <div class="card-head" style="padding:1rem 1.25rem .5rem;">💬 Global Chat <span style="font-size:11px;color:#22c55e;font-weight:700;">● Live</span></div>
-      <div class="chat-wrap" style="height:calc(100vh - 280px);">
-        <div class="quick-reacts" id="quick-reacts-chat"></div>
+      <div class="chat-wrap" style="height:calc(100vh - 300px);">
         <div class="chat-feed" id="chat-feed-main"></div>
         <div class="chat-input-row">
           <input type="text" class="chat-inp" id="chat-input-main" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg('main')"/>
@@ -609,105 +1133,32 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#b07;border-top:
     </div>
   </div>
 
-  <!-- VIEW: ADMIN -->
+  <!-- VIEW: ADMIN (full page) -->
   <div id="view-admin" class="view">
-    <div id="admin-login-panel">
-      <div class="admin-banner">
-        <h2>🔐 Admin Panel</h2>
-        <p style="font-size:13px;color:rgba(255,255,255,.6);margin-top:.5rem;">Enter password to access admin settings</p>
-      </div>
-      <div class="card-c" style="max-width:400px;margin:0 auto;">
-        <div class="field-g">
-          <label class="lbl">Admin Password</label>
-          <input type="password" class="inp" id="admin-pass-input" placeholder="Enter password..." onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <div class="card-c">
+      <div class="card-head"><span>⚙️ Admin Panel</span></div>
+      <div id="admin-login-area-full">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <input type="password" class="inp" id="admin-pass-input-full" placeholder="Admin password" style="flex:1;min-width:200px;" onkeydown="if(event.key==='Enter')adminLoginFull()"/>
+          <button class="btn-rose" onclick="adminLoginFull()" style="padding:0.5rem 2rem;">🔓 Unlock</button>
         </div>
-        <div class="err-box" id="admin-err"></div>
-        <button class="btn-gold btn-full" onclick="adminLogin()">🔓 Login</button>
-        <div style="font-size:11px;color:#b07;text-align:center;margin-top:.75rem;">Default password: <strong>ohoh2024</strong></div>
+        <div class="err-box mt-2" id="admin-err-full"></div>
       </div>
-    </div>
-
-    <div id="admin-panel" style="display:none;">
-      <div class="admin-banner">
-        <h2>⚙️ Admin Control Panel</h2>
-        <p style="font-size:13px;color:rgba(255,255,255,.6);">Configure your stream battle event</p>
-      </div>
-
-      <div class="card-c">
-        <div class="card-head"><span>🎪 Event Settings</span></div>
-        <div class="field-g">
-          <label class="lbl">Event Name</label>
-          <input type="text" class="inp" id="admin-event-name" placeholder="e.g. OhOh Fandom Stream Battle"/>
+      <div id="admin-panel-full" style="display:none;margin-top:1rem;">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button class="btn btn-outline-danger" onclick="adminResetAll()">🗑 Reset All Data</button>
+          <button class="btn btn-outline-secondary" onclick="adminLogoutFull()">🔒 Logout</button>
         </div>
-        <div class="field-g">
-          <label class="lbl">Change Admin Password</label>
-          <input type="password" class="inp" id="admin-new-pass" placeholder="New password (leave blank to keep current)"/>
-        </div>
-      </div>
-
-      <div class="card-c">
-        <div class="card-head">
-          <span>🎀 Team Configuration</span>
-          <button class="btn-outline-pink btn-sm-p" onclick="addAdminTeam()">+ Add Team</button>
-        </div>
-        <div id="admin-teams-list"></div>
-        <div style="font-size:11px;color:#b07;margin-top:.5rem;">⚠️ Changing team IDs after data is created will break existing scores.</div>
-      </div>
-
-      <div class="card-c">
-        <div class="card-head"><span>📊 Live Stats</span></div>
-        <div class="row g-2" id="admin-stats"></div>
-      </div>
-
-      <div class="card-c" style="border:2px solid #fca5a5;">
-        <div class="card-head" style="color:#dc2626;"><span>⚠️ Danger Zone</span></div>
-        <div style="font-size:13px;color:#666;margin-bottom:1rem;">These actions cannot be undone!</div>
-        <div class="d-flex gap-2 flex-wrap">
-          <button class="btn-danger-s" onclick="adminResetAll()">🗑 Reset ALL Data (Firebase + Local)</button>
-          <button class="btn-danger-s" onclick="adminResetLocal()">🗑 Reset Local Only</button>
-        </div>
-      </div>
-
-      <div class="card-c">
-        <div class="card-head"><span>💾 Save & Apply</span></div>
-        <button class="btn-pink btn-full" onclick="saveAdminConfig()" style="height:46px;">✅ Save Configuration</button>
-        <button class="btn-outline-pink btn-full mt-2" onclick="adminLogout()">🔒 Logout</button>
+        <div id="admin-user-list-full"></div>
+        <div style="font-size:12px;color:var(--text-light);margin-top:8px;">💡 Click "Delete" to reset a user's session and restart their battle.</div>
       </div>
     </div>
   </div>
 
-  <footer>Made with 💖 by OhOh Fandom · 5 min = 1 point · Powered by Firebase 🔥</footer>
-</main>
+  <footer>Made with 🐰 by OhOh Fandom · 5 min = 1 point · Powered by Firebase 🔥</footer>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ============================================================
-// ⚙️ CONFIG (admin-configurable)
-// ============================================================
-const DEFAULT_CONFIG = {
-  eventName: 'OhOh Fandom Stream Battle',
-  adminPass: 'ohoh2024',
-  teams: [
-    { id: 'khem',   name: 'Team Khem',   color: '#FF6B9D', emoji: '💙' },
-    { id: 'pharan', name: 'Team Pharan', color: '#E8294A', emoji: '🧡' }
-  ]
-};
-let config = { ...DEFAULT_CONFIG, teams: [...DEFAULT_CONFIG.teams.map(t=>({...t}))] };
-
-function loadConfig() {
-  try {
-    const s = localStorage.getItem('ohoh_config');
-    if (s) {
-      const parsed = JSON.parse(s);
-      config = { ...DEFAULT_CONFIG, ...parsed, teams: parsed.teams || DEFAULT_CONFIG.teams };
-    }
-  } catch(e) {}
-}
-
-function saveConfig() {
-  try { localStorage.setItem('ohoh_config', JSON.stringify(config)); } catch(e) {}
-}
-
 // ============================================================
 // 🔥 FIREBASE
 // ============================================================
@@ -732,285 +1183,27 @@ try {
 const LS_DATA = 'ohoh_data', LS_CHAT = 'ohoh_chat', LS_SESSION = 'ohoh_session';
 let db = {}, chat = [];
 let myTeam = null, myAccs = [], myUsername = '';
-let sessStart = null, sessSecs = 0, ticker = null, timerGoing = false;
+let sessStart = null, sessSecs = 0, ticker = null, timerGoing = false, paused = false;
 let lbFilter = { 'lb-home': 'all', 'lb-stream': 'all', 'lb-full': 'all' };
 let earnedSet = new Set();
 let verifyInterval = null, verifyTimeLeft = 900, verified = false;
-let isOnline = false, firebaseReady = false;
-let unsubUsers = null, unsubChat = null;
-let currentView = 'home';
+let firebaseReady = false;
 let adminLoggedIn = false;
-let spinAngle = 0, isSpinning = false;
-
-// ============================================================
-// 🚀 BOOT
-// ============================================================
-loadConfig();
-buildNav();
-buildTeamGrid();
-buildLbTabs();
-buildQuickReacts();
-applyEventName();
-renderScoreboard();
-restoreSession();
-renderAll();
-renderAllChats();
-scrollChats();
-
-if (dbFirestore) {
-  dbFirestore.collection('users').limit(1).get()
-    .then(() => {
-      firebaseReady = true; isOnline = true;
-      setStatus('on', 'Online');
-      toast('🌐 Connected to Firebase!', 2000);
-      setBadge('✅ Connected to Firebase', 'dcfce7', '15803d');
-      loadFromFirebase();
-    })
-    .catch(err => {
-      console.warn('Firebase failed:', err);
-      setStatus('off', 'Offline');
-      setBadge('🔴 Offline — local only', 'fee2e2', 'dc2626');
-      loadLocal();
-    });
-} else {
-  setStatus('off', 'Offline');
-  loadLocal();
-}
-
-// ============================================================
-// 🧭 NAVIGATION
-// ============================================================
-const NAV_ITEMS = [
-  { id: 'home',        label: 'Home',        icon: '🏠' },
-  { id: 'profile',     label: 'My Profile',  icon: '🐥' },
-  { id: 'stream',      label: 'Streaming',   icon: '🔴' },
-  { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
-  { id: 'chat',        label: 'Chat',        icon: '💬' },
-  { id: 'admin',       label: 'Admin',       icon: '⚙️' },
-];
-
-function buildNav() {
-  const sidebar = document.getElementById('sidebar-nav');
-  const mobile  = document.getElementById('mobile-nav-links');
-  const html = NAV_ITEMS.map(n =>
-    `<button class="nav-item-s${n.id===currentView?' active':''}" onclick="showView('${n.id}');closeMobileNav();" id="nav-${n.id}">
-       <span class="ni">${n.icon}</span>${n.label}
-     </button>`
-  ).join('');
-  if (sidebar) sidebar.innerHTML = html;
-  if (mobile)  mobile.innerHTML  = html;
-}
-
-function showView(v) {
-  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('view-' + v);
-  if (el) el.classList.add('active');
-  currentView = v;
-  document.querySelectorAll('.nav-item-s').forEach(b => {
-    b.classList.toggle('active', b.id === 'nav-' + v);
-  });
-  if (v === 'profile') renderProfile();
-  if (v === 'leaderboard') { renderAll(); }
-  if (v === 'admin') renderAdminStats();
-  if (v === 'chat') scrollChats();
-  if (v === 'stream' && !myUsername) { showView('home'); return; }
-  window.scrollTo(0, 0);
-}
-
-function toggleMobileNav() {
-  document.getElementById('mobile-drawer').classList.toggle('open');
-  buildNav(); // refresh nav in drawer
-}
-function closeMobileNav() {
-  document.getElementById('mobile-drawer').classList.remove('open');
-}
-function closeMobileNavOutside(e) {
-  if (e.target === document.getElementById('mobile-drawer')) closeMobileNav();
-}
-
-// ============================================================
-// 🎨 DYNAMIC UI BUILDERS
-// ============================================================
-function applyEventName() {
-  const n = config.eventName || 'OhOh Fandom Stream Battle';
-  document.title = n;
-  const t = document.getElementById('page-title');     if (t) t.textContent = n;
-  const h = document.getElementById('hero-event-name'); if (h) h.textContent = n;
-  const s = document.getElementById('sidebar-event-name'); if (s) s.textContent = n.split('—')[0].trim() || 'OhOh Fandom';
-}
-
-function buildTeamGrid() {
-  const g = document.getElementById('team-grid');
-  if (!g) return;
-  g.innerHTML = config.teams.map(t =>
-    `<div class="col-6 col-md-${12/Math.min(config.teams.length,4)}">
-       <button class="team-btn" id="team-btn-${t.id}" onclick="pickTeam('${t.id}')">
-         <span class="t-emoji">${t.emoji}</span>
-         <span class="t-name" style="color:${t.color}">${t.name}</span>
-         <span class="t-count" id="count-${t.id}">0 members</span>
-       </button>
-     </div>`
-  ).join('');
-}
-
-function buildLbTabs() {
-  ['lb-tabs-home','lb-tabs-stream','lb-tabs-lb'].forEach(tabsId => {
-    const lbId = tabsId === 'lb-tabs-home' ? 'lb-home' : tabsId === 'lb-tabs-stream' ? 'lb-stream' : 'lb-full';
-    const el = document.getElementById(tabsId);
-    if (!el) return;
-    el.innerHTML = `<button class="lb-tab on" onclick="lbSwitch(this,'all','${lbId}')">All</button>` +
-      config.teams.map(t => `<button class="lb-tab" onclick="lbSwitch(this,'${t.id}','${lbId}')">${t.emoji} ${t.name.replace('Team ','')}</button>`).join('');
-  });
-}
-
-function buildQuickReacts() {
-  const reacts = config.teams.flatMap(t => [
-    `<button class="react-btn" onclick="sendReact('${t.emoji} ${t.name} fighting!')">${t.emoji} ${t.name.replace('Team ','')}!</button>`
-  ]).join('') +
-  `<button class="react-btn" onclick="sendReact('🔥 Let\\'s go!')">🔥 Go!</button>` +
-  `<button class="react-btn" onclick="sendReact('✅ Verified!')">✅ Verified!</button>`;
-  document.querySelectorAll('#quick-reacts, #quick-reacts-chat').forEach(el => { el.innerHTML = reacts; });
-}
-
-// ============================================================
-// 📡 STATUS
-// ============================================================
-function setStatus(s, msg) {
-  const dot  = document.getElementById('status-dot');
-  const text = document.getElementById('status-text');
-  if (dot)  { dot.className  = 'status-dot ' + s; }
-  if (text) { text.textContent = msg; }
-}
-function setBadge(txt, bg, color) {
-  const b = document.getElementById('fb-badge');
-  if (b) { b.textContent = txt; b.style.background='#'+bg; b.style.color='#'+color; }
-}
-
-// ============================================================
-// 📡 FIREBASE SYNC
-// ============================================================
-async function syncUserToFirebase(u) {
-  if (!dbFirestore || !u?.name) return;
-  try {
-    await dbFirestore.collection('users').doc(u.name.toLowerCase()).set({
-      name: u.name, team: u.team || config.teams[0]?.id,
-      totalSecs: u.totalSecs||0, sessions: u.sessions||0,
-      verifications: u.verifications||0, isLive: u.isLive||false,
-      liveSecs: u.liveSecs||0, accounts: u.accounts||[],
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  } catch(e) { console.warn('Sync user:', e); }
-}
-
-async function pushChatMsg(m) {
-  if (!dbFirestore) return;
-  try {
-    await dbFirestore.collection('chat').add({
-      type: m.type||'msg', sender: m.sender||'System',
-      team: m.team||'system', text: m.text, ts: m.ts||tsNow(),
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) { console.warn('Push chat:', e); }
-}
-
-function startListeners() {
-  if (!dbFirestore) return;
-  if (unsubUsers) unsubUsers();
-  unsubUsers = dbFirestore.collection('users').onSnapshot(snap => {
-    snap.forEach(doc => { db[doc.id] = doc.data(); });
-    saveLocal(); renderAll();
-  }, err => console.warn('User listener:', err));
-  if (unsubChat) unsubChat();
-  unsubChat = dbFirestore.collection('chat').orderBy('timestamp','asc').limitToLast(80).onSnapshot(snap => {
-    const msgs = [];
-    snap.forEach(doc => { const d = doc.data(); if (d.text) msgs.push(d); });
-    chat = msgs;
-    saveLocalChat();
-    renderAllChats();
-    scrollChats();
-  }, err => console.warn('Chat listener:', err));
-}
-
-async function loadFromFirebase() {
-  if (!dbFirestore) return;
-  try {
-    const [us, cs] = await Promise.all([
-      dbFirestore.collection('users').get(),
-      dbFirestore.collection('chat').orderBy('timestamp','asc').limitToLast(80).get()
-    ]);
-    us.forEach(doc => { db[doc.id] = doc.data(); });
-    const msgs = [];
-    cs.forEach(doc => { const d = doc.data(); if (d.text) msgs.push(d); });
-    chat = msgs;
-    saveLocal(); saveLocalChat();
-    startListeners();
-    renderAll(); renderAllChats(); scrollChats();
-  } catch(e) { console.warn('loadFromFirebase:', e); loadLocal(); }
-}
-
-function loadLocal() {
-  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
-  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
-  renderAll(); renderAllChats(); scrollChats();
-}
-
-// ============================================================
-// 💾 LOCAL STORAGE
-// ============================================================
-function saveLocal() { try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {} }
-function saveLocalChat() { try { localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); } catch(e) {} }
-
-function save() {
-  saveLocal();
-  if (myUsername) {
-    try {
-      localStorage.setItem(LS_SESSION, JSON.stringify({
-        active:true, username:myUsername, team:myTeam, accounts:myAccs,
-        timerGoing, sessSecs, verified, verifyTimeLeft,
-        earnedSet:Array.from(earnedSet), timestamp:Date.now()
-      }));
-    } catch(e) {}
-    const u = db[myUsername.toLowerCase()];
-    if (u) syncUserToFirebase(u);
-  }
-}
-
-function restoreSession() {
-  try {
-    const s = JSON.parse(localStorage.getItem(LS_SESSION));
-    if (!s?.active || !s.username) return;
-    myUsername = s.username; myTeam = s.team; myAccs = s.accounts||[];
-    timerGoing = s.timerGoing||false; sessSecs = s.sessSecs||0;
-    verified = s.verified||false; verifyTimeLeft = s.verifyTimeLeft??900;
-    earnedSet = new Set(s.earnedSet||[]);
-    if (timerGoing) {
-      const elapsed = Math.floor((Date.now() - s.timestamp)/1000);
-      sessSecs += elapsed;
-      sessStart = Date.now() - sessSecs*1000;
-      setupStreamUI();
-      resumeTimers();
-    }
-  } catch(e) {}
-}
 
 // ============================================================
 // 🛠 HELPERS
 // ============================================================
-function fmt(s) {
-  if (s<0) s=0;
-  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
-  return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-}
-function fmtMin(s) {
-  const m=Math.floor(s/60),sec=s%60;
-  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-}
+function fmt(s) { if (s<0) s=0; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60; return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+function fmtMin(s) { const m=Math.floor(s/60),sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
 function initials(n) { return (n||'?').replace(/^@/,'').slice(0,2).toUpperCase()||'??'; }
 function tsNow() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function safe(n) { return (n||'').replace(/\W/g,'_'); }
 function escHtml(s) { const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
 function getPoints(secs) { return Math.floor(secs/300); }
-function teamById(id) { return config.teams.find(t=>t.id===id) || config.teams[0] || {id:'?',name:'?',color:'#ccc',emoji:'?'}; }
+function teamById(id) {
+  const teams = { 'khem': { id:'khem', name:'Team Khem', color:'#1a5276', emoji:'💙' }, 'pharan': { id:'pharan', name:'Team Pharan', color:'#b03a2e', emoji:'🧡' } };
+  return teams[id] || teams['khem'];
+}
 
 let toastTimer;
 function toast(msg, ms=3500) {
@@ -1034,79 +1227,237 @@ function scrollChats() {
 }
 
 // ============================================================
-// 🎀 TEAM SELECTION
+// 📡 STATUS
 // ============================================================
+function setStatus(s, msg) {
+  ['status-dot','status-dot-menu'].forEach(id=>{
+    const dot=document.getElementById(id); if(dot) dot.className='status-dot '+s;
+  });
+  ['status-text','status-text-menu'].forEach(id=>{
+    const text=document.getElementById(id); if(text) text.textContent=msg;
+  });
+}
+function setBadge(txt, bg, color) {
+  const b=document.getElementById('fb-badge'); if(b){b.textContent=txt;b.style.background='#'+bg;b.style.color='#'+color;}
+}
+
+// ============================================================
+// 📡 FIREBASE SYNC
+// ============================================================
+async function syncUserToFirebase(u) {
+  if (!dbFirestore || !u?.name) return;
+  try {
+    await dbFirestore.collection('users').doc(u.name.toLowerCase()).set({
+      name: u.name, team: u.team || 'khem',
+      totalSecs: u.totalSecs||0, sessions: u.sessions||0,
+      verifications: u.verifications||0, isLive: u.isLive||false,
+      liveSecs: u.liveSecs||0, accounts: u.accounts||[],
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch(e) { console.warn('Sync user:', e); }
+}
+
+async function pushChatMsg(m) {
+  if (!dbFirestore) return;
+  try {
+    await dbFirestore.collection('chat').add({
+      type: m.type||'msg', sender: m.sender||'System',
+      team: m.team||'system', text: m.text, ts: m.ts||tsNow(),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn('Push chat:', e); }
+}
+
+function startListeners() {
+  if (!dbFirestore) return;
+  dbFirestore.collection('users').onSnapshot(snap => {
+    snap.forEach(doc => { db[doc.id] = doc.data(); });
+    saveLocal(); renderAll();
+  }, err => console.warn('User listener:', err));
+  dbFirestore.collection('chat').orderBy('timestamp','asc').limitToLast(80).onSnapshot(snap => {
+    const msgs = []; snap.forEach(doc => { const d=doc.data(); if(d.text) msgs.push(d); });
+    chat = msgs; saveLocalChat(); renderAllChats(); scrollChats();
+  }, err => console.warn('Chat listener:', err));
+}
+
+async function loadFromFirebase() {
+  if (!dbFirestore) return;
+  try {
+    const [us, cs] = await Promise.all([
+      dbFirestore.collection('users').get(),
+      dbFirestore.collection('chat').orderBy('timestamp','asc').limitToLast(80).get()
+    ]);
+    us.forEach(doc => { db[doc.id] = doc.data(); });
+    const msgs = []; cs.forEach(doc => { const d=doc.data(); if(d.text) msgs.push(d); });
+    chat = msgs;
+    saveLocal(); saveLocalChat();
+    startListeners();
+    renderAll(); renderAllChats(); scrollChats();
+    renderAdminList();
+  } catch(e) { console.warn('loadFromFirebase:', e); loadLocal(); }
+}
+
+function loadLocal() {
+  try { const r=localStorage.getItem(LS_DATA); if(r) db=JSON.parse(r); } catch(e){db={};}
+  try { const r=localStorage.getItem(LS_CHAT); if(r) chat=JSON.parse(r); } catch(e){chat=[];}
+  renderAll(); renderAllChats(); scrollChats(); renderAdminList();
+}
+
+// ============================================================
+// 💾 LOCAL STORAGE
+// ============================================================
+function saveLocal() { try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {} }
+function saveLocalChat() { try { localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); } catch(e) {} }
+
+function save() {
+  saveLocal();
+  if (myUsername) {
+    try {
+      localStorage.setItem(LS_SESSION, JSON.stringify({
+        active:true, username:myUsername, team:myTeam, accounts:myAccs,
+        timerGoing, paused, sessSecs, verified, verifyTimeLeft,
+        earnedSet:Array.from(earnedSet), timestamp:Date.now()
+      }));
+    } catch(e) {}
+    const u = db[myUsername.toLowerCase()];
+    if (u) syncUserToFirebase(u);
+  }
+}
+
+function restoreSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_SESSION));
+    if (!s?.active || !s.username) return;
+    myUsername = s.username; myTeam = s.team; myAccs = s.accounts||[];
+    timerGoing = s.timerGoing||false; paused = s.paused||false;
+    sessSecs = s.sessSecs||0; verified = s.verified||false;
+    verifyTimeLeft = s.verifyTimeLeft??900;
+    earnedSet = new Set(s.earnedSet||[]);
+    if (timerGoing && !paused) {
+      const elapsed = Math.floor((Date.now() - s.timestamp)/1000);
+      sessSecs += elapsed;
+      sessStart = Date.now() - sessSecs*1000;
+      setupStreamUI();
+      resumeTimers();
+    } else if (timerGoing && paused) {
+      setupStreamUI();
+      updatePauseUI();
+    }
+    if (myTeam) {
+      document.querySelectorAll('.team-card').forEach(el => el.classList.remove('selected'));
+      const card = document.getElementById('team-card-'+myTeam);
+      if (card) card.classList.add('selected');
+    }
+  } catch(e) {}
+}
+
+// ============================================================
+// 🧭 NAVIGATION
+// ============================================================
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('view-' + v);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(b => b.classList.toggle('active', b.textContent.trim().toLowerCase()===v));
+  if (v === 'profile') renderProfile();
+  if (v === 'stream' && !myUsername) { showView('home'); return; }
+  if (v === 'stream') setupStreamUI();
+  window.scrollTo(0,0);
+}
+
+function toggleMenu() {
+  const drawer = document.getElementById('menu-drawer');
+  const overlay = document.getElementById('menu-overlay');
+  drawer.classList.toggle('open');
+  overlay.classList.toggle('open');
+  document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+}
+
+// ============================================================
+// 🎨 UI BUILDERS
+// ============================================================
+function buildTeamGrid() {
+  const g=document.getElementById('team-grid'); if(!g) return;
+  const teams = [
+    { id:'khem', name:'Team Khem', color:'#1a5276', emoji:'💙', cls:'khem' },
+    { id:'pharan', name:'Team Pharan', color:'#b03a2e', emoji:'🧡', cls:'pharan' }
+  ];
+  g.innerHTML = teams.map(t => `
+    <div class="team-card ${t.cls}" id="team-card-${t.id}" onclick="pickTeam('${t.id}')">
+      <span class="tc-emoji">${t.emoji}</span>
+      <span class="tc-name" style="color:${t.color}">${t.name}</span>
+      <span class="tc-count" id="count-${t.id}">0 members</span>
+    </div>
+  `).join('');
+}
+
 function pickTeam(teamId) {
   myTeam = teamId;
-  config.teams.forEach(t => {
-    const btn = document.getElementById('team-btn-'+t.id);
-    if (btn) btn.classList.toggle('selected', t.id===teamId);
-  });
-  const goBtn = document.getElementById('go-btn');
-  if (goBtn) {
-    const t = teamById(teamId);
-    goBtn.textContent = `${t.emoji} Join ${t.name}`;
-    goBtn.style.background = `linear-gradient(135deg,${t.color},${t.color}cc)`;
-  }
+  document.querySelectorAll('.team-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('team-card-'+teamId)?.classList.add('selected');
+  const goBtn=document.getElementById('go-btn');
+  if(goBtn){ const t=teamById(teamId); goBtn.textContent=`${t.emoji} Join ${t.name}`; goBtn.style.background=`linear-gradient(135deg,${t.color},${t.color}cc)`; }
   showErr('reg-err','');
 }
 
 function addAcc() {
-  const list = document.getElementById('acc-list');
-  const n = list.children.length+1;
-  const d = document.createElement('div');
-  d.className = 'acc-item';
-  d.innerHTML = `
+  const list=document.getElementById('acc-list');
+  const n=list.children.length+1;
+  const d=document.createElement('div');
+  d.className='acc-item';
+  d.innerHTML=`
     <div class="acc-row">
       <input type="text" class="inp inp-sm acc-name" placeholder="Account ${n}"/>
       <button class="rm-btn" onclick="rmAcc(this)">×</button>
     </div>
     <input type="text" class="inp inp-sm acc-url" placeholder="YouTube / streaming link"/>`;
   list.appendChild(d);
+  toast('📺 Added new account field!', 1500);
 }
 function rmAcc(btn) {
-  const list = document.getElementById('acc-list');
-  if (list.children.length>1) btn.closest('.acc-item').remove();
+  const list=document.getElementById('acc-list');
+  if(list.children.length>1){ btn.closest('.acc-item').remove(); toast('🗑 Account removed',1000); }
+  else toast('⚠️ Keep at least one account!',1500);
 }
 
 // ============================================================
 // 🎬 GO TO STREAM
 // ============================================================
 function goStream() {
-  const username = document.getElementById('username-input').value.trim();
-  if (!username) { showErr('reg-err','Enter your username!'); return; }
-  if (!myTeam)   { showErr('reg-err','Choose your team!'); return; }
-  const names = [...document.querySelectorAll('.acc-name')].map(i=>i.value.trim().replace(/^@/,''));
-  const urls  = [...document.querySelectorAll('.acc-url')].map(i=>i.value.trim());
-  const accs  = names.map((n,i)=>({name:n,url:urls[i]||''})).filter(a=>a.name);
-  if (!accs.length) { showErr('reg-err','Add at least one account!'); return; }
+  const username=document.getElementById('username-input').value.trim();
+  if(!username){ showErr('reg-err','Enter your username!'); return; }
+  if(!myTeam){ showErr('reg-err','Choose your team!'); return; }
+  const names=[...document.querySelectorAll('.acc-name')].map(i=>i.value.trim().replace(/^@/,''));
+  const urls=[...document.querySelectorAll('.acc-url')].map(i=>i.value.trim());
+  const accs=names.map((n,i)=>({name:n,url:urls[i]||''})).filter(a=>a.name);
+  if(!accs.length){ showErr('reg-err','Add at least one account!'); return; }
   showErr('reg-err','');
-  myUsername = username; myAccs = accs;
-  timerGoing=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900;
-  const key = username.toLowerCase();
-  if (!db[key]) db[key]={name:username,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
+  myUsername=username; myAccs=accs;
+  timerGoing=false; paused=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900;
+  const key=username.toLowerCase();
+  if(!db[key]) db[key]={name:username,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
   db[key].name=username; db[key].team=myTeam;
   db[key].accounts=[...new Set([...(db[key].accounts||[]),...accs.map(a=>a.name)])];
   save();
   setupStreamUI();
   showView('stream');
-  renderAll();
-  postSysMsg(`🎬 @${username} joined ${teamById(myTeam).name} ${teamById(myTeam).emoji} with ${accs.length} account${accs.length>1?'s':''}!`);
+  renderAll(); renderAdminList();
+  postSysMsg(`🎬 @${username} joined ${teamById(myTeam).name} with ${accs.length} account${accs.length>1?'s':''}!`);
 }
 
 // ============================================================
 // 🖥 STREAM UI
 // ============================================================
 function setupStreamUI() {
-  const t = teamById(myTeam);
-  const hero = document.getElementById('sess-hero');
-  if (hero) hero.style.background = `linear-gradient(135deg,${t.color},${t.color}99,#FFD1DC)`;
-  const el = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
-  el('sh-timer', fmt(sessSecs));
-  el('sh-points', `⭐ ${getPoints(sessSecs)} points`);
-  el('sh-accs', myAccs.map(a=>'@'+a.name).join(' · '));
+  const t=teamById(myTeam);
+  const hero=document.getElementById('sess-hero');
+  if(hero) hero.style.background=`linear-gradient(135deg,${t.color},${t.color}99,var(--rose-light))`;
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('sh-timer',fmt(sessSecs));
+  el('sh-points',`⭐ ${getPoints(sessSecs)} points`);
+  el('sh-accs',myAccs.map(a=>'@'+a.name).join(' · '));
 
-  if (timerGoing) {
+  if(timerGoing && !paused){
     el('sh-eye','🔴 LIVE');
     const sb=document.getElementById('status-bar');
     if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min!';}
@@ -1114,109 +1465,99 @@ function setupStreamUI() {
     if(tb){tb.disabled=true;tb.textContent='⏱ RUNNING...';}
     const vb=document.getElementById('verify-box');
     if(vb) vb.style.display='block';
-    el('verify-timer', fmtMin(Math.max(0,verifyTimeLeft)));
+    el('verify-timer',fmtMin(Math.max(0,verifyTimeLeft)));
+    document.getElementById('pause-btn').style.display='inline-block';
+    document.getElementById('resume-btn').style.display='none';
+  } else if(timerGoing && paused){
+    el('sh-eye','⏸ PAUSED');
+    const sb=document.getElementById('status-bar');
+    if(sb){sb.className='status-bar sb-paused';sb.textContent='⏸ Timer paused — click Resume to continue!';}
+    const tb=document.getElementById('timer-btn');
+    if(tb){tb.disabled=true;tb.textContent='⏸ PAUSED';}
+    document.getElementById('pause-btn').style.display='none';
+    document.getElementById('resume-btn').style.display='inline-block';
+    const vb=document.getElementById('verify-box');
+    if(vb) vb.style.display='block';
+    el('verify-timer',fmtMin(Math.max(0,verifyTimeLeft)));
   } else {
     el('sh-eye','⏳ Ready');
     const sb=document.getElementById('status-bar');
     if(sb){sb.className='status-bar sb-wait';sb.textContent='⏳ Open tabs, log in, then Start Timer';}
     const tb=document.getElementById('timer-btn');
     if(tb){tb.disabled=false;tb.textContent='▶ START TIMER';}
+    document.getElementById('pause-btn').style.display='none';
+    document.getElementById('resume-btn').style.display='none';
     const vb=document.getElementById('verify-box');
     if(vb) vb.style.display='none';
   }
 
-  const ot = document.getElementById('open-tabs');
-  if (ot) {
-    ot.innerHTML = myAccs.map((a,i)=>`
-      <div class="open-row" id="otr-${i}">
-        <div>
-          <div class="or-acc">@${escHtml(a.name)}</div>
-          <div class="or-url">${escHtml(a.url||'No link')}</div>
-        </div>
-        <div>${a.url?`<button class="btn-pink btn-sm-p open-btn" data-url="${escHtml(a.url)}">Open ↗</button>`:'<span style="font-size:11px;color:#ccc;">No link</span>'}</div>
+  const ot=document.getElementById('open-tabs');
+  if(ot){
+    ot.innerHTML=myAccs.map((a,i)=>`
+      <div class="open-row">
+        <div><div style="font-weight:700;">@${escHtml(a.name)}</div><div style="font-size:11px;color:var(--text-light);">${escHtml(a.url||'No link')}</div></div>
+        <div>${a.url?`<button class="btn-rose btn-sm-p open-btn" data-url="${escHtml(a.url)}" style="padding:0.4rem 1.2rem;font-size:12px;border-radius:8px;">Open ↗</button>`:'<span style="font-size:11px;color:#ccc;">No link</span>'}</div>
       </div>`).join('');
-    ot.onclick = function(e) {
-      const btn = e.target.closest('.open-btn');
-      if (!btn) return;
-      const url = btn.dataset.url;
-      if (url) { window.open(url,'_blank','noopener'); toast('🔗 Tab opened!',1800); }
-    };
+    ot.onclick=function(e){ const btn=e.target.closest('.open-btn'); if(!btn) return; const url=btn.dataset.url; if(url){ window.open(url,'_blank','noopener'); toast('🔗 Tab opened!',1800); } };
   }
 
-  const al = document.getElementById('acc-live');
-  if (al) {
-    al.innerHTML = myAccs.map(a=>`
-      <div class="acc-live-row">
-        <div class="al-left">
-          <div class="avatar-sm" style="background:${teamById(myTeam).color}">${initials(a.name)}</div>
-          <div style="font-weight:700;font-size:13px;">@${escHtml(a.name)}</div>
+  const al=document.getElementById('acc-live');
+  if(al){
+    al.innerHTML=myAccs.map(a=>`
+      <div class="open-row">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:${t.color}">${initials(a.name)}</div>
+          <span style="font-weight:700;">@${escHtml(a.name)}</span>
         </div>
-        <div class="al-time" id="alt-${safe(a.name)}">${fmt(sessSecs)}</div>
+        <div style="font-weight:800;color:var(--rose);" id="alt-${safe(a.name)}">${fmt(sessSecs)}</div>
       </div>`).join('');
   }
 
   ['b15','b30','b60','bmulti','bverify'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) earnedSet.has(id)?el.classList.add('got'):el.classList.remove('got');
+    if(el) earnedSet.has(id)?el.classList.add('earned'):el.classList.remove('earned');
   });
-}
-
-// ============================================================
-// 🔗 OPEN ALL TABS
-// ============================================================
-function openAllTabs() {
-  const btns = document.querySelectorAll('#open-tabs .open-btn');
-  if (!btns.length) { toast('No links to open!'); return; }
-  btns.forEach(btn=>{ const u=btn.dataset.url; if(u) window.open(u,'_blank','noopener'); });
-  toast(`🔗 ${btns.length} tab${btns.length>1?'s':''} opened!`,2000);
 }
 
 // ============================================================
 // ▶ TIMER
 // ============================================================
-function startTimer() {
-  if (timerGoing) return;
-  timerGoing=true; sessStart=Date.now()-sessSecs*1000; verified=false; verifyTimeLeft=900;
+function startTimer(){
+  if(timerGoing) return;
+  timerGoing=true; paused=false; sessStart=Date.now()-sessSecs*1000; verified=false; verifyTimeLeft=900;
   const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   el('sh-eye','🔴 LIVE'); el('verify-timer','15:00');
   const sb=document.getElementById('status-bar');
   if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min!';}
   const tb=document.getElementById('timer-btn');
   if(tb){tb.disabled=true;tb.textContent='⏱ RUNNING...';}
+  document.getElementById('pause-btn').style.display='inline-block';
+  document.getElementById('resume-btn').style.display='none';
   const vb=document.getElementById('verify-box');
   if(vb) vb.style.display='block';
   resumeTimers(); save(); toast('🎬 Timer started!');
   postSysMsg(`⏱ @${myUsername} started streaming!`);
 }
 
-function resumeTimers() {
-  if (ticker) clearInterval(ticker);
-  if (verifyInterval) clearInterval(verifyInterval);
-  ticker = setInterval(tick,1000);
-  verifyInterval = setInterval(verifyTick,1000);
-}
+function resumeTimers(){ if(ticker) clearInterval(ticker); if(verifyInterval) clearInterval(verifyInterval); ticker=setInterval(tick,1000); verifyInterval=setInterval(verifyTick,1000); }
 
-function verifyTick() {
-  if (!timerGoing) return;
-  verifyTimeLeft = Math.max(0,verifyTimeLeft-1);
+function verifyTick(){
+  if(!timerGoing || paused) return;
+  verifyTimeLeft=Math.max(0,verifyTimeLeft-1);
   const vt=document.getElementById('verify-timer');
   if(vt) vt.textContent=fmtMin(verifyTimeLeft);
-  if (verifyTimeLeft===0) {
+  if(verifyTimeLeft===0){
     const sb=document.getElementById('status-bar');
-    if(sb){sb.className='status-bar sb-verify';sb.textContent='⏰ VERIFY NOW or timer pauses!';}
-    const vb=document.getElementById('verify-box');
-    if(vb){vb.style.borderColor='#dc2626';vb.style.background='#fee2e2';}
+    if(sb){sb.className='status-bar sb-verify';sb.textContent='⏰ VERIFY NOW!';}
     toast('⏰ VERIFY NOW!',5000);
   }
 }
 
-function verifyStream() {
-  if (!timerGoing) return;
+function verifyStream(){
+  if(!timerGoing || paused) return;
   verified=true; verifyTimeLeft=900;
   const vt=document.getElementById('verify-timer');
   if(vt) vt.textContent='15:00';
-  const vb=document.getElementById('verify-box');
-  if(vb){vb.style.borderColor='#c4b5fd';vb.style.background='linear-gradient(135deg,#ede9fe,#fce7f3)';}
   const sb=document.getElementById('status-bar');
   if(sb){sb.className='status-bar sb-live';sb.textContent='✅ Verified! Next in 15 min.';}
   tryBadge('bverify','✅ Verified');
@@ -1226,47 +1567,127 @@ function verifyStream() {
   postSysMsg(`✅ @${myUsername} verified!`);
 }
 
-function tick() {
-  if (!timerGoing) return;
-  if (verified || verifyTimeLeft>0) {
+function tick(){
+  if(!timerGoing || paused) return;
+  if(verified || verifyTimeLeft>0){
     sessSecs=Math.floor((Date.now()-sessStart)/1000);
     const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
     el('sh-timer',fmt(sessSecs));
     el('sh-points',`⭐ ${getPoints(sessSecs)} points`);
-    myAccs.forEach(a=>{const e=document.getElementById('alt-'+safe(a.name));if(e) e.textContent=fmt(sessSecs);});
-    if (sessSecs>=900)  tryBadge('b15','⏱ 15 min warrior');
-    if (sessSecs>=1800) tryBadge('b30','🔥 30 min streamer');
-    if (sessSecs>=3600) tryBadge('b60','👑 1 hour legend');
-    if (myAccs.length>=2) tryBadge('bmulti','🖥 Multi-account pro');
-    if (sessSecs%20===0) { saveLive(); renderAll(); }
-    if (sessSecs%30===0) save();
+    myAccs.forEach(a=>{const e=document.getElementById('alt-'+safe(a.name));if(e)e.textContent=fmt(sessSecs);});
+    if(sessSecs>=900) tryBadge('b15','⏱ 15 min warrior');
+    if(sessSecs>=1800) tryBadge('b30','🔥 30 min streamer');
+    if(sessSecs>=3600) tryBadge('b60','👑 1 hour legend');
+    if(myAccs.length>=2) tryBadge('bmulti','🖥 Multi-account pro');
+    if(sessSecs%20===0){ saveLive(); renderAll(); renderAdminList(); }
+    if(sessSecs%30===0) save();
   }
 }
 
-function tryBadge(id, msg) {
-  if (!earnedSet.has(id)) {
+function tryBadge(id,msg){
+  if(!earnedSet.has(id)){
     earnedSet.add(id);
-    const el=document.getElementById(id); if(el) el.classList.add('got');
+    const el=document.getElementById(id);
+    if(el) el.classList.add('earned');
     save(); toast(`🎖 ${msg}!`,4000);
-    launchConfetti();
     postSysMsg(`🎖 @${myUsername} earned "${msg}" badge!`);
   }
 }
 
-function saveLive() {
+function saveLive(){
   const key=myUsername.toLowerCase();
   if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
-  db[key].liveSecs=sessSecs; db[key].isLive=true; save();
+  db[key].liveSecs=paused?0:sessSecs; db[key].isLive=timerGoing && !paused; save();
 }
 
 // ============================================================
-// ⏹ STOP / BACK
+// 🛠 SESSION CONTROLS
 // ============================================================
-function stopStream() {
-  if (!confirm('Stop session and save to Firebase?')) return;
+function pauseSession(){
+  if(!timerGoing || paused) return;
+  paused=true;
+  if(ticker) clearInterval(ticker);
+  if(verifyInterval) clearInterval(verifyInterval);
+  ticker=null; verifyInterval=null;
+  const shEye=document.getElementById('sh-eye'); if(shEye) shEye.textContent='⏸ PAUSED';
+  const sb=document.getElementById('status-bar');
+  if(sb){sb.className='status-bar sb-paused';sb.textContent='⏸ Timer paused — click Resume to continue!';}
+  document.getElementById('pause-btn').style.display='none';
+  document.getElementById('resume-btn').style.display='inline-block';
+  const key=myUsername.toLowerCase();
+  if(db[key]){db[key].isLive=false; db[key].liveSecs=0;}
+  save(); renderAll(); renderAdminList();
+  toast('⏸ Session paused!',2000);
+  postSysMsg(`⏸ @${myUsername} paused their stream`);
+}
+
+function resumeSession(){
+  if(!timerGoing || !paused) return;
+  paused=false;
+  sessStart=Date.now()-sessSecs*1000;
+  resumeTimers();
+  const shEye=document.getElementById('sh-eye'); if(shEye) shEye.textContent='🔴 LIVE';
+  const sb=document.getElementById('status-bar');
+  if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min!';}
+  document.getElementById('pause-btn').style.display='inline-block';
+  document.getElementById('resume-btn').style.display='none';
+  const key=myUsername.toLowerCase();
+  if(db[key]){db[key].isLive=true; db[key].liveSecs=sessSecs;}
+  save(); renderAll(); renderAdminList();
+  toast('▶️ Session resumed!',2000);
+  postSysMsg(`▶️ @${myUsername} resumed their stream`);
+}
+
+function saveSessionProgress(){
+  if(!timerGoing){ toast('No active session',2000); return; }
+  const elapsed=sessSecs;
+  if(elapsed>0){
+    const key=myUsername.toLowerCase();
+    if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
+    db[key].totalSecs=(db[key].totalSecs||0)+elapsed;
+    db[key].sessions=(db[key].sessions||0)+1;
+    if(!paused){ db[key].isLive=true; db[key].liveSecs=elapsed; }
+    save();
+    const pts=getPoints(elapsed);
+    toast(`💾 Saved! ${fmt(elapsed)} (${pts} pts)`,3000);
+    postSysMsg(`💾 @${myUsername} saved (${fmt(elapsed)}, ${pts} pts)`);
+    sessSecs=0; if(!paused) sessStart=Date.now();
+    earnedSet=new Set(); renderAll(); renderAdminList(); setupStreamUI();
+  } else toast('No progress to save',2000);
+}
+
+function deleteSession(){
+  if(!confirm('Delete your current session? This will reset your progress.')) return;
   clearTimers();
-  const elapsed = timerGoing ? sessSecs : 0;
-  if (elapsed>0) {
+  const key=myUsername.toLowerCase();
+  if(db[key]){db[key].isLive=false; db[key].liveSecs=0; save();}
+  try{localStorage.removeItem(LS_SESSION);}catch(e){}
+  timerGoing=false; paused=false; sessSecs=0;
+  myTeam=null; myAccs=[]; myUsername='';
+  earnedSet=new Set(); verified=false; verifyTimeLeft=900;
+  document.querySelectorAll('.team-card').forEach(el=>el.classList.remove('selected'));
+  const goBtn=document.getElementById('go-btn');
+  if(goBtn){goBtn.textContent='🎬 Start Streaming Battle!';goBtn.style.background='';}
+  renderAll(); renderAdminList(); showView('home');
+  toast('🗑 Session deleted!',3000);
+  postSysMsg(`🗑 @${myUsername} deleted their session`);
+}
+
+function updatePauseUI(){
+  const shEye=document.getElementById('sh-eye'); if(shEye) shEye.textContent='⏸ PAUSED';
+  const sb=document.getElementById('status-bar');
+  if(sb){sb.className='status-bar sb-paused';sb.textContent='⏸ Timer paused — click Resume to continue!';}
+  document.getElementById('pause-btn').style.display='none';
+  document.getElementById('resume-btn').style.display='inline-block';
+}
+
+function clearTimers(){ if(ticker) clearInterval(ticker); if(verifyInterval) clearInterval(verifyInterval); ticker=null; verifyInterval=null; }
+
+function stopStream(){
+  if(!confirm('Stop session and save?')) return;
+  clearTimers();
+  const elapsed=timerGoing?sessSecs:0;
+  if(elapsed>0){
     const key=myUsername.toLowerCase();
     if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
     db[key].totalSecs=(db[key].totalSecs||0)+elapsed;
@@ -1277,480 +1698,237 @@ function stopStream() {
     postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} (${pts} pts)!`);
     toast(`✅ ${fmt(elapsed)} saved! ⭐ ${pts} points!`,5000);
   }
-  resetSession();
-}
-
-function goBack() {
-  if (timerGoing) {
-    if (!confirm('Pause timer? Progress is saved.')) return;
-    clearTimers(); timerGoing=false; save(); toast('⏸ Timer paused.',2000);
-  }
-  showView('home'); renderAll();
-}
-
-function clearTimers() {
-  if (ticker) clearInterval(ticker);
-  if (verifyInterval) clearInterval(verifyInterval);
-  ticker=null; verifyInterval=null;
-}
-
-function resetSession() {
-  clearTimers();
-  timerGoing=false; sessSecs=0; myTeam=null; myAccs=[]; myUsername='';
-  earnedSet=new Set(); verified=false; verifyTimeLeft=900;
-  try { localStorage.removeItem(LS_SESSION); } catch(e) {}
-  config.teams.forEach(t=>{ const b=document.getElementById('team-btn-'+t.id); if(b) b.classList.remove('selected'); });
+  timerGoing=false; paused=false; sessSecs=0;
+  document.querySelectorAll('.team-card').forEach(el=>el.classList.remove('selected'));
   const goBtn=document.getElementById('go-btn');
   if(goBtn){goBtn.textContent='🎬 Start Streaming Battle!';goBtn.style.background='';}
-  showView('home'); renderAll();
+  renderAll(); renderAdminList(); showView('home');
 }
 
 // ============================================================
 // 💬 CHAT
 // ============================================================
-function postSysMsg(txt) {
+function postSysMsg(txt){
   const m={type:'sys',sender:'System',team:'system',text:txt,ts:tsNow()};
   chat.push(m); saveLocalChat(); renderAllChats(); scrollChats(); pushChatMsg(m);
 }
 
-function sendMsg(source) {
-  const ids = {home:'chat-input-home', stream:'chat-input-stream', main:'chat-input-main'};
-  const inp = document.getElementById(ids[source]||ids.home);
-  const txt = inp?.value.trim(); if (!txt) return;
-  if (!myUsername) { toast('Register first to chat!'); return; }
+function sendMsg(source){
+  const ids={home:'chat-input-home', stream:'chat-input-stream', main:'chat-input-main'};
+  const inp=document.getElementById(ids[source]||ids.home);
+  const txt=inp?.value.trim(); if(!txt) return;
+  if(!myUsername){ toast('Register first!'); return; }
   inp.value='';
   const m={type:'msg',sender:myUsername,team:myTeam,text:txt,ts:tsNow()};
   chat.push(m); saveLocalChat(); renderAllChats(); scrollChats(); pushChatMsg(m);
 }
 
-function sendReact(txt) {
-  if (!myUsername) { toast('Register first!'); return; }
-  const m={type:'msg',sender:myUsername,team:myTeam,text:txt,ts:tsNow()};
-  chat.push(m); saveLocalChat(); renderAllChats(); scrollChats(); pushChatMsg(m);
-}
-
-function renderChat(feedId) {
-  const feed = document.getElementById(feedId); if (!feed) return;
-  const atBottom = feed.scrollHeight-feed.scrollTop-feed.clientHeight < 80;
-  const msgs = chat.slice(-60);
-  if (!msgs.length) {
-    feed.innerHTML='<div class="chat-msg sys"><span class="chat-sys">🐥 Welcome to the OhOh Fandom Battle!</span></div>';
-    return;
-  }
-  feed.innerHTML = msgs.map(m=>{
-    const isSys = m.type==='sys'||m.team==='system'||m.sender==='System';
-    if (isSys) return `<div class="chat-msg sys"><span class="chat-sys">${escHtml(m.text)}</span></div>`;
-    const t = teamById(m.team);
+function renderChat(feedId){
+  const feed=document.getElementById(feedId); if(!feed) return;
+  const atBottom=feed.scrollHeight-feed.scrollTop-feed.clientHeight<80;
+  const msgs=chat.slice(-60);
+  if(!msgs.length){ feed.innerHTML='<div class="chat-msg sys"><span class="chat-sys">🐰 Welcome to OhOh Fandom!</span></div>'; return; }
+  feed.innerHTML=msgs.map(m=>{
+    const isSys=m.type==='sys'||m.team==='system'||m.sender==='System';
+    if(isSys) return `<div class="chat-msg sys"><span class="chat-sys">${escHtml(m.text)}</span></div>`;
+    const t=teamById(m.team);
     return `<div class="chat-msg">
       <div class="chat-avatar" style="background:${t.color}">${initials(m.sender)}</div>
       <div class="chat-bubble-wrap">
-        <div class="chat-meta">
-          <span class="chat-sender" style="color:${t.color}">@${escHtml(m.sender)}</span>
-          <span class="chat-ts">${m.ts||''}</span>
-        </div>
-        <div class="chat-bubble" style="background:${t.color}18;border-color:${t.color}30">${escHtml(m.text)}</div>
+        <div class="chat-meta"><span class="chat-sender" style="color:${t.color}">@${escHtml(m.sender)}</span><span class="chat-ts">${m.ts||''}</span></div>
+        <div class="chat-bubble" style="border-color:${t.color}30;">${escHtml(m.text)}</div>
       </div>
     </div>`;
   }).join('');
-  if (atBottom) feed.scrollTop=feed.scrollHeight;
+  if(atBottom) feed.scrollTop=feed.scrollHeight;
 }
-
-function renderAllChats() {
-  renderChat('chat-feed-home');
-  renderChat('chat-feed-stream');
-  renderChat('chat-feed-main');
-}
+function renderAllChats(){ renderChat('chat-feed-home'); renderChat('chat-feed-stream'); renderChat('chat-feed-main'); }
 
 // ============================================================
 // 🏆 SCOREBOARD + LEADERBOARD
 // ============================================================
-function renderScoreboard() {
-  // Team totals
-  const totals = {};
-  config.teams.forEach(t=>{ totals[t.id]={secs:0,pts:0,count:0,t}; });
+function renderScoreboard(){
+  const totals={khem:{secs:0,pts:0,count:0},pharan:{secs:0,pts:0,count:0}};
   Object.values(db).forEach(u=>{
     const secs=(u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0);
-    if (totals[u.team]) { totals[u.team].secs+=secs; totals[u.team].pts+=getPoints(secs); totals[u.team].count++; }
+    if(totals[u.team]){ totals[u.team].secs+=secs; totals[u.team].pts+=getPoints(secs); totals[u.team].count++; }
   });
-  if (timerGoing&&myTeam&&myUsername&&totals[myTeam]) {
-    totals[myTeam].pts+=getPoints(sessSecs);
-  }
+  if(timerGoing&&myTeam&&myUsername&&totals[myTeam]) totals[myTeam].pts+=getPoints(sessSecs);
 
-  // Hero scoreboard
-  const sw = document.getElementById('scoreboard-wrap');
-  if (sw) {
-    const teams = config.teams;
-    const totalPts = Object.values(totals).reduce((s,v)=>s+v.pts,0)||1;
-    sw.innerHTML = teams.map((t,i)=>`
-      <div class="score-card" style="${teams.length>2?'flex:1;min-width:120px;':'flex:1;'}">
-        <div class="sc-label">${t.emoji} Team</div>
-        <div class="sc-name">${t.name}</div>
-        <div class="sc-pts">${totals[t.id]?.pts||0}</div>
+  const teams=[{id:'khem',name:'Khem',color:'#1a5276',emoji:'💙'},{id:'pharan',name:'Pharan',color:'#b03a2e',emoji:'🧡'}];
+  const sw=document.getElementById('scoreboard-wrap');
+  if(sw){
+    sw.innerHTML=teams.map((t,i)=>`
+      <div class="score-card" style="background:${t.color}22;border-color:${t.color}44;">
+        <div style="font-size:28px;">${t.emoji}</div>
+        <div class="sc-name" style="color:${t.color}">${t.name}</div>
+        <div class="sc-pts" style="color:${t.color}">${totals[t.id]?.pts||0}</div>
         <div class="sc-time">${fmt(totals[t.id]?.secs||0)}</div>
         <div class="sc-meta">${totals[t.id]?.count||0} streamer${(totals[t.id]?.count||0)!==1?'s':''}</div>
       </div>
-      ${i<teams.length-1?'<div class="vs-orb">VS</div>':''}`).join('');
+      ${i<teams.length-1?'<div class="vs-orb">⚔️</div>':''}`).join('');
   }
 
-  // Progress bar
-  const pb = document.getElementById('progress-bar');
-  if (pb && config.teams.length>=2) {
-    const total = Object.values(totals).reduce((s,v)=>s+v.secs,0)||1;
-    pb.innerHTML = config.teams.map(t=>{
-      const pct = Math.max(5,Math.min(95,Math.round((totals[t.id]?.secs||0)/total*100)));
-      return `<div class="pb-k" style="width:${pct}%;background:${t.color};flex-shrink:0;"></div>`;
-    }).join('');
+  const pb=document.getElementById('progress-bar');
+  if(pb){
+    const total=totals.khem.secs+totals.pharan.secs||1;
+    const kpct=Math.max(5,Math.min(95,Math.round(totals.khem.secs/total*100)));
+    pb.innerHTML=`<div class="pb-k" style="width:${kpct}%;background:#1a5276;"></div><div class="pb-p" style="width:${100-kpct}%;background:#b03a2e;"></div>`;
   }
 
-  // Verdict
-  const vd = document.getElementById('verdict-text');
-  if (vd) {
-    const sorted = config.teams.map(t=>({...t,...totals[t.id]})).sort((a,b)=>b.pts-a.pts);
-    if (sorted.every(t=>t.pts===0)) vd.textContent='⚔️ Ready for battle!';
-    else if (sorted[0].pts===sorted[1]?.pts) vd.textContent='⚔️ Perfectly tied! Keep streaming!';
-    else vd.textContent=`${sorted[0].emoji} ${sorted[0].name} leads by ${sorted[0].pts-(sorted[1]?.pts||0)} points!`;
+  const vd=document.getElementById('verdict-text');
+  if(vd){
+    if(totals.khem.pts===0&&totals.pharan.pts===0) vd.textContent='⚔️ Ready for battle!';
+    else if(totals.khem.pts>totals.pharan.pts) vd.textContent=`💙 Team Khem leads by ${totals.khem.pts-totals.pharan.pts} points!`;
+    else if(totals.pharan.pts>totals.khem.pts) vd.textContent=`🧡 Team Pharan leads by ${totals.pharan.pts-totals.khem.pts} points!`;
+    else vd.textContent='⚔️ Perfectly tied! Keep streaming!';
   }
 
-  // Team score boxes
   ['team-score-home','team-score-stream','team-score-lb'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    const sorted=config.teams.map(t=>({...t,...totals[t.id]})).sort((a,b)=>b.pts-a.pts);
-    el.innerHTML=config.teams.map(t=>{
-      const isLead = sorted[0].id===t.id && (totals[t.id]?.pts||0)>0;
-      return `<div class="col-${12/Math.min(config.teams.length,4)}">
-        <div class="team-score-box${isLead?' lead':''}">
-          <div class="tsb-name">${t.emoji} ${t.name}</div>
-          <div class="tsb-pts" style="color:${t.color}">${totals[t.id]?.pts||0}</div>
-          <div style="font-size:10px;color:#b07;">${fmt(totals[t.id]?.secs||0)}</div>
+    const el=document.getElementById(id); if(!el) return;
+    const sorted=[...teams].sort((a,b)=>totals[b.id].pts-totals[a.id].pts);
+    el.innerHTML=teams.map(t=>{
+      const isLead=sorted[0].id===t.id && totals[t.id].pts>0;
+      return `<div class="col-6">
+        <div class="team-score-box${isLead?' lead':''}" style="${isLead?`border-color:${t.color};background:${t.color}22;`:'border-color:#e8ddd8;background:#fff;'}">
+          <div style="font-weight:700;font-size:14px;">${t.emoji} ${t.name}</div>
+          <div style="font-size:28px;font-weight:900;color:${isLead?t.color:'var(--text)'}">${totals[t.id]?.pts||0}</div>
+          <div style="font-size:10px;color:var(--text-light);">${fmt(totals[t.id]?.secs||0)}</div>
         </div>
       </div>`;
     }).join('');
   });
 
-  // Member counts
-  config.teams.forEach(t=>{
-    const el=document.getElementById('count-'+t.id);
-    if(el) el.textContent=(totals[t.id]?.count||0)+' member'+(totals[t.id]?.count!==1?'s':'');
-  });
-
-  // Live count
+  config.teams.forEach(t=>{ const el=document.getElementById('count-'+t.id); if(el) el.textContent=(totals[t.id]?.count||0)+' member'+(totals[t.id]?.count!==1?'s':''); });
   const lc=Object.values(db).filter(u=>u.isLive).length;
   ['live-count','live-count-lb'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent='👀 '+lc+' live';});
 }
 
-function renderLB(id) {
+function renderLB(id){
   const el=document.getElementById(id); if(!el) return;
   const f=lbFilter[id]||'all';
-  let entries=Object.entries(db).map(([k,u])=>{
-    const secs=(u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0);
-    return {...u,key:k,secs};
-  });
+  let entries=Object.entries(db).map(([k,u])=>{ const secs=(u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0); return {...u,key:k,secs}; });
   if(f!=='all') entries=entries.filter(u=>u.team===f);
   entries.sort((a,b)=>b.secs-a.secs);
-  if(!entries.length){el.innerHTML='<div class="lb-empty">No streamers yet — be first! 🐥</div>';return;}
+  if(!entries.length){ el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-light);">No streamers yet — be first! 🐰</div>'; return; }
   const medals=['🥇','🥈','🥉'];
   el.innerHTML=entries.slice(0,20).map((u,i)=>{
     const t=teamById(u.team);
     const livep=u.isLive?'<span class="pill pill-live">LIVE</span>':'';
     const mep=(myUsername&&u.key===myUsername.toLowerCase())?'<span class="pill pill-you">YOU</span>':'';
     const vp=u.verifications>0?`<span class="pill pill-verify">✅${u.verifications}</span>`:'';
-    return `<div class="lb-entry" style="border-left:3px solid ${t.color}">
+    return `<div class="lb-entry" style="border-left:3px solid ${t.color};">
       <div class="lb-rank${i<3?' r'+(i+1):''}">${medals[i]||(i+1)}</div>
-      <div class="avatar-sm" style="background:${t.color}">${initials(u.name)}</div>
-      <div class="lb-body">
-        <div class="lb-name">@${escHtml(u.name||'')} ${t.emoji}${livep}${mep}${vp}</div>
-        <div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts · ${u.verifications||0} verifs</div>
-      </div>
-      <div>
-        <div class="lb-pts">⭐${getPoints(u.secs)}</div>
-        <div class="lb-time-s">${fmt(u.secs)}</div>
-      </div>
+      <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:${t.color};">${initials(u.name)}</div>
+      <div class="lb-body"><div class="lb-name">@${escHtml(u.name||'')} ${t.emoji}${livep}${mep}${vp}</div><div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts</div></div>
+      <div><div class="lb-pts">⭐${getPoints(u.secs)}</div><div class="lb-time-s">${fmt(u.secs)}</div></div>
     </div>`;
   }).join('');
 }
 
-function renderAll() { renderScoreboard(); renderLB('lb-home'); renderLB('lb-stream'); renderLB('lb-full'); }
-
-function lbSwitch(btn, f, id) {
-  lbFilter[id]=f;
-  btn.closest('.lb-tabs').querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  renderLB(id);
-}
+function renderAll(){ renderScoreboard(); renderLB('lb-home'); renderLB('lb-stream'); renderLB('lb-full'); }
+function lbSwitch(btn,f,id){ lbFilter[id]=f; btn.closest('.lb-tabs').querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('on')); btn.classList.add('on'); renderLB(id); }
 
 // ============================================================
-// 👤 MY PROFILE
+// 👤 PROFILE
 // ============================================================
-function renderProfile() {
-  if (!myUsername) {
-    document.getElementById('profile-not-logged').style.display='block';
-    document.getElementById('profile-content').style.display='none';
-    return;
-  }
-  document.getElementById('profile-not-logged').style.display='none';
-  document.getElementById('profile-content').style.display='block';
-
+function renderProfile(){
+  if(!myUsername){ document.getElementById('profile-not-logged').style.display='block'; document.getElementById('profile-content').style.display='none'; return; }
+  document.getElementById('profile-not-logged').style.display='none'; document.getElementById('profile-content').style.display='block';
   const t=teamById(myTeam);
-  const av=document.getElementById('profile-avatar');
-  if(av){av.textContent=initials(myUsername);av.style.background=`rgba(255,255,255,.3)`;}
-  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  el('profile-name','@'+myUsername);
-  el('profile-team',t.emoji+' '+t.name);
-
-  const key=myUsername.toLowerCase();
-  const u=db[key]||{};
+  document.getElementById('profile-avatar').textContent=t.emoji;
+  document.getElementById('profile-name').textContent='@'+myUsername;
+  document.getElementById('profile-team').textContent=t.emoji+' '+t.name;
+  const key=myUsername.toLowerCase(); const u=db[key]||{};
   const totalSecs=(u.totalSecs||0)+(timerGoing?sessSecs:0);
-  el('prof-pts',getPoints(totalSecs));
-  el('prof-time',fmt(totalSecs));
-  el('prof-sessions',(u.sessions||0)+(timerGoing?1:0));
-  el('prof-verifs',u.verifications||0);
-  el('prof-accs',(u.accounts||myAccs.map(a=>a.name)).length);
-  el('prof-badges',earnedSet.size);
-
-  const badgeDefs=[
-    {id:'b15',label:'⏱ 15 min warrior'},{id:'b30',label:'🔥 30 min streamer'},
-    {id:'b60',label:'👑 1 hour legend'},{id:'bmulti',label:'🖥 Multi-account pro'},
-    {id:'bverify',label:'✅ Verified'}
-  ];
-  const bg=document.getElementById('prof-badge-grid');
-  if(bg) bg.innerHTML=badgeDefs.map(b=>`<div class="badge-item${earnedSet.has(b.id)?' got':''}">${b.label}</div>`).join('');
-
-  initSpinWheel();
+  document.getElementById('prof-pts').textContent=getPoints(totalSecs);
+  document.getElementById('prof-time').textContent=fmt(totalSecs);
+  document.getElementById('prof-badges').textContent=earnedSet.size;
+  const badges=['b15','b30','b60','bmulti','bverify'];
+  const labels=['⏱ 15 min','🔥 30 min','👑 1 hour','🖥 Multi','✅ Verified'];
+  document.getElementById('prof-badge-grid').innerHTML=badges.map((b,i)=>`<span class="badge-item${earnedSet.has(b)?' earned':''}">${labels[i]}</span>`).join('');
 }
 
-function deleteMyData() {
-  if (!myUsername) { toast('No data to delete!'); return; }
-  if (!confirm(`Delete all progress for @${myUsername}? This cannot be undone.`)) return;
-  const key=myUsername.toLowerCase();
-  delete db[key];
-  saveLocal();
-  if (dbFirestore) {
-    dbFirestore.collection('users').doc(key).delete().catch(e=>console.warn(e));
-  }
-  try { localStorage.removeItem(LS_SESSION); } catch(e) {}
-  clearTimers(); timerGoing=false; sessSecs=0;
-  earnedSet=new Set(); verified=false; verifyTimeLeft=900;
+function deleteMyData(){
+  if(!myUsername){ toast('No data!'); return; }
+  if(!confirm(`Delete all progress for @${myUsername}?`)) return;
+  const key=myUsername.toLowerCase(); delete db[key]; saveLocal();
+  if(dbFirestore){ dbFirestore.collection('users').doc(key).delete().catch(e=>console.warn(e)); }
+  try{localStorage.removeItem(LS_SESSION);}catch(e){}
+  clearTimers(); timerGoing=false; paused=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900;
   myUsername=''; myTeam=null; myAccs=[];
-  renderAll();
-  toast('🗑 Your data has been deleted.',3000);
-  showView('home');
-}
-
-// ============================================================
-// 🎡 SPIN WHEEL
-// ============================================================
-const WHEEL_PRIZES = ['🎉 +5 pts!','🔥 Keep going!','🐥 Quack!','⭐ You star!','💖 Fighting!','🎀 Kawaii!','🎊 LFG!','✨ Shine!'];
-let wheelAngle = 0, wheelSpinning = false;
-
-function initSpinWheel() {
-  const canvas=document.getElementById('spin-wheel');
-  if(!canvas) return;
-  const ctx=canvas.getContext('2d');
-  drawWheel(ctx,canvas.width,canvas.height,wheelAngle);
-}
-
-function drawWheel(ctx,w,h,angle) {
-  const cx=w/2,cy=h/2,r=cx-6;
-  const n=WHEEL_PRIZES.length;
-  const colors=['#FF6B9D','#FFB347','#FFD1DC','#D4AF37','#E8294A','#FFB3C6','#FF8E53','#FFF0F7'];
-  ctx.clearRect(0,0,w,h);
-  for(let i=0;i<n;i++){
-    const start=angle+i*(2*Math.PI/n);
-    const end=start+2*Math.PI/n;
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,end);ctx.closePath();
-    ctx.fillStyle=colors[i%colors.length];ctx.fill();
-    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
-    ctx.save();ctx.translate(cx,cy);ctx.rotate(start+(end-start)/2);
-    ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 11px Nunito,sans-serif';
-    ctx.fillText(WHEEL_PRIZES[i],r-8,4);ctx.restore();
-  }
-  ctx.beginPath();ctx.arc(cx,cy,18,0,2*Math.PI);
-  ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#FF6B9D';ctx.lineWidth=3;ctx.stroke();
-  ctx.fillStyle='#FF6B9D';ctx.font='bold 14px Nunito,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('🐥',cx,cy);
-  // Arrow pointer
-  ctx.beginPath();ctx.moveTo(cx+r+4,cy);ctx.lineTo(cx+r-10,cy-8);ctx.lineTo(cx+r-10,cy+8);ctx.closePath();
-  ctx.fillStyle='#E8294A';ctx.fill();
-}
-
-function spinWheel() {
-  if(wheelSpinning) return;
-  wheelSpinning=true;
-  document.getElementById('spin-result').textContent='';
-  const canvas=document.getElementById('spin-wheel');
-  if(!canvas) return;
-  const ctx=canvas.getContext('2d');
-  const totalSpin=(Math.PI*2*5)+(Math.random()*Math.PI*2);
-  const duration=3000;
-  const start=performance.now();
-  const startAngle=wheelAngle;
-  function frame(now){
-    const elapsed=now-start;
-    const t=Math.min(elapsed/duration,1);
-    const ease=1-Math.pow(1-t,3);
-    wheelAngle=startAngle+totalSpin*ease;
-    drawWheel(ctx,canvas.width,canvas.height,wheelAngle);
-    if(t<1){requestAnimationFrame(frame);}
-    else{
-      wheelSpinning=false;
-      const n=WHEEL_PRIZES.length;
-      const normalized=((2*Math.PI)-(wheelAngle%(2*Math.PI)))%(2*Math.PI);
-      const idx=Math.floor(normalized/(2*Math.PI/n))%n;
-      document.getElementById('spin-result').textContent='You got: '+WHEEL_PRIZES[idx];
-      toast('🎡 '+WHEEL_PRIZES[idx],3000);
-    }
-  }
-  requestAnimationFrame(frame);
-}
-
-// ============================================================
-// 🎉 CONFETTI
-// ============================================================
-function launchConfetti() {
-  const colors=['#FF6B9D','#FFD1DC','#D4AF37','#FF8E53','#E8294A','#fff','#c4b5fd'];
-  const container=document.getElementById('confetti-container');
-  if(!container) return;
-  for(let i=0;i<70;i++){
-    const p=document.createElement('div');
-    p.className='cp';
-    const size=6+Math.random()*8;
-    p.style.cssText=`left:${Math.random()*100}vw;top:-10px;width:${size}px;height:${size}px;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      border-radius:${Math.random()>.5?'50%':'3px'};
-      animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.6}s;`;
-    container.appendChild(p);
-    setTimeout(()=>p.remove(),3500);
-  }
+  renderAll(); renderAdminList(); toast('🗑 Data deleted!',3000); showView('home');
 }
 
 // ============================================================
 // ⚙️ ADMIN
 // ============================================================
-function adminLogin() {
+function adminLogin(){
   const pass=document.getElementById('admin-pass-input')?.value;
-  if(pass===config.adminPass){
-    adminLoggedIn=true;
-    document.getElementById('admin-login-panel').style.display='none';
-    document.getElementById('admin-panel').style.display='block';
-    loadAdminPanel();
-  } else {
-    showErr('admin-err','Incorrect password!');
-  }
+  if(pass==='ohoh2024'){ adminLoggedIn=true; document.getElementById('admin-login-area').style.display='none'; document.getElementById('admin-panel-area').style.display='block'; renderAdminList(); toast('🔓 Admin unlocked!',2000); }
+  else showErr('admin-err','❌ Incorrect password!');
+}
+function adminLoginFull(){
+  const pass=document.getElementById('admin-pass-input-full')?.value;
+  if(pass==='ohoh2024'){ adminLoggedIn=true; document.getElementById('admin-login-area-full').style.display='none'; document.getElementById('admin-panel-full').style.display='block'; renderAdminListFull(); toast('🔓 Admin unlocked!',2000); }
+  else showErr('admin-err-full','❌ Incorrect password!');
+}
+function adminLogout(){ adminLoggedIn=false; document.getElementById('admin-login-area').style.display='block'; document.getElementById('admin-panel-area').style.display='none'; document.getElementById('admin-pass-input').value=''; document.getElementById('admin-err').style.display='none'; }
+function adminLogoutFull(){ adminLoggedIn=false; document.getElementById('admin-login-area-full').style.display='block'; document.getElementById('admin-panel-full').style.display='none'; document.getElementById('admin-pass-input-full').value=''; document.getElementById('admin-err-full').style.display='none'; }
+
+function renderAdminList(){
+  const container=document.getElementById('admin-user-list'); if(!container) return;
+  if(!adminLoggedIn){ container.innerHTML='<div class="text-secondary small">🔒 Login to manage</div>'; return; }
+  const users=Object.entries(db).filter(([k,u])=>u.name&&u.team);
+  if(!users.length){ container.innerHTML='<div class="text-secondary small">No active users.</div>'; return; }
+  container.innerHTML=users.map(([key,u])=>{
+    const t=teamById(u.team); const isLive=u.isLive?'🔴 LIVE':'';
+    return `<div class="admin-user-row">
+      <div><span class="uname">@${escHtml(u.name)}</span><span class="uteam ${u.team}">${t.emoji} ${t.name}</span>${isLive?' <span class="badge bg-success text-white">LIVE</span>':''}</div>
+      <div><span class="small text-secondary me-2">⭐${getPoints(u.totalSecs||0)}</span><button class="btn-admin-del" onclick="adminDeleteUser('${key}')">Delete</button></div>
+    </div>`;
+  }).join('');
+}
+function renderAdminListFull(){ const c=document.getElementById('admin-user-list-full'); if(c) c.innerHTML=document.getElementById('admin-user-list').innerHTML; }
+
+function adminDeleteUser(key){
+  if(!adminLoggedIn){ toast('🔒 Admin only',2000); return; }
+  if(!confirm(`Reset @${db[key]?.name||key}'s session?`)) return;
+  if(db[key]){ db[key].totalSecs=0; db[key].sessions=0; db[key].isLive=false; db[key].liveSecs=0; save(); renderAll(); renderAdminList(); renderAdminListFull(); toast(`🗑 @${db[key]?.name||key} reset!`,2500); postSysMsg(`🗑 Admin reset @${db[key]?.name||key}'s session`); }
 }
 
-function adminLogout() {
-  adminLoggedIn=false;
-  document.getElementById('admin-login-panel').style.display='block';
-  document.getElementById('admin-panel').style.display='none';
-  document.getElementById('admin-pass-input').value='';
-}
-
-function loadAdminPanel() {
-  document.getElementById('admin-event-name').value=config.eventName||'';
-  document.getElementById('admin-new-pass').value='';
-  renderAdminTeams();
-  renderAdminStats();
-}
-
-function renderAdminTeams() {
-  const list=document.getElementById('admin-teams-list');
-  if(!list) return;
-  list.innerHTML=config.teams.map((t,i)=>`
-    <div class="team-config-row" id="team-cfg-${i}">
-      <div class="team-color-dot" style="background:${t.color}"></div>
-      <input type="text" class="inp inp-sm" style="width:80px" value="${t.id}" placeholder="ID" onchange="updateTeamField(${i},'id',this.value)"/>
-      <input type="text" class="inp inp-sm" style="flex:1" value="${t.name}" placeholder="Team name" onchange="updateTeamField(${i},'name',this.value)"/>
-      <input type="text" class="inp inp-sm" style="width:50px;text-align:center;" value="${t.emoji}" placeholder="Emoji" onchange="updateTeamField(${i},'emoji',this.value)"/>
-      <input type="color" value="${t.color}" onchange="updateTeamField(${i},'color',this.value)" style="width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;background:none;"/>
-      ${config.teams.length>2?`<button class="rm-btn" onclick="removeAdminTeam(${i})">×</button>`:''}
-    </div>`).join('');
-}
-
-function updateTeamField(i,field,val) {
-  if(config.teams[i]) config.teams[i][field]=val;
-  if(field==='color'){
-    const dot=document.querySelector(`#team-cfg-${i} .team-color-dot`);
-    if(dot) dot.style.background=val;
-  }
-}
-
-function addAdminTeam() {
-  if(config.teams.length>=4){toast('Max 4 teams!');return;}
-  config.teams.push({id:'team'+config.teams.length,name:'New Team',color:'#9b59b6',emoji:'💜'});
-  renderAdminTeams();
-}
-
-function removeAdminTeam(i) {
-  if(config.teams.length<=2){toast('Minimum 2 teams!');return;}
-  if(!confirm('Remove this team?')) return;
-  config.teams.splice(i,1);
-  renderAdminTeams();
-}
-
-function saveAdminConfig() {
-  config.eventName=document.getElementById('admin-event-name')?.value||config.eventName;
-  const np=document.getElementById('admin-new-pass')?.value;
-  if(np) config.adminPass=np;
-  saveConfig();
-  applyEventName();
-  buildTeamGrid();
-  buildLbTabs();
-  buildQuickReacts();
-  renderAll();
-  toast('✅ Configuration saved!',3000);
-  launchConfetti();
-}
-
-function renderAdminStats() {
-  const el=document.getElementById('admin-stats');
-  if(!el) return;
-  const users=Object.values(db);
-  const live=users.filter(u=>u.isLive).length;
-  const total=users.reduce((s,u)=>s+(u.totalSecs||0),0);
-  const stats=[
-    {label:'Total Users',val:users.length,icon:'👥'},
-    {label:'Live Now',val:live,icon:'🔴'},
-    {label:'Total Stream Time',val:fmt(total),icon:'⏱'},
-    {label:'Chat Messages',val:chat.length,icon:'💬'},
-  ];
-  el.innerHTML=stats.map(s=>`
-    <div class="col-6">
-      <div class="stat-box"><div class="stat-val" style="font-size:18px;">${s.icon} ${s.val}</div><div class="stat-lbl">${s.label}</div></div>
-    </div>`).join('');
-}
-
-async function adminResetAll() {
-  if(!confirm('RESET ALL DATA in Firebase and localStorage? This cannot be undone!')) return;
+function adminResetAll(){
+  if(!adminLoggedIn){ toast('🔒 Admin only',2000); return; }
+  if(!confirm('RESET ALL DATA? This cannot be undone!')) return;
   if(!confirm('Are you absolutely sure?')) return;
-  try {
+  try{
     if(dbFirestore){
-      const us=await dbFirestore.collection('users').get();
-      const cs=await dbFirestore.collection('chat').get();
-      const batch=dbFirestore.batch();
-      us.forEach(d=>batch.delete(d.ref));
-      cs.forEach(d=>batch.delete(d.ref));
-      await batch.commit();
+      dbFirestore.collection('users').get().then(us=>{ const batch=dbFirestore.batch(); us.forEach(d=>batch.delete(d.ref)); return batch.commit(); }).catch(e=>console.warn(e));
+      dbFirestore.collection('chat').get().then(cs=>{ const batch=dbFirestore.batch(); cs.forEach(d=>batch.delete(d.ref)); return batch.commit(); }).catch(e=>console.warn(e));
     }
-  } catch(e) { console.warn('Firebase reset:', e); }
-  db={}; chat=[];
-  try{localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_CHAT);localStorage.removeItem(LS_SESSION);}catch(e){}
-  clearTimers(); timerGoing=false; sessSecs=0; myUsername=''; myTeam=null; myAccs=[];
-  earnedSet=new Set();
-  renderAll(); renderAllChats();
-  toast('🗑 All data reset!',4000);
-  showView('home');
+  }catch(e){ console.warn('Reset error:',e); }
+  db={}; chat=[]; try{localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_CHAT);localStorage.removeItem(LS_SESSION);}catch(e){}
+  clearTimers(); timerGoing=false; paused=false; sessSecs=0; myUsername=''; myTeam=null; myAccs=[]; earnedSet=new Set();
+  renderAll(); renderAllChats(); renderAdminList(); renderAdminListFull();
+  toast('🗑 All data reset!',4000); showView('home');
 }
 
-function adminResetLocal() {
-  if(!confirm('Reset local data only?')) return;
-  db={}; chat=[];
-  try{localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_CHAT);localStorage.removeItem(LS_SESSION);}catch(e){}
-  renderAll(); renderAllChats();
-  toast('🗑 Local data cleared!',3000);
-}
+// ============================================================
+// 🚀 BOOT
+// ============================================================
+const config={teams:[{id:'khem'},{id:'pharan'}]};
+buildTeamGrid();
+renderScoreboard();
+restoreSession();
+renderAll(); renderAllChats(); scrollChats();
 
-console.log('🐥 OhOh Fandom Stream Battle loading...');
+if(dbFirestore){
+  dbFirestore.collection('users').limit(1).get()
+    .then(()=>{ firebaseReady=true; setStatus('on','Online'); toast('🌐 Connected!',2000); setBadge('✅ Connected','dcfce7','15803d'); loadFromFirebase(); })
+    .catch(err=>{ console.warn('Firebase failed:',err); setStatus('off','Offline'); setBadge('🔴 Offline','fee2e2','dc2626'); loadLocal(); });
+} else { setStatus('off','Offline'); loadLocal(); }
+
+console.log('🐰 OhOh Fandom Stream Battle loaded!');
 </script>
 </body>
 </html>
