@@ -41,7 +41,7 @@
       left: 0;
       width: 100%;
       z-index: 1000;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.95);
       backdrop-filter: blur(12px);
       padding: 0.8rem 1.5rem;
       display: flex;
@@ -879,7 +879,7 @@
     <div class="menu-divider"></div>
     <div class="menu-footer">
       <div><span class="status-dot" id="status-dot-menu"></span><span id="status-text-menu">Connecting...</span></div>
-      <div style="margin-top:2px;">5 min = 1 point ⭐</div>
+      <div style="margin-top:2px;">10 min = 5 pts · ×2 per account</div>
     </div>
   </div>
 </div>
@@ -893,7 +893,7 @@
       <span class="mascot-hero">🐰</span>
       <div style="position:relative;z-index:1;max-width:620px;">
         <div class="hero-title" id="hero-event-name">OhOh Fandom — Stream Battle</div>
-        <div class="hero-subtitle">Team Khem 💙 vs 🧡 Team Pharan · Stream &amp; Win!</div>
+        <div class="hero-subtitle">Team Khem 💙 vs 🧡 Team Pharan · 10 min = 5 pts · ×2 per account</div>
         <div class="scoreboard" id="scoreboard-wrap"></div>
         <div class="progress-bar-wrap" id="progress-bar"></div>
         <div class="verdict-text" id="verdict-text">⚔️ Ready for battle!</div>
@@ -915,7 +915,7 @@
         <strong>🐰 Real-Time Battle!</strong> Live leaderboard · Global chat · <span class="fw-bold" id="fb-badge">⏳ Connecting...</span>
       </div>
       <div class="alert alert-success" style="background:#d4edda;border-color:#b8daff;">
-        <strong>⭐ Points: 1 point = 5 minutes</strong> · Multiple accounts = multiplied points · <strong>Verify every 15 min!</strong>
+        <strong>⭐ Points: 10 minutes = 5 points</strong> · Multiplier: ×2 per extra account · <strong>Verify = +1 bonus point!</strong>
       </div>
     </div>
 
@@ -923,7 +923,7 @@
       <div class="card-head"><span>👤 Your Username</span></div>
       <div class="field-g">
         <label class="lbl">Display Name</label>
-        <input type="text" class="inp" id="username-input" placeholder="e.g. KengFan_Pro" value="kengfan1"/>
+        <input type="text" class="inp" id="username-input" placeholder="e.g. KengFan_Pro" />
       </div>
     </div>
 
@@ -932,13 +932,13 @@
       <div id="acc-list">
         <div class="acc-item">
           <div class="acc-row">
-            <input type="text" class="inp inp-sm acc-name" placeholder="Account name (e.g. @MyFanAcc)" value="XXXXX"/>
+            <input type="text" class="inp inp-sm acc-name" placeholder="Account name (e.g. @MyFanAcc)" />
             <button class="rm-btn" onclick="rmAcc(this)">×</button>
           </div>
-          <input type="text" class="inp inp-sm acc-url" placeholder="YouTube / streaming link"/>
+          <input type="text" class="inp inp-sm acc-url" placeholder="YouTube / streaming link" />
         </div>
       </div>
-      <button class="add-acc-btn" onclick="addAcc()">+ Add another account</button>
+      <button class="add-acc-btn" onclick="addAcc()">+ Add another account (×2 multiplier)</button>
     </div>
 
     <div class="card-c">
@@ -991,7 +991,7 @@
     <div class="verify-box" id="verify-box" style="display:none;">
       <div class="vt">📸 Verification Required</div>
       <div class="vtime" id="verify-timer">15:00</div>
-      <button class="btn-rose btn-full" onclick="verifyStream()" style="height:48px;">✅ I'm Still Streaming!</button>
+      <button class="btn-rose btn-full" onclick="verifyStream()" style="height:48px;">✅ I'm Still Streaming! (+1 bonus point)</button>
     </div>
 
     <div class="card-c">
@@ -1016,8 +1016,9 @@
         <span class="badge-item" id="b15">⏱ 15 min</span>
         <span class="badge-item" id="b30">🔥 30 min</span>
         <span class="badge-item" id="b60">👑 1 hour</span>
-        <span class="badge-item" id="bmulti">🖥 Multi</span>
+        <span class="badge-item" id="bmulti">🖥 Multi (×2)</span>
         <span class="badge-item" id="bverify">✅ Verified</span>
+        <span class="badge-item" id="bpoints">⭐ 50 pts</span>
       </div>
     </div>
 
@@ -1155,7 +1156,7 @@
     </div>
   </div>
 
-  <footer>Made with 🐰 by OhOh Fandom · 5 min = 1 point · Powered by Firebase 🔥</footer>
+  <footer>Made with 🐰 by OhOh Fandom · 10 min = 5 pts · ×2 per account · Powered by Firebase 🔥</footer>
 </div>
 
 <script>
@@ -1189,9 +1190,11 @@ let earnedSet = new Set();
 let verifyInterval = null, verifyTimeLeft = 900, verified = false;
 let firebaseReady = false;
 let adminLoggedIn = false;
+let totalPoints = 0;
+let verificationPoints = 0;
 
 // ============================================================
-// 🛠 HELPERS
+// 🛠 HELPERS - NEW SCORING: 10 min = 5 points, multiplier x2 per account, +1 for verify
 // ============================================================
 function fmt(s) { if (s<0) s=0; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60; return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
 function fmtMin(s) { const m=Math.floor(s/60),sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
@@ -1199,7 +1202,17 @@ function initials(n) { return (n||'?').replace(/^@/,'').slice(0,2).toUpperCase()
 function tsNow() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function safe(n) { return (n||'').replace(/\W/g,'_'); }
 function escHtml(s) { const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
-function getPoints(secs) { return Math.floor(secs/300); }
+
+function getPoints(secs, accounts=1) {
+  const basePoints = Math.floor(secs / 600) * 5; // 5 points per 10 minutes
+  const multiplier = Math.pow(2, Math.max(0, accounts - 1));
+  return basePoints * multiplier;
+}
+
+function getTotalPoints(secs, accounts=1, verifs=0) {
+  return getPoints(secs, accounts) + verifs; // +1 point per verification
+}
+
 function teamById(id) {
   const teams = { 'khem': { id:'khem', name:'Team Khem', color:'#1a5276', emoji:'💙' }, 'pharan': { id:'pharan', name:'Team Pharan', color:'#b03a2e', emoji:'🧡' } };
   return teams[id] || teams['khem'];
@@ -1252,6 +1265,7 @@ async function syncUserToFirebase(u) {
       totalSecs: u.totalSecs||0, sessions: u.sessions||0,
       verifications: u.verifications||0, isLive: u.isLive||false,
       liveSecs: u.liveSecs||0, accounts: u.accounts||[],
+      totalPoints: u.totalPoints||0,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
   } catch(e) { console.warn('Sync user:', e); }
@@ -1316,7 +1330,8 @@ function save() {
       localStorage.setItem(LS_SESSION, JSON.stringify({
         active:true, username:myUsername, team:myTeam, accounts:myAccs,
         timerGoing, paused, sessSecs, verified, verifyTimeLeft,
-        earnedSet:Array.from(earnedSet), timestamp:Date.now()
+        earnedSet:Array.from(earnedSet), verificationPoints,
+        timestamp:Date.now()
       }));
     } catch(e) {}
     const u = db[myUsername.toLowerCase()];
@@ -1333,6 +1348,7 @@ function restoreSession() {
     sessSecs = s.sessSecs||0; verified = s.verified||false;
     verifyTimeLeft = s.verifyTimeLeft??900;
     earnedSet = new Set(s.earnedSet||[]);
+    verificationPoints = s.verificationPoints||0;
     if (timerGoing && !paused) {
       const elapsed = Math.floor((Date.now() - s.timestamp)/1000);
       sessSecs += elapsed;
@@ -1347,6 +1363,16 @@ function restoreSession() {
       document.querySelectorAll('.team-card').forEach(el => el.classList.remove('selected'));
       const card = document.getElementById('team-card-'+myTeam);
       if (card) card.classList.add('selected');
+    }
+    const uf = document.getElementById('username-input');
+    if (uf && myUsername) uf.value = myUsername;
+    if (myAccs && myAccs.length) {
+      const accInputs = document.querySelectorAll('.acc-name');
+      const urlInputs = document.querySelectorAll('.acc-url');
+      myAccs.forEach((a, i) => {
+        if (accInputs[i]) accInputs[i].value = a.name;
+        if (urlInputs[i]) urlInputs[i].value = a.url || '';
+      });
     }
   } catch(e) {}
 }
@@ -1407,16 +1433,17 @@ function addAcc() {
   d.className='acc-item';
   d.innerHTML=`
     <div class="acc-row">
-      <input type="text" class="inp inp-sm acc-name" placeholder="Account ${n}"/>
+      <input type="text" class="inp inp-sm acc-name" placeholder="Account ${n} (e.g. @KengFan${n})" />
       <button class="rm-btn" onclick="rmAcc(this)">×</button>
     </div>
-    <input type="text" class="inp inp-sm acc-url" placeholder="YouTube / streaming link"/>`;
+    <input type="text" class="inp inp-sm acc-url" placeholder="YouTube / streaming link" />
+  `;
   list.appendChild(d);
-  toast('📺 Added new account field!', 1500);
+  toast('📺 Added! Multiplier now ×' + Math.pow(2, list.children.length - 1), 2000);
 }
 function rmAcc(btn) {
   const list=document.getElementById('acc-list');
-  if(list.children.length>1){ btn.closest('.acc-item').remove(); toast('🗑 Account removed',1000); }
+  if(list.children.length>1){ btn.closest('.acc-item').remove(); toast('🗑 Removed! Multiplier ×' + Math.pow(2, list.children.length - 1), 1500); }
   else toast('⚠️ Keep at least one account!',1500);
 }
 
@@ -1433,16 +1460,17 @@ function goStream() {
   if(!accs.length){ showErr('reg-err','Add at least one account!'); return; }
   showErr('reg-err','');
   myUsername=username; myAccs=accs;
-  timerGoing=false; paused=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900;
+  timerGoing=false; paused=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900; verificationPoints=0;
   const key=username.toLowerCase();
-  if(!db[key]) db[key]={name:username,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
+  if(!db[key]) db[key]={name:username,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0,totalPoints:0};
   db[key].name=username; db[key].team=myTeam;
   db[key].accounts=[...new Set([...(db[key].accounts||[]),...accs.map(a=>a.name)])];
   save();
   setupStreamUI();
   showView('stream');
   renderAll(); renderAdminList();
-  postSysMsg(`🎬 @${username} joined ${teamById(myTeam).name} with ${accs.length} account${accs.length>1?'s':''}!`);
+  const multiplier = Math.pow(2, accs.length - 1);
+  postSysMsg(`🎬 @${username} joined ${teamById(myTeam).name} with ${accs.length} accounts (×${multiplier} multiplier)!`);
 }
 
 // ============================================================
@@ -1454,13 +1482,14 @@ function setupStreamUI() {
   if(hero) hero.style.background=`linear-gradient(135deg,${t.color},${t.color}99,var(--rose-light))`;
   const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   el('sh-timer',fmt(sessSecs));
-  el('sh-points',`⭐ ${getPoints(sessSecs)} points`);
+  const pts = getTotalPoints(sessSecs, myAccs.length, verificationPoints);
+  el('sh-points',`⭐ ${pts} points (×${Math.pow(2, myAccs.length-1)})`);
   el('sh-accs',myAccs.map(a=>'@'+a.name).join(' · '));
 
   if(timerGoing && !paused){
     el('sh-eye','🔴 LIVE');
     const sb=document.getElementById('status-bar');
-    if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min!';}
+    if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min (+1 bonus pt)!';}
     const tb=document.getElementById('timer-btn');
     if(tb){tb.disabled=true;tb.textContent='⏱ RUNNING...';}
     const vb=document.getElementById('verify-box');
@@ -1513,7 +1542,7 @@ function setupStreamUI() {
       </div>`).join('');
   }
 
-  ['b15','b30','b60','bmulti','bverify'].forEach(id=>{
+  ['b15','b30','b60','bmulti','bverify','bpoints'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) earnedSet.has(id)?el.classList.add('earned'):el.classList.remove('earned');
   });
@@ -1528,7 +1557,7 @@ function startTimer(){
   const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   el('sh-eye','🔴 LIVE'); el('verify-timer','15:00');
   const sb=document.getElementById('status-bar');
-  if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min!';}
+  if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min (+1 bonus pt)!';}
   const tb=document.getElementById('timer-btn');
   if(tb){tb.disabled=true;tb.textContent='⏱ RUNNING...';}
   document.getElementById('pause-btn').style.display='inline-block';
@@ -1548,23 +1577,24 @@ function verifyTick(){
   if(vt) vt.textContent=fmtMin(verifyTimeLeft);
   if(verifyTimeLeft===0){
     const sb=document.getElementById('status-bar');
-    if(sb){sb.className='status-bar sb-verify';sb.textContent='⏰ VERIFY NOW!';}
-    toast('⏰ VERIFY NOW!',5000);
+    if(sb){sb.className='status-bar sb-verify';sb.textContent='⏰ VERIFY NOW! (+1 bonus point)';}
+    toast('⏰ VERIFY NOW! (+1 bonus point)',5000);
   }
 }
 
 function verifyStream(){
   if(!timerGoing || paused) return;
   verified=true; verifyTimeLeft=900;
+  verificationPoints += 1; // +1 bonus point for verifying
   const vt=document.getElementById('verify-timer');
   if(vt) vt.textContent='15:00';
   const sb=document.getElementById('status-bar');
-  if(sb){sb.className='status-bar sb-live';sb.textContent='✅ Verified! Next in 15 min.';}
-  tryBadge('bverify','✅ Verified');
+  if(sb){sb.className='status-bar sb-live';sb.textContent='✅ Verified! +1 bonus point! Next in 15 min.';}
+  tryBadge('bverify','✅ Verified (+1 pt)');
   const key=myUsername.toLowerCase();
-  if(db[key]){db[key].verifications=(db[key].verifications||0)+1;save();}
-  toast('✅ Verified!',2000);
-  postSysMsg(`✅ @${myUsername} verified!`);
+  if(db[key]){db[key].verifications=(db[key].verifications||0)+1; save();}
+  toast('✅ Verified! +1 bonus point!',2000);
+  postSysMsg(`✅ @${myUsername} verified! +1 bonus point!`);
 }
 
 function tick(){
@@ -1573,12 +1603,14 @@ function tick(){
     sessSecs=Math.floor((Date.now()-sessStart)/1000);
     const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
     el('sh-timer',fmt(sessSecs));
-    el('sh-points',`⭐ ${getPoints(sessSecs)} points`);
+    const pts = getTotalPoints(sessSecs, myAccs.length, verificationPoints);
+    el('sh-points',`⭐ ${pts} points (×${Math.pow(2, myAccs.length-1)})`);
     myAccs.forEach(a=>{const e=document.getElementById('alt-'+safe(a.name));if(e)e.textContent=fmt(sessSecs);});
     if(sessSecs>=900) tryBadge('b15','⏱ 15 min warrior');
     if(sessSecs>=1800) tryBadge('b30','🔥 30 min streamer');
     if(sessSecs>=3600) tryBadge('b60','👑 1 hour legend');
-    if(myAccs.length>=2) tryBadge('bmulti','🖥 Multi-account pro');
+    if(myAccs.length>=2) tryBadge('bmulti','🖥 Multi-account (×2)');
+    if(pts>=50) tryBadge('bpoints','⭐ 50 points club!');
     if(sessSecs%20===0){ saveLive(); renderAll(); renderAdminList(); }
     if(sessSecs%30===0) save();
   }
@@ -1596,8 +1628,10 @@ function tryBadge(id,msg){
 
 function saveLive(){
   const key=myUsername.toLowerCase();
-  if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
-  db[key].liveSecs=paused?0:sessSecs; db[key].isLive=timerGoing && !paused; save();
+  if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0,totalPoints:0};
+  db[key].liveSecs=paused?0:sessSecs; db[key].isLive=timerGoing && !paused;
+  db[key].totalPoints = getTotalPoints((db[key].totalSecs||0) + sessSecs, myAccs.length, db[key].verifications||0);
+  save();
 }
 
 // ============================================================
@@ -1628,7 +1662,7 @@ function resumeSession(){
   resumeTimers();
   const shEye=document.getElementById('sh-eye'); if(shEye) shEye.textContent='🔴 LIVE';
   const sb=document.getElementById('status-bar');
-  if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min!';}
+  if(sb){sb.className='status-bar sb-live';sb.textContent='🔴 Timer running! Verify every 15 min (+1 bonus pt)!';}
   document.getElementById('pause-btn').style.display='inline-block';
   document.getElementById('resume-btn').style.display='none';
   const key=myUsername.toLowerCase();
@@ -1643,12 +1677,13 @@ function saveSessionProgress(){
   const elapsed=sessSecs;
   if(elapsed>0){
     const key=myUsername.toLowerCase();
-    if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
+    if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0,totalPoints:0};
     db[key].totalSecs=(db[key].totalSecs||0)+elapsed;
     db[key].sessions=(db[key].sessions||0)+1;
     if(!paused){ db[key].isLive=true; db[key].liveSecs=elapsed; }
+    db[key].totalPoints = getTotalPoints(db[key].totalSecs, myAccs.length, db[key].verifications||0);
     save();
-    const pts=getPoints(elapsed);
+    const pts = getTotalPoints(elapsed, myAccs.length, 0);
     toast(`💾 Saved! ${fmt(elapsed)} (${pts} pts)`,3000);
     postSysMsg(`💾 @${myUsername} saved (${fmt(elapsed)}, ${pts} pts)`);
     sessSecs=0; if(!paused) sessStart=Date.now();
@@ -1664,7 +1699,7 @@ function deleteSession(){
   try{localStorage.removeItem(LS_SESSION);}catch(e){}
   timerGoing=false; paused=false; sessSecs=0;
   myTeam=null; myAccs=[]; myUsername='';
-  earnedSet=new Set(); verified=false; verifyTimeLeft=900;
+  earnedSet=new Set(); verified=false; verifyTimeLeft=900; verificationPoints=0;
   document.querySelectorAll('.team-card').forEach(el=>el.classList.remove('selected'));
   const goBtn=document.getElementById('go-btn');
   if(goBtn){goBtn.textContent='🎬 Start Streaming Battle!';goBtn.style.background='';}
@@ -1689,12 +1724,13 @@ function stopStream(){
   const elapsed=timerGoing?sessSecs:0;
   if(elapsed>0){
     const key=myUsername.toLowerCase();
-    if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0};
+    if(!db[key]) db[key]={name:myUsername,team:myTeam,totalSecs:0,sessions:0,accounts:[],verifications:0,totalPoints:0};
     db[key].totalSecs=(db[key].totalSecs||0)+elapsed;
     db[key].sessions=(db[key].sessions||0)+1;
     db[key].isLive=false; db[key].liveSecs=0;
+    db[key].totalPoints = getTotalPoints(db[key].totalSecs, myAccs.length, db[key].verifications||0);
     save();
-    const pts=getPoints(elapsed);
+    const pts = getTotalPoints(elapsed, myAccs.length, verificationPoints);
     postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} (${pts} pts)!`);
     toast(`✅ ${fmt(elapsed)} saved! ⭐ ${pts} points!`,5000);
   }
@@ -1745,15 +1781,20 @@ function renderChat(feedId){
 function renderAllChats(){ renderChat('chat-feed-home'); renderChat('chat-feed-stream'); renderChat('chat-feed-main'); }
 
 // ============================================================
-// 🏆 SCOREBOARD + LEADERBOARD
+// 🏆 SCOREBOARD + LEADERBOARD - POINTS ONLY
 // ============================================================
 function renderScoreboard(){
-  const totals={khem:{secs:0,pts:0,count:0},pharan:{secs:0,pts:0,count:0}};
+  const totals={khem:{secs:0,pts:0,count:0,verifs:0},pharan:{secs:0,pts:0,count:0,verifs:0}};
   Object.values(db).forEach(u=>{
     const secs=(u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0);
-    if(totals[u.team]){ totals[u.team].secs+=secs; totals[u.team].pts+=getPoints(secs); totals[u.team].count++; }
+    const accCount = (u.accounts||[]).length || 1;
+    const verifs = u.verifications||0;
+    const pts = getTotalPoints(secs, accCount, verifs);
+    if(totals[u.team]){ totals[u.team].secs+=secs; totals[u.team].pts+=pts; totals[u.team].count++; totals[u.team].verifs+=verifs; }
   });
-  if(timerGoing&&myTeam&&myUsername&&totals[myTeam]) totals[myTeam].pts+=getPoints(sessSecs);
+  if(timerGoing&&myTeam&&myUsername&&totals[myTeam]) {
+    totals[myTeam].pts += getTotalPoints(sessSecs, myAccs.length, verificationPoints);
+  }
 
   const teams=[{id:'khem',name:'Khem',color:'#1a5276',emoji:'💙'},{id:'pharan',name:'Pharan',color:'#b03a2e',emoji:'🧡'}];
   const sw=document.getElementById('scoreboard-wrap');
@@ -1762,7 +1803,7 @@ function renderScoreboard(){
       <div class="score-card" style="background:${t.color}22;border-color:${t.color}44;">
         <div style="font-size:28px;">${t.emoji}</div>
         <div class="sc-name" style="color:${t.color}">${t.name}</div>
-        <div class="sc-pts" style="color:${t.color}">${totals[t.id]?.pts||0}</div>
+        <div class="sc-pts" style="color:${t.color}">⭐${totals[t.id]?.pts||0}</div>
         <div class="sc-time">${fmt(totals[t.id]?.secs||0)}</div>
         <div class="sc-meta">${totals[t.id]?.count||0} streamer${(totals[t.id]?.count||0)!==1?'s':''}</div>
       </div>
@@ -1771,16 +1812,17 @@ function renderScoreboard(){
 
   const pb=document.getElementById('progress-bar');
   if(pb){
-    const total=totals.khem.secs+totals.pharan.secs||1;
-    const kpct=Math.max(5,Math.min(95,Math.round(totals.khem.secs/total*100)));
+    const totalPts=(totals.khem.pts||0)+(totals.pharan.pts||0)||1;
+    const kpct=Math.max(5,Math.min(95,Math.round((totals.khem.pts||0)/totalPts*100)));
     pb.innerHTML=`<div class="pb-k" style="width:${kpct}%;background:#1a5276;"></div><div class="pb-p" style="width:${100-kpct}%;background:#b03a2e;"></div>`;
   }
 
   const vd=document.getElementById('verdict-text');
   if(vd){
-    if(totals.khem.pts===0&&totals.pharan.pts===0) vd.textContent='⚔️ Ready for battle!';
-    else if(totals.khem.pts>totals.pharan.pts) vd.textContent=`💙 Team Khem leads by ${totals.khem.pts-totals.pharan.pts} points!`;
-    else if(totals.pharan.pts>totals.khem.pts) vd.textContent=`🧡 Team Pharan leads by ${totals.pharan.pts-totals.khem.pts} points!`;
+    const kPts=totals.khem.pts||0, pPts=totals.pharan.pts||0;
+    if(kPts===0&&pPts===0) vd.textContent='⚔️ Ready for battle!';
+    else if(kPts>pPts) vd.textContent=`💙 Team Khem leads by ${kPts-pPts} points!`;
+    else if(pPts>kPts) vd.textContent=`🧡 Team Pharan leads by ${pPts-kPts} points!`;
     else vd.textContent='⚔️ Perfectly tied! Keep streaming!';
   }
 
@@ -1792,14 +1834,17 @@ function renderScoreboard(){
       return `<div class="col-6">
         <div class="team-score-box${isLead?' lead':''}" style="${isLead?`border-color:${t.color};background:${t.color}22;`:'border-color:#e8ddd8;background:#fff;'}">
           <div style="font-weight:700;font-size:14px;">${t.emoji} ${t.name}</div>
-          <div style="font-size:28px;font-weight:900;color:${isLead?t.color:'var(--text)'}">${totals[t.id]?.pts||0}</div>
+          <div style="font-size:28px;font-weight:900;color:${isLead?t.color:'var(--text)'}">⭐${totals[t.id]?.pts||0}</div>
           <div style="font-size:10px;color:var(--text-light);">${fmt(totals[t.id]?.secs||0)}</div>
         </div>
       </div>`;
     }).join('');
   });
 
-  config.teams.forEach(t=>{ const el=document.getElementById('count-'+t.id); if(el) el.textContent=(totals[t.id]?.count||0)+' member'+(totals[t.id]?.count!==1?'s':''); });
+  ['khem','pharan'].forEach(id=>{
+    const el=document.getElementById('count-'+id);
+    if(el) el.textContent=(totals[id]?.count||0)+' member'+(totals[id]?.count!==1?'s':'');
+  });
   const lc=Object.values(db).filter(u=>u.isLive).length;
   ['live-count','live-count-lb'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent='👀 '+lc+' live';});
 }
@@ -1807,21 +1852,28 @@ function renderScoreboard(){
 function renderLB(id){
   const el=document.getElementById(id); if(!el) return;
   const f=lbFilter[id]||'all';
-  let entries=Object.entries(db).map(([k,u])=>{ const secs=(u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0); return {...u,key:k,secs}; });
+  let entries=Object.entries(db).map(([k,u])=>{
+    const secs=(u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0);
+    const accCount = (u.accounts||[]).length || 1;
+    const verifs = u.verifications||0;
+    const pts = getTotalPoints(secs, accCount, verifs);
+    return {...u, key:k, secs, pts, verifs};
+  });
   if(f!=='all') entries=entries.filter(u=>u.team===f);
-  entries.sort((a,b)=>b.secs-a.secs);
+  entries.sort((a,b)=>b.pts - a.pts);
   if(!entries.length){ el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-light);">No streamers yet — be first! 🐰</div>'; return; }
   const medals=['🥇','🥈','🥉'];
   el.innerHTML=entries.slice(0,20).map((u,i)=>{
     const t=teamById(u.team);
     const livep=u.isLive?'<span class="pill pill-live">LIVE</span>':'';
     const mep=(myUsername&&u.key===myUsername.toLowerCase())?'<span class="pill pill-you">YOU</span>':'';
-    const vp=u.verifications>0?`<span class="pill pill-verify">✅${u.verifications}</span>`:'';
+    const vp=u.verifs>0?`<span class="pill pill-verify">✅${u.verifs}</span>`:'';
+    const multiplier = Math.pow(2, ((u.accounts||[]).length || 1) - 1);
     return `<div class="lb-entry" style="border-left:3px solid ${t.color};">
       <div class="lb-rank${i<3?' r'+(i+1):''}">${medals[i]||(i+1)}</div>
       <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:${t.color};">${initials(u.name)}</div>
-      <div class="lb-body"><div class="lb-name">@${escHtml(u.name||'')} ${t.emoji}${livep}${mep}${vp}</div><div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts</div></div>
-      <div><div class="lb-pts">⭐${getPoints(u.secs)}</div><div class="lb-time-s">${fmt(u.secs)}</div></div>
+      <div class="lb-body"><div class="lb-name">@${escHtml(u.name||'')} ${t.emoji}${livep}${mep}${vp}</div><div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts · ×${multiplier}</div></div>
+      <div><div class="lb-pts">⭐${u.pts}</div><div class="lb-time-s">${fmt(u.secs)}</div></div>
     </div>`;
   }).join('');
 }
@@ -1841,11 +1893,14 @@ function renderProfile(){
   document.getElementById('profile-team').textContent=t.emoji+' '+t.name;
   const key=myUsername.toLowerCase(); const u=db[key]||{};
   const totalSecs=(u.totalSecs||0)+(timerGoing?sessSecs:0);
-  document.getElementById('prof-pts').textContent=getPoints(totalSecs);
+  const accCount = (u.accounts||[]).length || myAccs.length || 1;
+  const verifs = (u.verifications||0) + (timerGoing?verificationPoints:0);
+  const pts = getTotalPoints(totalSecs, accCount, verifs);
+  document.getElementById('prof-pts').textContent=pts;
   document.getElementById('prof-time').textContent=fmt(totalSecs);
   document.getElementById('prof-badges').textContent=earnedSet.size;
-  const badges=['b15','b30','b60','bmulti','bverify'];
-  const labels=['⏱ 15 min','🔥 30 min','👑 1 hour','🖥 Multi','✅ Verified'];
+  const badges=['b15','b30','b60','bmulti','bverify','bpoints'];
+  const labels=['⏱ 15 min','🔥 30 min','👑 1 hour','🖥 Multi (×2)','✅ Verified','⭐ 50 pts'];
   document.getElementById('prof-badge-grid').innerHTML=badges.map((b,i)=>`<span class="badge-item${earnedSet.has(b)?' earned':''}">${labels[i]}</span>`).join('');
 }
 
@@ -1855,7 +1910,7 @@ function deleteMyData(){
   const key=myUsername.toLowerCase(); delete db[key]; saveLocal();
   if(dbFirestore){ dbFirestore.collection('users').doc(key).delete().catch(e=>console.warn(e)); }
   try{localStorage.removeItem(LS_SESSION);}catch(e){}
-  clearTimers(); timerGoing=false; paused=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900;
+  clearTimers(); timerGoing=false; paused=false; sessSecs=0; earnedSet=new Set(); verified=false; verifyTimeLeft=900; verificationPoints=0;
   myUsername=''; myTeam=null; myAccs=[];
   renderAll(); renderAdminList(); toast('🗑 Data deleted!',3000); showView('home');
 }
@@ -1883,9 +1938,12 @@ function renderAdminList(){
   if(!users.length){ container.innerHTML='<div class="text-secondary small">No active users.</div>'; return; }
   container.innerHTML=users.map(([key,u])=>{
     const t=teamById(u.team); const isLive=u.isLive?'🔴 LIVE':'';
+    const accCount = (u.accounts||[]).length || 1;
+    const verifs = u.verifications||0;
+    const pts = getTotalPoints((u.totalSecs||0)+(u.isLive?(u.liveSecs||0):0), accCount, verifs);
     return `<div class="admin-user-row">
       <div><span class="uname">@${escHtml(u.name)}</span><span class="uteam ${u.team}">${t.emoji} ${t.name}</span>${isLive?' <span class="badge bg-success text-white">LIVE</span>':''}</div>
-      <div><span class="small text-secondary me-2">⭐${getPoints(u.totalSecs||0)}</span><button class="btn-admin-del" onclick="adminDeleteUser('${key}')">Delete</button></div>
+      <div><span class="small text-secondary me-2">⭐${pts}</span><button class="btn-admin-del" onclick="adminDeleteUser('${key}')">Delete</button></div>
     </div>`;
   }).join('');
 }
@@ -1894,7 +1952,7 @@ function renderAdminListFull(){ const c=document.getElementById('admin-user-list
 function adminDeleteUser(key){
   if(!adminLoggedIn){ toast('🔒 Admin only',2000); return; }
   if(!confirm(`Reset @${db[key]?.name||key}'s session?`)) return;
-  if(db[key]){ db[key].totalSecs=0; db[key].sessions=0; db[key].isLive=false; db[key].liveSecs=0; save(); renderAll(); renderAdminList(); renderAdminListFull(); toast(`🗑 @${db[key]?.name||key} reset!`,2500); postSysMsg(`🗑 Admin reset @${db[key]?.name||key}'s session`); }
+  if(db[key]){ db[key].totalSecs=0; db[key].sessions=0; db[key].isLive=false; db[key].liveSecs=0; db[key].verifications=0; db[key].totalPoints=0; save(); renderAll(); renderAdminList(); renderAdminListFull(); toast(`🗑 @${db[key]?.name||key} reset!`,2500); postSysMsg(`🗑 Admin reset @${db[key]?.name||key}'s session`); }
 }
 
 function adminResetAll(){
@@ -1908,7 +1966,7 @@ function adminResetAll(){
     }
   }catch(e){ console.warn('Reset error:',e); }
   db={}; chat=[]; try{localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_CHAT);localStorage.removeItem(LS_SESSION);}catch(e){}
-  clearTimers(); timerGoing=false; paused=false; sessSecs=0; myUsername=''; myTeam=null; myAccs=[]; earnedSet=new Set();
+  clearTimers(); timerGoing=false; paused=false; sessSecs=0; myUsername=''; myTeam=null; myAccs=[]; earnedSet=new Set(); verificationPoints=0;
   renderAll(); renderAllChats(); renderAdminList(); renderAdminListFull();
   toast('🗑 All data reset!',4000); showView('home');
 }
@@ -1916,7 +1974,6 @@ function adminResetAll(){
 // ============================================================
 // 🚀 BOOT
 // ============================================================
-const config={teams:[{id:'khem'},{id:'pharan'}]};
 buildTeamGrid();
 renderScoreboard();
 restoreSession();
