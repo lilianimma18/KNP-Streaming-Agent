@@ -424,7 +424,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG - Direct values (works in browser!)
+// 🔥 FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -633,7 +633,6 @@ function save(){
       localStorage.setItem(LS_SESSION, JSON.stringify(session));
     } catch(e){}
   }
-  // Sync to Firebase
   if(myUsername && db[myUsername.toLowerCase()]){
     syncUserToFirebase(db[myUsername.toLowerCase()]);
   }
@@ -665,13 +664,37 @@ function toast(msg, ms=3500){
   toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
 
-function pickTeam(team, el){
+// ============================================================
+// 🎯 TEAM SELECTION - FIXED!
+// ============================================================
+function pickTeam(team, el) {
+  console.log('Team selected:', team); // Debug log
   myTeam = team;
-  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
-  el.classList.add(team === 'khem' ? 'sel-k' : 'sel-p');
+  
+  // Remove selection from all team buttons
+  document.querySelectorAll('.team-btn').forEach(b => {
+    b.classList.remove('sel-k', 'sel-p');
+  });
+  
+  // Add selection to clicked button
+  if (team === 'khem') {
+    el.classList.add('sel-k');
+  } else {
+    el.classList.add('sel-p');
+  }
+  
+  // Update the Start Streaming button
   const btn = document.getElementById('go-btn');
-  btn.className = 'btn ' + (team === 'khem' ? 'btn-primary' : 'btn-ora');
-  btn.textContent = team === 'khem' ? '💙 Join Team Khem' : '🧡 Join Team Pharan';
+  if (team === 'khem') {
+    btn.className = 'btn btn-primary';
+    btn.textContent = '💙 Join Team Khem';
+  } else {
+    btn.className = 'btn btn-ora';
+    btn.textContent = '🧡 Join Team Pharan';
+  }
+  
+  // Clear any previous errors
+  showErr('reg-err', '');
 }
 
 function addAcc(){
@@ -696,6 +719,7 @@ function rmAcc(btn){
 
 function showErr(id, msg){
   const el = document.getElementById(id);
+  if (!el) return;
   el.textContent = msg;
   el.style.display = msg ? 'block' : 'none';
 }
@@ -1102,11 +1126,16 @@ setInterval(() => {
   if(myUsername && document.getElementById('s-stream').classList.contains('on')) save();
 }, 10000);
 
-// Start
+// ============================================================
+// 🚀 START
+// ============================================================
+console.log('🔥 Stream Battle starting...');
 load();
 
-console.log('🔥 Firebase connected!');
-console.log('📡 Real-time sync active!');
+// ============================================================
+// 🔧 DEBUG - Test team selection
+// ============================================================
+console.log('✅ Team buttons should work now! Click on Khem or Pharan.');
 </script>
 </body>
 </html>
