@@ -423,7 +423,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG — real credentials, not env vars
+// 🔥 FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
@@ -434,174 +434,22 @@ const firebaseConfig = {
   appId: "1:882579620540:web:b3a37322c60421120b06b9"
 };
 
-let dbFirestore;
+let dbFirestore = null;
 try {
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   dbFirestore = firebase.firestore();
-  dbFirestore.settings({ experimentalForceLongPolling: true }); // helps in some envs
+  dbFirestore.settings({ experimentalForceLongPolling: true });
 } catch(e) {
   console.error('Firebase init error:', e);
 }
 
 // ============================================================
-// 📡 STATUS
-// ============================================================
-let isOnline = false;
-let firebaseReady = false;
-
-function updateStatus(s, msg) {
-  const el = document.getElementById('status');
-  if (el) { el.className = 'status ' + s; el.textContent = msg; }
-  const badge = document.getElementById('fb-badge');
-  if (badge) {
-    if (s === 'on') { badge.textContent = '✅ Connected to Firebase'; badge.style.background = '#dcfce7'; badge.style.color = '#15803d'; }
-    else if (s === 'off') { badge.textContent = '🔴 Offline — local only'; badge.style.background = '#fee2e2'; badge.style.color = '#dc2626'; }
-  }
-}
-
-// Always restore session and render immediately (works offline too)
-restoreSession();
-renderAll();
-renderChat('chat-feed-reg');
-renderChat('chat-feed');
-scrollChats();
-
-if (dbFirestore) {
-  // Ping using users collection (more likely to exist and pass security rules)
-  dbFirestore.collection('users').limit(1).get()
-    .then(() => {
-      firebaseReady = true; isOnline = true;
-      updateStatus('on', '🟢 Online');
-      toast('🌐 Connected to Firebase!', 2000);
-      loadFromFirebase();
-    })
-    .catch(err => {
-      console.warn('Firebase connection failed:', err);
-      isOnline = false; firebaseReady = false;
-      updateStatus('off', '🔴 Offline');
-      // load local data (session already restored above)
-      try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
-      try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
-      renderAll();
-      renderChat('chat-feed-reg');
-      renderChat('chat-feed');
-      scrollChats();
-    });
-} else {
-  updateStatus('off', '🔴 Offline');
-  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
-  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
-  renderAll();
-  renderChat('chat-feed-reg');
-  renderChat('chat-feed');
-  scrollChats();
-}
-
-// ============================================================
-// 📡 SYNC USER
-// ============================================================
-async function syncUserToFirebase(userData) {
-  if (!dbFirestore || !userData?.name) return;
-  try {
-    await dbFirestore.collection('users').doc(userData.name.toLowerCase()).set({
-      name: userData.name,
-      team: userData.team || 'khem',
-      totalSecs: userData.totalSecs || 0,
-      sessions: userData.sessions || 0,
-      verifications: userData.verifications || 0,
-      isLive: userData.isLive || false,
-      liveSecs: userData.liveSecs || 0,
-      accounts: userData.accounts || [],
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  } catch(e) { console.warn('Sync user error:', e); }
-}
-
-// ============================================================
-// 📡 SYNC CHAT MESSAGE — called immediately on send
-// ============================================================
-async function pushChatMsg(msg) {
-  if (!dbFirestore) return;
-  try {
-    await dbFirestore.collection('chat').add({
-      type: msg.type || 'msg',
-      sender: msg.sender || 'System',
-      team: msg.team || 'system',
-      text: msg.text,
-      ts: msg.ts || tsNow(),
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) { console.warn('Push chat error:', e); }
-}
-
-// ============================================================
-// 📡 REAL-TIME LISTENERS
-// ============================================================
-let unsubUsers = null, unsubChat = null;
-
-function startListeners() {
-  if (!dbFirestore) return;
-
-  // Users — update db and re-render when anything changes
-  if (unsubUsers) unsubUsers();
-  unsubUsers = dbFirestore.collection('users').onSnapshot(snap => {
-    snap.forEach(doc => { db[doc.id] = doc.data(); });
-    saveLocal();
-    renderAll();
-  }, err => console.warn('User listener:', err));
-
-  // Chat — always replace local chat with Firestore truth
-  if (unsubChat) unsubChat();
-  unsubChat = dbFirestore.collection('chat')
-    .orderBy('timestamp', 'asc')
-    .limitToLast(80)
-    .onSnapshot(snap => {
-      const msgs = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        if (d.text) msgs.push(d);
-      });
-      chat = msgs;
-      saveLocalChat();
-      renderChat('chat-feed-reg');
-      renderChat('chat-feed');
-      scrollChats();
-    }, err => console.warn('Chat listener:', err));
-}
-
-// ============================================================
-// 📡 INITIAL LOAD FROM FIREBASE
-// ============================================================
-async function loadFromFirebase() {
-  if (!dbFirestore) return;
-  try {
-    const [userSnap, chatSnap] = await Promise.all([
-      dbFirestore.collection('users').get(),
-      dbFirestore.collection('chat').orderBy('timestamp', 'asc').limitToLast(80).get()
-    ]);
-    userSnap.forEach(doc => { db[doc.id] = doc.data(); });
-    const msgs = [];
-    chatSnap.forEach(doc => { const d = doc.data(); if (d.text) msgs.push(d); });
-    chat = msgs;
-    saveLocal();
-    saveLocalChat();
-    startListeners();
-    renderAll();
-    renderChat('chat-feed-reg');
-    renderChat('chat-feed');
-    scrollChats();
-  } catch(e) {
-    console.warn('loadFromFirebase error:', e);
-    load(); // fallback to local
-  }
-}
-
-// ============================================================
-// 📦 LOCAL STATE
+// 📦 STATE — declared first, before ANY function calls
 // ============================================================
 const LS_DATA    = 'ohoh_data';
 const LS_CHAT    = 'ohoh_chat';
 const LS_SESSION = 'ohoh_session';
+
 let db = {};
 let chat = [];
 let myTeam = null;
@@ -616,75 +464,20 @@ let earnedSet = new Set();
 let verifyInterval = null;
 let verifyTimeLeft = 900;
 let verified = false;
-
-// Full load (offline fallback) — restoreSession already called at boot
-function load() {
-  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
-  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
-  renderAll();
-  renderChat('chat-feed-reg');
-  renderChat('chat-feed');
-  scrollChats();
-}
-
-function restoreSession() {
-  try {
-    const session = JSON.parse(localStorage.getItem(LS_SESSION));
-    if (!session?.active || !session.username) return;
-    myUsername = session.username;
-    myTeam = session.team;
-    myAccs = session.accounts || [];
-    timerGoing = session.timerGoing || false;
-    sessSecs = session.sessSecs || 0;
-    verified = session.verified || false;
-    verifyTimeLeft = session.verifyTimeLeft ?? 900;
-    earnedSet = new Set(session.earnedSet || []);
-    if (timerGoing) {
-      const elapsed = Math.floor((Date.now() - session.timestamp) / 1000);
-      sessSecs += elapsed;
-      sessStart = Date.now() - sessSecs * 1000;
-      document.getElementById('s-reg').classList.remove('on');
-      document.getElementById('s-stream').classList.add('on');
-      setupStreamUI();
-      resumeTimers();
-    }
-  } catch(e) {}
-}
-
-function saveLocal() {
-  try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {}
-}
-
-function saveLocalChat() {
-  try { localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); } catch(e) {}
-}
-
-function save() {
-  saveLocal();
-  if (myUsername) {
-    try {
-      localStorage.setItem(LS_SESSION, JSON.stringify({
-        active: true, username: myUsername, team: myTeam,
-        accounts: myAccs, timerGoing, sessSecs, verified,
-        verifyTimeLeft, earnedSet: Array.from(earnedSet),
-        timestamp: Date.now()
-      }));
-    } catch(e) {}
-    const u = db[myUsername.toLowerCase()];
-    if (u) syncUserToFirebase(u);
-  }
-}
+let isOnline = false;
+let firebaseReady = false;
 
 // ============================================================
-// 🛠 HELPERS
+// 🛠 UTILS
 // ============================================================
 function fmt(s) {
   if (s < 0) s = 0;
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
 function fmtTime(s) {
-  const m = Math.floor(s / 60), sec = s % 60;
+  if (s < 0) s = 0;
+  const m = Math.floor(s/60), sec = s%60;
   return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
 function initials(n) { return (n||'?').replace(/^@/,'').slice(0,2).toUpperCase() || '??'; }
@@ -694,11 +487,10 @@ function escHtml(s) { const d = document.createElement('div'); d.textContent = s
 function getPoints(secs) { return Math.floor(secs / 300); }
 
 let toastTimer;
-function toast(msg, ms = 3500) {
+function toast(msg, ms=3500) {
   const el = document.getElementById('toast');
   if (!el) return;
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
@@ -706,21 +498,171 @@ function toast(msg, ms = 3500) {
 function showErr(id, msg) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
+  el.textContent = msg; el.style.display = msg ? 'block' : 'none';
 }
 
 function scrollChats() {
-  setTimeout(() => {
-    ['chat-feed-reg','chat-feed'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.scrollTop = el.scrollHeight;
-    });
-  }, 80);
+  ['chat-feed-reg','chat-feed'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.scrollTop = el.scrollHeight;
+  });
 }
 
 // ============================================================
-// 🎯 TEAM SELECTION
+// 📡 STATUS
+// ============================================================
+function updateStatus(s, msg) {
+  const el = document.getElementById('status');
+  if (el) { el.className = 'status ' + s; el.textContent = msg; }
+  const badge = document.getElementById('fb-badge');
+  if (badge) {
+    if (s === 'on') { badge.textContent = '✅ Connected to Firebase'; badge.style.background = '#dcfce7'; badge.style.color = '#15803d'; }
+    else if (s === 'off') { badge.textContent = '🔴 Offline — local only'; badge.style.background = '#fee2e2'; badge.style.color = '#dc2626'; }
+  }
+}
+
+// ============================================================
+// 💾 STORAGE
+// ============================================================
+function saveLocal() {
+  try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {}
+}
+function saveLocalChat() {
+  try { localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); } catch(e) {}
+}
+function saveSession() {
+  try {
+    localStorage.setItem(LS_SESSION, JSON.stringify({
+      active: true, username: myUsername, team: myTeam, accounts: myAccs,
+      timerGoing, sessSecs, verified, verifyTimeLeft
+    }));
+  } catch(e) {}
+}
+function save() {
+  saveLocal();
+  saveSession();
+  if (firebaseReady && myUsername) syncUserToFirebase(db[myUsername.toLowerCase()]);
+}
+
+function load() {
+  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
+  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
+  renderAll();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+}
+
+// ============================================================
+// 🔄 SESSION RESTORE
+// ============================================================
+function restoreSession() {
+  try {
+    const session = JSON.parse(localStorage.getItem(LS_SESSION));
+    if (!session?.active || !session.username) return;
+    myUsername    = session.username;
+    myTeam        = session.team;
+    myAccs        = session.accounts || [];
+    timerGoing    = session.timerGoing || false;
+    sessSecs      = session.sessSecs || 0;
+    verified      = session.verified || false;
+    verifyTimeLeft = session.verifyTimeLeft ?? 900;
+
+    // Show stream step
+    document.getElementById('s-reg').classList.remove('on');
+    document.getElementById('s-stream').classList.add('on');
+    setupStreamUI();
+
+    if (timerGoing) {
+      sessStart = Date.now() - sessSecs * 1000;
+      resumeTimers();
+    }
+  } catch(e) {
+    console.warn('Could not restore session:', e);
+  }
+}
+
+// ============================================================
+// 🔥 FIREBASE SYNC
+// ============================================================
+async function syncUserToFirebase(userData) {
+  if (!firebaseReady || !dbFirestore || !userData) return;
+  try {
+    const key = (userData.name || myUsername).toLowerCase();
+    await dbFirestore.collection('users').doc(key).set({
+      ...userData,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch(e) { console.warn('Sync error:', e); }
+}
+
+async function pushChatMsg(msg) {
+  if (!firebaseReady || !dbFirestore) return;
+  try {
+    await dbFirestore.collection('chat').add({
+      ...msg,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn('Chat push error:', e); }
+}
+
+function startListeners() {
+  if (!dbFirestore) return;
+
+  // Listen to users collection for live leaderboard updates
+  dbFirestore.collection('users').onSnapshot(snap => {
+    snap.forEach(doc => {
+      const data = doc.data();
+      const key = doc.id;
+      // Don't overwrite current user's live session with stale Firebase data
+      if (key === myUsername.toLowerCase() && timerGoing) return;
+      db[key] = { ...db[key], ...data };
+    });
+    saveLocal();
+    renderAll();
+  }, err => console.warn('Users listener error:', err));
+
+  // Listen to chat
+  dbFirestore.collection('chat')
+    .orderBy('timestamp', 'desc')
+    .limit(60)
+    .onSnapshot(snap => {
+      const msgs = [];
+      snap.forEach(doc => msgs.unshift(doc.data()));
+      // Merge: keep local messages not yet in Firebase
+      const fbTexts = new Set(msgs.map(m => m.text + m.ts + m.sender));
+      const localOnly = chat.filter(m => !fbTexts.has(m.text + m.ts + m.sender));
+      chat = [...msgs, ...localOnly].sort((a,b) => (a.ts||'').localeCompare(b.ts||''));
+      saveLocalChat();
+      renderChat('chat-feed-reg');
+      renderChat('chat-feed');
+      scrollChats();
+
+      const count = Object.values(db).filter(u => u.isLive).length;
+      const el = document.getElementById('online-count');
+      if (el) el.textContent = count + ' online';
+    }, err => console.warn('Chat listener error:', err));
+}
+
+async function loadFromFirebase() {
+  if (!dbFirestore) return;
+  try {
+    const snap = await dbFirestore.collection('users').get();
+    snap.forEach(doc => {
+      const key = doc.id;
+      if (key === myUsername.toLowerCase() && timerGoing) return; // don't overwrite live session
+      db[key] = { ...(db[key]||{}), ...doc.data() };
+    });
+    saveLocal();
+    renderAll();
+    startListeners();
+  } catch(e) {
+    console.warn('loadFromFirebase error:', e);
+  }
+}
+
+// ============================================================
+// 👥 TEAM PICK
 // ============================================================
 function pickTeam(team) {
   myTeam = team;
@@ -738,6 +680,9 @@ function pickTeam(team) {
   showErr('reg-err','');
 }
 
+// ============================================================
+// ➕ ADD / REMOVE ACCOUNTS
+// ============================================================
 function addAcc() {
   const list = document.getElementById('acc-list');
   const n = list.children.length + 1;
@@ -762,9 +707,10 @@ function rmAcc(btn) {
 // 🎬 GO TO STREAM PAGE
 // ============================================================
 function goStream() {
-  const username = document.getElementById('username-input').value.trim();
+  const username = document.getElementById('username-input').value.trim().replace(/^@/,'');
   if (!username) { showErr('reg-err','Enter your username!'); return; }
-  if (!myTeam)   { showErr('reg-err','Choose your team!'); return; }
+  if (!myTeam)   { showErr('reg-err','Choose your team first!'); return; }
+
   const names = [...document.querySelectorAll('.acc-name')].map(i => i.value.trim().replace(/^@/,''));
   const urls  = [...document.querySelectorAll('.acc-url')].map(i => i.value.trim());
   const accs  = names.map((n,i) => ({name:n, url:urls[i]||''})).filter(a => a.name);
@@ -796,61 +742,77 @@ function goStream() {
 // ============================================================
 function setupStreamUI() {
   const hero = document.getElementById('sess-hero');
+  if (!hero) return;
   hero.className = 'sess-hero ' + (myTeam === 'khem' ? 'k' : 'p');
-  document.getElementById('sh-timer').textContent = fmt(sessSecs);
-  document.getElementById('sh-points').textContent = '🏆 ' + getPoints(sessSecs) + ' points';
-  document.getElementById('sh-accs').textContent = myAccs.map(a => '@'+a.name).join(' · ');
-  document.getElementById('sh-team').textContent = 'Team ' + (myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
+
+  const shTimer = document.getElementById('sh-timer');
+  const shPoints = document.getElementById('sh-points');
+  const shAccs = document.getElementById('sh-accs');
+  const shTeam = document.getElementById('sh-team');
+  const shEye = document.getElementById('sh-eye');
+
+  if (shTimer) shTimer.textContent = fmt(sessSecs);
+  if (shPoints) shPoints.textContent = '🏆 ' + getPoints(sessSecs) + ' points';
+  if (shAccs) shAccs.textContent = myAccs.map(a => '@'+a.name).join(' · ');
+  if (shTeam) shTeam.textContent = 'Team ' + (myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
+
+  const timerBtn = document.getElementById('timer-btn');
+  const statusBar = document.getElementById('status-bar');
+  const verifyBox = document.getElementById('verify-box');
 
   if (timerGoing) {
-    document.getElementById('sh-eye').textContent = '🔴 LIVE';
-    document.getElementById('status-bar').className = 'status-bar sb-live';
-    document.getElementById('status-bar').textContent = '🔴 Timer running! Verify every 15 min!';
-    document.getElementById('timer-btn').disabled = true;
-    document.getElementById('timer-btn').textContent = '⏱ RUNNING...';
-    document.getElementById('verify-box').style.display = 'block';
-    document.getElementById('verify-timer').textContent = fmtTime(Math.max(0, verifyTimeLeft));
+    if (shEye) shEye.textContent = '🔴 LIVE';
+    if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '🔴 Timer running! Verify every 15 min!'; }
+    if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏱ RUNNING...'; }
+    if (verifyBox) { verifyBox.style.display = 'block'; }
+    const vt = document.getElementById('verify-timer');
+    if (vt) vt.textContent = fmtTime(Math.max(0, verifyTimeLeft));
   } else {
-    document.getElementById('sh-eye').textContent = '⏳ Ready';
-    document.getElementById('status-bar').className = 'status-bar sb-wait';
-    document.getElementById('status-bar').textContent = '⏳ Open tabs, log in, then Start Timer';
-    document.getElementById('timer-btn').disabled = false;
-    document.getElementById('timer-btn').textContent = '▶ START TIMER';
-    document.getElementById('verify-box').style.display = 'none';
+    if (shEye) shEye.textContent = '⏳ Ready';
+    if (statusBar) { statusBar.className = 'status-bar sb-wait'; statusBar.textContent = '⏳ Open tabs, log in, then click Start Timer'; }
+    if (timerBtn) { timerBtn.disabled = false; timerBtn.textContent = '▶ START TIMER'; }
+    if (verifyBox) verifyBox.style.display = 'none';
   }
 
-  // Open-tabs list — use data-url + event delegation (no inline onclick with URLs)
+  // Open-tabs list — event delegation to avoid inline onclick with URLs
   const ot = document.getElementById('open-tabs');
-  ot.innerHTML = myAccs.map((a,i) => `
-    <div class="open-row" id="otr-${i}">
-      <div>
-        <div class="acc">@${escHtml(a.name)}</div>
-        <div class="url">${escHtml(a.url || 'No link')}</div>
+  if (ot) {
+    ot.innerHTML = myAccs.map((a,i) => `
+      <div class="open-row" id="otr-${i}">
+        <div>
+          <div class="acc">@${escHtml(a.name)}</div>
+          <div class="url">${escHtml(a.url || 'No link')}</div>
+        </div>
+        <div>${a.url
+          ? `<button class="btn btn-dark btn-xs open-btn" data-url="${escHtml(a.url)}">Open ↗</button>`
+          : '<span style="font-size:11px;color:#94a3b8;">No link</span>'}</div>
       </div>
-      <div>${a.url
-        ? `<button class="btn btn-dark btn-xs open-btn" data-url="${escHtml(a.url)}">Open ↗</button>`
-        : '<span style="font-size:11px;color:#94a3b8;">No link</span>'}</div>
-    </div>
-  `).join('');
+    `).join('');
 
-  // Event delegation for open-tab buttons
-  ot.onclick = function(e) {
-    const btn = e.target.closest('.open-btn');
-    if (!btn) return;
-    const url = btn.dataset.url;
-    if (url) { window.open(url, '_blank', 'noopener'); toast('🔗 Tab opened!', 1800); }
-  };
+    ot.onclick = function(e) {
+      const btn = e.target.closest('.open-btn');
+      if (!btn) return;
+      const url = btn.dataset.url;
+      if (url) {
+        window.open(url, '_blank', 'noopener');
+        btn.outerHTML = '<span style="font-size:11px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:2px 8px;">✅ Opened</span>';
+        toast('🔗 Tab opened!', 1800);
+      }
+    };
+  }
 
   const al = document.getElementById('acc-live');
-  al.innerHTML = myAccs.map(a => `
-    <div class="acc-live-row">
-      <div class="left">
-        <div class="avatar ${myTeam==='khem'?'k':'p'}">${initials(a.name)}</div>
-        <div class="name">@${escHtml(a.name)}</div>
+  if (al) {
+    al.innerHTML = myAccs.map(a => `
+      <div class="acc-live-row">
+        <div class="left">
+          <div class="avatar ${myTeam==='khem'?'k':'p'}">${initials(a.name)}</div>
+          <div class="name">@${escHtml(a.name)}</div>
+        </div>
+        <div class="time" id="alt-${safe(a.name)}">${fmt(sessSecs)}</div>
       </div>
-      <div class="time" id="alt-${safe(a.name)}">${fmt(sessSecs)}</div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
   ['b15','b30','b60','bmulti','bverify'].forEach(id => {
     const el = document.getElementById(id);
@@ -880,17 +842,21 @@ function startTimer() {
   sessStart = Date.now() - sessSecs * 1000;
   verified = false; verifyTimeLeft = 900;
 
-  document.getElementById('sh-eye').textContent = '🔴 LIVE';
-  document.getElementById('status-bar').className = 'status-bar sb-live';
-  document.getElementById('status-bar').textContent = '🔴 Timer running! Verify every 15 min!';
-  document.getElementById('timer-btn').disabled = true;
-  document.getElementById('timer-btn').textContent = '⏱ RUNNING...';
-  document.getElementById('verify-box').style.display = 'block';
-  document.getElementById('verify-timer').textContent = '15:00';
+  const shEye = document.getElementById('sh-eye');
+  const statusBar = document.getElementById('status-bar');
+  const timerBtn = document.getElementById('timer-btn');
+  const verifyBox = document.getElementById('verify-box');
+
+  if (shEye) shEye.textContent = '🔴 LIVE';
+  if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '🔴 Timer running! Verify every 15 min!'; }
+  if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏱ RUNNING...'; }
+  if (verifyBox) { verifyBox.style.display = 'block'; }
+  const vt = document.getElementById('verify-timer');
+  if (vt) vt.textContent = '15:00';
 
   resumeTimers();
   save();
-  toast('🎬 Timer started!');
+  toast('🎬 Timer started! Keep streaming!');
   postSysMsg(`⏱ @${myUsername} started streaming!`);
 }
 
@@ -904,12 +870,13 @@ function resumeTimers() {
 function verifyTick() {
   if (!timerGoing) return;
   verifyTimeLeft = Math.max(0, verifyTimeLeft - 1);
-  document.getElementById('verify-timer').textContent = fmtTime(verifyTimeLeft);
+  const vt = document.getElementById('verify-timer');
+  if (vt) vt.textContent = fmtTime(verifyTimeLeft);
   if (verifyTimeLeft === 0) {
-    document.getElementById('status-bar').className = 'status-bar sb-verify';
-    document.getElementById('status-bar').textContent = '⏰ VERIFY NOW!';
-    document.getElementById('verify-box').style.borderColor = '#dc2626';
-    document.getElementById('verify-box').style.background = '#fee2e2';
+    const statusBar = document.getElementById('status-bar');
+    const verifyBox = document.getElementById('verify-box');
+    if (statusBar) { statusBar.className = 'status-bar sb-verify'; statusBar.textContent = '⏰ VERIFY NOW — click the button below!'; }
+    if (verifyBox) { verifyBox.style.borderColor = '#dc2626'; verifyBox.style.background = '#fee2e2'; }
     toast('⏰ VERIFY NOW!', 5000);
   }
 }
@@ -917,25 +884,27 @@ function verifyTick() {
 function verifyStream() {
   if (!timerGoing) return;
   verified = true; verifyTimeLeft = 900;
-  document.getElementById('verify-timer').textContent = '15:00';
-  document.getElementById('verify-box').style.borderColor = '#a78bfa';
-  document.getElementById('verify-box').style.background = '#ede9fe';
-  document.getElementById('status-bar').className = 'status-bar sb-live';
-  document.getElementById('status-bar').textContent = '✅ Verified! Next in 15 min.';
-  tryBadge('bverify','✅ Verified');
+  const vt = document.getElementById('verify-timer');
+  if (vt) vt.textContent = '15:00';
+  const verifyBox = document.getElementById('verify-box');
+  if (verifyBox) { verifyBox.style.borderColor = '#a78bfa'; verifyBox.style.background = '#ede9fe'; }
+  const statusBar = document.getElementById('status-bar');
+  if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '✅ Verified! Next check in 15 min.'; }
+  tryBadge('bverify','✅ Verified streamer');
   const key = myUsername.toLowerCase();
   if (db[key]) { db[key].verifications = (db[key].verifications||0) + 1; save(); }
-  toast('✅ Verified!', 2000);
-  postSysMsg(`✅ @${myUsername} verified!`);
+  toast('✅ Verified! Keep streaming!', 2000);
+  postSysMsg(`✅ @${myUsername} verified they're still streaming!`);
 }
 
 function tick() {
   if (!timerGoing) return;
-  // Timer only ticks when verified or within 15-min window
   if (verified || verifyTimeLeft > 0) {
     sessSecs = Math.floor((Date.now() - sessStart) / 1000);
-    document.getElementById('sh-timer').textContent = fmt(sessSecs);
-    document.getElementById('sh-points').textContent = '🏆 ' + getPoints(sessSecs) + ' points';
+    const shTimer = document.getElementById('sh-timer');
+    const shPoints = document.getElementById('sh-points');
+    if (shTimer) shTimer.textContent = fmt(sessSecs);
+    if (shPoints) shPoints.textContent = '🏆 ' + getPoints(sessSecs) + ' points';
     myAccs.forEach(a => {
       const el = document.getElementById('alt-' + safe(a.name));
       if (el) el.textContent = fmt(sessSecs);
@@ -956,7 +925,7 @@ function tryBadge(id, msg) {
     if (el) el.classList.add('got');
     save();
     toast(`🎖 ${msg}!`, 4000);
-    postSysMsg(`🎖 @${myUsername} earned "${msg}" badge!`);
+    postSysMsg(`🎖 @${myUsername} earned the "${msg}" badge!`);
   }
 }
 
@@ -969,21 +938,22 @@ function saveLive() {
 }
 
 // ============================================================
-// ⏹ STOP / BACK
+// ⏹ STOP / BACK / RESET
 // ============================================================
 function stopStream() {
-  if (!confirm('Stop your session and save to Firebase?')) return;
+  if (!confirm('Stop your session and save your time?')) return;
   clearTimers();
   const elapsed = timerGoing ? sessSecs : 0;
   if (elapsed > 0) {
     const key = myUsername.toLowerCase();
     if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
-    db[key].totalSecs = (db[key].totalSecs||0) + elapsed;
-    db[key].sessions  = (db[key].sessions||0) + 1;
-    db[key].isLive = false; db[key].liveSecs = 0;
+    db[key].totalSecs   = (db[key].totalSecs||0) + elapsed;
+    db[key].sessions    = (db[key].sessions||0) + 1;
+    db[key].isLive      = false;
+    db[key].liveSecs    = 0;
     save();
     const pts = getPoints(elapsed);
-    postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} (${pts} pts)!`);
+    postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} (${pts} pts) — amazing!`);
     toast(`✅ ${fmt(elapsed)} saved! 🏆 ${pts} points!`, 5000);
   }
   resetSession();
@@ -991,11 +961,11 @@ function stopStream() {
 
 function goBack() {
   if (timerGoing) {
-    if (!confirm('Pause timer? Your progress is saved.')) return;
+    if (!confirm('Pause timer and go back? Your progress is saved.')) return;
     clearTimers();
     timerGoing = false;
     save();
-    toast('⏸ Timer paused.', 2000);
+    toast('⏸ Timer paused. Come back to resume!', 2500);
   }
   document.getElementById('s-stream').classList.remove('on');
   document.getElementById('s-reg').classList.add('on');
@@ -1016,11 +986,11 @@ function resetSession() {
   try { localStorage.removeItem(LS_SESSION); } catch(e) {}
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
   const btn = document.getElementById('go-btn');
-  btn.className = 'btn btn-primary';
-  btn.textContent = '🎬 Start Streaming Battle!';
+  if (btn) { btn.className = 'btn btn-primary'; btn.textContent = '🎬 Start Streaming Battle!'; }
+  const verifyBox = document.getElementById('verify-box');
+  if (verifyBox) verifyBox.style.display = 'none';
   document.getElementById('s-stream').classList.remove('on');
   document.getElementById('s-reg').classList.add('on');
-  document.getElementById('verify-box').style.display = 'none';
   renderAll();
   window.scrollTo(0,0);
 }
@@ -1039,7 +1009,9 @@ function postSysMsg(txt) {
 }
 
 function sendMsg(source) {
-  const inp = document.getElementById(source === 'reg' ? 'chat-input-reg' : 'chat-input');
+  const inputId = source === 'reg' ? 'chat-input-reg' : 'chat-input';
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
   const txt = inp.value.trim();
   if (!txt) return;
   if (!myUsername) { toast('Register first to chat!'); return; }
@@ -1050,11 +1022,11 @@ function sendMsg(source) {
   renderChat('chat-feed-reg');
   renderChat('chat-feed');
   scrollChats();
-  pushChatMsg(m); // send directly to Firebase
+  pushChatMsg(m);
 }
 
 function sendReact(txt) {
-  if (!myUsername) { toast('Register first!'); return; }
+  if (!myUsername) { toast('Register first to react!'); return; }
   const m = {type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()};
   chat.push(m);
   saveLocalChat();
@@ -1076,7 +1048,7 @@ function renderChat(feedId) {
   feed.innerHTML = msgs.map(m => {
     const isSys = m.type === 'sys' || m.team === 'system' || m.sender === 'System';
     if (isSys) return `<div class="chat-msg sys"><span class="chat-sys">${escHtml(m.text)}</span></div>`;
-    const cls  = m.team === 'khem' ? 'k' : 'p';
+    const cls = m.team === 'khem' ? 'k' : 'p';
     return `<div class="chat-msg">
       <div class="chat-avatar ${cls}">${initials(m.sender)}</div>
       <div class="chat-bubble-wrap">
@@ -1101,44 +1073,41 @@ function renderVS() {
     if (u.team === 'khem') { ks+=secs; kn++; kp+=getPoints(secs); }
     else                   { ps+=secs; pn++; pp+=getPoints(secs); }
   });
-  // Add live session of current user
   if (timerGoing && myTeam && myUsername) {
     if (myTeam === 'khem') kp += getPoints(sessSecs);
     else                   pp += getPoints(sessSecs);
   }
 
-  document.getElementById('k-points').textContent = kp;
-  document.getElementById('p-points').textContent = pp;
-  document.getElementById('k-time').textContent   = fmt(ks);
-  document.getElementById('p-time').textContent   = fmt(ps);
-  document.getElementById('k-meta').textContent   = kn + ' streamer' + (kn!==1?'s':'');
-  document.getElementById('p-meta').textContent   = pn + ' streamer' + (pn!==1?'s':'');
-  document.getElementById('k-count').textContent  = kn + ' member'   + (kn!==1?'s':'');
-  document.getElementById('p-count').textContent  = pn + ' member'   + (pn!==1?'s':'');
-
-  ['team-k-points','team-k-points-live'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=kp; });
-  ['team-p-points','team-p-points-live'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=pp; });
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('k-points', kp); set('p-points', pp);
+  set('k-time', fmt(ks)); set('p-time', fmt(ps));
+  set('k-meta', kn + ' streamer' + (kn!==1?'s':'')); set('p-meta', pn + ' streamer' + (pn!==1?'s':''));
+  set('k-count', kn + ' member' + (kn!==1?'s':'')); set('p-count', pn + ' member' + (pn!==1?'s':''));
+  ['team-k-points','team-k-points-live'].forEach(id => set(id, kp));
+  ['team-p-points','team-p-points-live'].forEach(id => set(id, pp));
 
   ['team-k-box','team-p-box','team-k-box-live','team-p-box-live'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('lead-k','lead-p');
   });
-  if      (kp > pp) { document.getElementById('team-k-box')?.classList.add('lead-k'); document.getElementById('team-k-box-live')?.classList.add('lead-k'); }
-  else if (pp > kp) { document.getElementById('team-p-box')?.classList.add('lead-p'); document.getElementById('team-p-box-live')?.classList.add('lead-p'); }
+  if      (kp > pp) { ['team-k-box','team-k-box-live'].forEach(id => document.getElementById(id)?.classList.add('lead-k')); }
+  else if (pp > kp) { ['team-p-box','team-p-box-live'].forEach(id => document.getElementById(id)?.classList.add('lead-p')); }
 
   const liveCount = Object.values(db).filter(u => u.isLive).length;
-  document.getElementById('live-count').textContent = '👀 ' + liveCount + ' live';
+  set('live-count', '👀 ' + liveCount + ' live');
 
   const total = ks + ps || 1;
   const kpct  = Math.max(5, Math.min(95, Math.round(ks/total*100)));
-  document.getElementById('bp-k').style.width = kpct + '%';
-  document.getElementById('bp-p').style.width = (100-kpct) + '%';
+  const bpk = document.getElementById('bp-k'); if(bpk) bpk.style.width = kpct + '%';
+  const bpp = document.getElementById('bp-p'); if(bpp) bpp.style.width = (100-kpct) + '%';
 
   const vd = document.getElementById('verdict');
-  if (ks===0 && ps===0)    { vd.className='verdict tie'; vd.textContent='⚔️ Ready for battle!'; }
-  else if (kp > pp)         { vd.className='verdict k';   vd.textContent='💙 Team Khem leads by '+(kp-pp)+' points!'; }
-  else if (pp > kp)         { vd.className='verdict p';   vd.textContent='🧡 Team Pharan leads by '+(pp-kp)+' points!'; }
-  else                      { vd.className='verdict tie'; vd.textContent='⚔️ Perfectly tied! Keep streaming!'; }
+  if (vd) {
+    if (ks===0 && ps===0)  { vd.className='verdict tie'; vd.textContent='⚔️ Ready for battle!'; }
+    else if (kp > pp)       { vd.className='verdict k';   vd.textContent=`💙 Team Khem leads by ${kp-pp} point${kp-pp!==1?'s':''}!`; }
+    else if (pp > kp)       { vd.className='verdict p';   vd.textContent=`🧡 Team Pharan leads by ${pp-kp} point${pp-kp!==1?'s':''}!`; }
+    else                    { vd.className='verdict tie'; vd.textContent='⚔️ Perfectly tied! Keep streaming!'; }
+  }
 }
 
 function renderLB(id) {
@@ -1155,15 +1124,15 @@ function renderLB(id) {
   if (!entries.length) { el.innerHTML = '<div class="lb-empty">No streamers yet — be the first! 🎬</div>'; return; }
   const rk = ['r1','r2','r3'];
   el.innerHTML = entries.slice(0,20).map((u,i) => {
-    const cls     = u.team === 'khem' ? 'k' : 'p';
-    const medal   = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-    const tpill   = u.team==='khem'?'<span class="pill pill-k">KHEM</span>':'<span class="pill pill-p">PHARAN</span>';
-    const livepill= u.isLive ? '<span class="pill pill-live">LIVE</span>' : '';
-    const mepill  = (myUsername && u.key===myUsername.toLowerCase()) ? '<span class="pill pill-you">YOU</span>' : '';
-    const vpill   = u.verifications>0 ? `<span class="pill pill-verify">✅${u.verifications}</span>` : '';
+    const cls      = u.team === 'khem' ? 'k' : 'p';
+    const medal    = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    const tpill    = u.team==='khem'?'<span class="pill pill-k">KHEM</span>':'<span class="pill pill-p">PHARAN</span>';
+    const livepill = u.isLive ? '<span class="pill pill-live">LIVE</span>' : '';
+    const mepill   = (myUsername && u.key===myUsername.toLowerCase()) ? '<span class="pill pill-you">YOU</span>' : '';
+    const vpill    = u.verifications>0 ? `<span class="pill pill-verify">✅${u.verifications}</span>` : '';
     return `<div class="lb-entry ${cls}">
       <div class="lb-rank ${i<3?rk[i]:''}">${medal}</div>
-      <div class="lb-avatar ${cls}">${initials(u.name)}</div>
+      <div class="lb-avatar ${cls}">${initials(u.name||'')}</div>
       <div class="lb-body">
         <div class="lb-name">@${escHtml(u.name||'')}${tpill}${livepill}${mepill}${vpill}</div>
         <div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts · ${u.verifications||0} verifs</div>
@@ -1186,10 +1155,51 @@ function lbSwitch(el, f, id) {
 }
 
 // ============================================================
-// 🚀 BOOT
+// 🚀 BOOT — runs LAST, after all functions are defined
 // ============================================================
-console.log('🔥 OhOh Stream Battle loading...');
-// Firebase connection attempt is already running above; load() is called as fallback.
+window.addEventListener('DOMContentLoaded', function() {
+  // 1. Load localStorage first — works offline immediately
+  load();
+
+  // 2. Restore any active session
+  restoreSession();
+
+  // 3. Initial render
+  renderAll();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+
+  // 4. Try Firebase — non-blocking
+  if (dbFirestore) {
+    dbFirestore.collection('users').limit(1).get()
+      .then(() => {
+        firebaseReady = true; isOnline = true;
+        updateStatus('on', '🟢 Online');
+        toast('🌐 Connected to Firebase!', 2000);
+        loadFromFirebase();
+      })
+      .catch(err => {
+        console.warn('Firebase offline:', err);
+        updateStatus('off', '🔴 Offline — using local data');
+      });
+  } else {
+    updateStatus('off', '🔴 Offline');
+  }
+
+  // 5. Save session on close
+  window.addEventListener('beforeunload', () => {
+    if (!timerGoing || !myUsername) return;
+    if (ticker) clearInterval(ticker);
+    const key = myUsername.toLowerCase();
+    if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+    db[key].totalSecs = (db[key].totalSecs||0) + sessSecs;
+    db[key].sessions  = (db[key].sessions||0) + 1;
+    db[key].isLive    = false; db[key].liveSecs = 0;
+    try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {}
+    try { localStorage.removeItem(LS_SESSION); } catch(e) {}
+  });
+});
 </script>
 </body>
 </html>
