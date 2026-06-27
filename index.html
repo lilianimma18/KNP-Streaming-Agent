@@ -1,610 +1,1430 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
-  <title>Cake & Bake · artisanal bakery</title>
-  <!-- Bootstrap 5 + Icons + Google Font -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600&display=swap" rel="stylesheet" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #fef9f5;
-      color: #2e1e1a;
-    }
-    h1, h2, h3, h4, .logo-font {
-      font-family: 'Playfair Display', serif;
-    }
-    .gold {
-      color: #c49b3f;
-    }
-    .gold-bg {
-      background: #c49b3f;
-    }
-    .pink {
-      color: #d45a7a;
-    }
-    .pink-bg {
-      background: #d45a7a;
-    }
-    .red {
-      color: #b13e3e;
-    }
-    .red-bg {
-      background: #b13e3e;
-    }
-    .cream-bg {
-      background: #fef5ed;
-    }
-    .warm-shadow {
-      box-shadow: 0 8px 24px rgba(196, 155, 63, 0.15);
-    }
-    .navbar-custom {
-      background: #2e1e1a;
-      padding: 0.8rem 0;
-      border-bottom: 3px solid #c49b3f;
-    }
-    .navbar-custom .navbar-brand {
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 1.8rem;
-      color: #fef5ed;
-      letter-spacing: 1px;
-    }
-    .navbar-custom .navbar-brand span {
-      color: #c49b3f;
-    }
-    .navbar-custom .nav-link {
-      color: rgba(255, 245, 235, 0.85) !important;
-      font-weight: 500;
-      font-size: 0.95rem;
-      padding: 0.5rem 1rem !important;
-      transition: 0.2s;
-      border-radius: 30px;
-    }
-    .navbar-custom .nav-link:hover {
-      color: #c49b3f !important;
-      background: rgba(196, 155, 63, 0.15);
-    }
-    .navbar-custom .nav-link.active {
-      color: #c49b3f !important;
-      background: rgba(196, 155, 63, 0.2);
-    }
-    .btn-gold {
-      background: #c49b3f;
-      color: #2e1e1a;
-      font-weight: 600;
-      border: none;
-      padding: 0.6rem 2rem;
-      border-radius: 50px;
-      transition: 0.25s;
-      box-shadow: 0 4px 12px rgba(196, 155, 63, 0.3);
-    }
-    .btn-gold:hover {
-      background: #b0882e;
-      color: #1f1310;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 18px rgba(196, 155, 63, 0.4);
-    }
-    .btn-outline-gold {
-      background: transparent;
-      color: #c49b3f;
-      border: 2px solid #c49b3f;
-      font-weight: 600;
-      border-radius: 50px;
-      padding: 0.5rem 2rem;
-      transition: 0.25s;
-    }
-    .btn-outline-gold:hover {
-      background: #c49b3f;
-      color: #1f1310;
-    }
-    .hero-section {
-      background: linear-gradient(135deg, #f7ede4 0%, #fce8db 100%);
-      padding: 5rem 0 3rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-section::after {
-      content: '';
-      position: absolute;
-      top: -30%;
-      right: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(196,155,63,0.08) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .hero-title {
-      font-size: 4.2rem;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-    .hero-title .gold {
-      font-style: italic;
-    }
-    .section-title {
-      font-size: 2.6rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      position: relative;
-      display: inline-block;
-    }
-    .section-title:after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 0;
-      width: 70px;
-      height: 4px;
-      background: #c49b3f;
-      border-radius: 4px;
-    }
-    .section-title-center:after {
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .card-bake {
-      border: none;
-      border-radius: 20px;
-      overflow: hidden;
-      background: #ffffff;
-      transition: 0.3s;
-      box-shadow: 0 4px 16px rgba(46, 30, 26, 0.06);
-      height: 100%;
-    }
-    .card-bake:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 16px 40px rgba(196, 155, 63, 0.18);
-    }
-    .card-bake img {
-      border-bottom: 3px solid #c49b3f;
-      height: 220px;
-      object-fit: cover;
-      width: 100%;
-    }
-    .card-bake .card-body {
-      padding: 1.5rem 1.2rem;
-    }
-    .card-bake .card-title {
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      color: #2e1e1a;
-    }
-    .card-bake .price-tag {
-      background: #d45a7a;
-      color: white;
-      font-weight: 600;
-      padding: 0.25rem 1.2rem;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      display: inline-block;
-    }
-    .gallery-filter .btn {
-      border-radius: 40px;
-      padding: 0.4rem 1.6rem;
-      font-weight: 500;
-      border: 2px solid #e3d4cb;
-      color: #4a3530;
-      background: transparent;
-      transition: 0.2s;
-    }
-    .gallery-filter .btn:hover,
-    .gallery-filter .btn.active {
-      background: #c49b3f;
-      border-color: #c49b3f;
-      color: white;
-    }
-    .gallery-img {
-      border-radius: 18px;
-      overflow: hidden;
-      transition: 0.3s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      border: 2px solid transparent;
-    }
-    .gallery-img:hover {
-      transform: scale(1.02);
-      border-color: #c49b3f;
-      box-shadow: 0 12px 28px rgba(196,155,63,0.15);
-    }
-    .gallery-img img {
-      width: 100%;
-      height: 240px;
-      object-fit: cover;
-    }
-    .footer-custom {
-      background: #2e1e1a;
-      color: #e8dbd3;
-      padding: 3rem 0 1.5rem;
-      border-top: 4px solid #c49b3f;
-    }
-    .footer-custom a {
-      color: #d4b99b;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-    .footer-custom a:hover {
-      color: #c49b3f;
-    }
-    .footer-custom .social-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(196,155,63,0.15);
-      color: #c49b3f;
-      transition: 0.2s;
-      font-size: 1.2rem;
-    }
-    .footer-custom .social-icon:hover {
-      background: #c49b3f;
-      color: #2e1e1a;
-    }
-    .info-block {
-      background: #f9efe8;
-      border-left: 6px solid #d45a7a;
-      padding: 1rem 1.5rem;
-      border-radius: 16px;
-    }
-    .info-block i {
-      color: #c49b3f;
-      font-size: 1.4rem;
-      width: 2rem;
-    }
-    .hr-gold {
-      width: 80px;
-      height: 3px;
-      background: #c49b3f;
-      margin: 1.2rem auto;
-      opacity: 0.6;
-    }
-    @media (max-width: 768px) {
-      .hero-title {
-        font-size: 2.8rem;
-      }
-      .section-title {
-        font-size: 2rem;
-      }
-      .navbar-custom .navbar-brand {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OhOh Fandom — Stream Battle</title>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a202c;min-height:100vh;}
+.navbar{background:#0f1923;padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nb-logo{color:#fff;font-weight:800;font-size:16px;}
+.nb-logo span{color:#ff8a65;}
+.nb-right{display:flex;align-items:center;gap:10px;}
+.status{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;}
+.status.on{background:#dcfce7;color:#16a34a;border:1px solid #86efac;}
+.status.off{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;}
+.status.waiting{background:#fefce8;color:#d97706;border:1px solid #fde047;}
+.live-chip{background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#4ade80;}
+.live-dot{display:inline-block;width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.6;}}
+.hero{background:#0f1923;padding:2rem 1.5rem 1rem;text-align:center;}
+.hero h1{color:#fff;font-size:clamp(24px,4vw,36px);margin-bottom:1.5rem;}
+.hero h1 .k{color:#42a5f5;}
+.hero h1 .p{color:#ff8a65;}
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;max-width:800px;margin:0 auto;}
+.score-panel{padding:1rem;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);}
+.score-panel.k{background:linear-gradient(145deg,rgba(13,71,161,.8),rgba(21,101,192,.6));}
+.score-panel.p{background:linear-gradient(145deg,rgba(191,54,12,.8),rgba(230,81,0,.6));}
+.score-panel .label{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.4);letter-spacing:.1em;}
+.score-panel .name{font-size:16px;font-weight:700;color:#fff;margin:4px 0;}
+.score-panel .points{font-size:28px;font-weight:800;color:#fbbf24;}
+.score-panel .time{font-size:20px;font-weight:700;color:rgba(255,255,255,.8);}
+.score-panel .meta{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;}
+.vs{width:44px;height:44px;border-radius:50%;background:#1a2535;border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);margin:0 auto;}
+.progress{background:rgba(255,255,255,.06);border-radius:6px;height:6px;max-width:800px;margin:12px auto 8px;overflow:hidden;display:flex;}
+.progress .k{background:linear-gradient(90deg,#0d47a1,#42a5f5);transition:width 1s;}
+.progress .p{background:linear-gradient(90deg,#ff8a65,#bf360c);transition:width 1s;}
+.verdict{color:rgba(255,255,255,.5);font-size:13px;font-weight:700;padding-bottom:1rem;}
+.verdict.k{color:#42a5f5;}
+.verdict.p{color:#ff8a65;}
+.verdict.tie{color:rgba(255,255,255,.35);}
+.main{max-width:800px;margin:0 auto;padding:1.5rem 1rem;}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:1.25rem;margin-bottom:1rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);}
+.card-header{font-weight:700;font-size:14px;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center;}
+.step{display:none;}
+.step.on{display:block;}
+.input{width:100%;height:40px;border:1.5px solid #e2e8f0;border-radius:8px;padding:0 12px;font-size:13px;font-family:inherit;outline:none;}
+.input:focus{border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.1);}
+.input-sm{height:36px;font-size:12px;}
+.label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.team-btn{border:2px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;cursor:pointer;background:#fff;font-family:inherit;transition:all .15s;font-size:16px;}
+.team-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.team-btn.sel-k{border-color:#1565c0;background:#e3f2fd;box-shadow:0 0 0 3px rgba(21,101,192,.2);}
+.team-btn.sel-p{border-color:#e65100;background:#fff3e0;box-shadow:0 0 0 3px rgba(230,81,0,.2);}
+.team-btn .icon{font-size:28px;display:block;margin-bottom:4px;}
+.team-btn .tname{font-weight:700;font-size:14px;display:block;}
+.team-btn .tname.k{color:#1565c0;}
+.team-btn .tname.p{color:#e65100;}
+.team-btn .count{font-size:11px;color:#94a3b8;margin-top:2px;display:block;}
+.acc-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.acc-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;}
+.acc-item .row{display:flex;gap:8px;align-items:center;}
+.acc-item .row input{flex:1;}
+.acc-item .rm-btn{width:28px;height:28px;border-radius:50%;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;color:#94a3b8;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.acc-item .rm-btn:hover{background:#fee2e2;border-color:#fca5a5;color:#dc2626;}
+.add-btn{width:100%;height:36px;border:1.5px dashed #e2e8f0;border-radius:8px;background:none;font-size:12px;color:#94a3b8;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;}
+.add-btn:hover{border-color:#1565c0;color:#1565c0;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 20px;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .15s;width:100%;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-primary{background:#1565c0;color:#fff;}
+.btn-primary:hover:not(:disabled){background:#0d47a1;}
+.btn-ora{background:#e65100;color:#fff;}
+.btn-ora:hover:not(:disabled){background:#bf360c;}
+.btn-success{background:#16a34a;color:#fff;}
+.btn-success:hover:not(:disabled){filter:brightness(1.1);}
+.btn-outline{background:#fff;color:#1a202c;border:1.5px solid #e2e8f0;}
+.btn-outline:hover:not(:disabled){border-color:#1565c0;color:#1565c0;}
+.btn-danger{background:#fff;color:#dc2626;border:1.5px solid #fca5a5;}
+.btn-danger:hover:not(:disabled){background:#fee2e2;}
+.btn-dark{background:#0f1923;color:#fff;}
+.btn-dark:hover:not(:disabled){background:#1a2535;}
+.btn-warning{background:#d97706;color:#fff;}
+.btn-warning:hover:not(:disabled){filter:brightness(1.1);}
+.btn-xs{height:28px;font-size:11px;padding:0 10px;width:auto;}
+.btn-sm{height:34px;font-size:12px;padding:0 14px;width:auto;}
+.err{background:#fee2e2;color:#dc2626;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;margin-bottom:.75rem;display:none;border:1px solid #fca5a5;}
+.sess-hero{border-radius:12px;padding:1.5rem 1rem;text-align:center;margin-bottom:1rem;}
+.sess-hero.k{background:linear-gradient(145deg,#0d47a1,#1565c0);}
+.sess-hero.p{background:linear-gradient(145deg,#bf360c,#e65100);}
+.sess-hero .eyebrow{font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.4);letter-spacing:.1em;font-weight:700;}
+.sess-hero .timer{font-size:clamp(48px,10vw,70px);font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-3px;line-height:1;margin:4px 0;}
+.sess-hero .pts{font-size:24px;font-weight:800;color:#fbbf24;margin:4px 0;}
+.sess-hero .accs{font-size:12px;color:rgba(255,255,255,.6);}
+.sess-hero .team{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;}
+.status-bar{padding:9px 14px;border-radius:8px;font-size:12px;font-weight:600;margin-bottom:1rem;text-align:center;border:1px solid;}
+.sb-wait{background:#fefce8;border-color:#fde047;color:#713f12;}
+.sb-live{background:#dcfce7;border-color:#86efac;color:#15803d;}
+.sb-verify{background:#ede9fe;border-color:#a78bfa;color:#6d28d9;}
+.sb-paused{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
+.sb-saved{background:#dbeafe;border-color:#93c5fd;color:#1e40af;}
+.open-tabs{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;}
+.open-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;}
+.open-row .acc{font-weight:700;font-size:13px;}
+.open-row .url{font-size:10px;color:#94a3b8;margin-top:1px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.acc-live{display:flex;flex-direction:column;gap:6px;}
+.acc-live-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;}
+.acc-live-row .left{display:flex;align-items:center;gap:8px;}
+.acc-live-row .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+.acc-live-row .avatar.k{background:#1565c0;}
+.acc-live-row .avatar.p{background:#e65100;}
+.acc-live-row .name{font-weight:700;font-size:13px;}
+.acc-live-row .time{font-weight:800;font-size:13px;font-variant-numeric:tabular-nums;}
+.badges{display:flex;flex-wrap:wrap;gap:6px;}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;border:1.5px solid #e2e8f0;color:#94a3b8;background:#fff;transition:all .35s;}
+.badge.got{border-color:#fde047;background:#fef9c3;color:#713f12;}
+.lb-tabs{display:flex;gap:3px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:3px;margin-bottom:.85rem;}
+.lb-tab{flex:1;height:30px;border:none;border-radius:6px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;background:none;color:#94a3b8;transition:all .14s;}
+.lb-tab.on{background:#fff;color:#1a202c;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.lb-team-header{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.lb-team-box{padding:10px;border-radius:8px;text-align:center;border:2px solid #e2e8f0;background:#fff;}
+.lb-team-box.lead-k{border-color:#1565c0;background:#e3f2fd;}
+.lb-team-box.lead-p{border-color:#e65100;background:#fff3e0;}
+.lb-team-box .tb-name{font-weight:700;font-size:12px;}
+.lb-team-box .tb-points{font-size:24px;font-weight:800;}
+.lb-team-box .tb-points.k{color:#1565c0;}
+.lb-team-box .tb-points.p{color:#e65100;}
+.lb-entry{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:5px;background:#fff;}
+.lb-entry.k{border-left:3px solid #1565c0;}
+.lb-entry.p{border-left:3px solid #e65100;}
+.lb-rank{font-weight:800;font-size:13px;width:24px;text-align:center;color:#94a3b8;flex-shrink:0;}
+.lb-rank.r1{color:#d97706;}
+.lb-rank.r2{color:#64748b;}
+.lb-rank.r3{color:#92400e;}
+.lb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+.lb-avatar.k{background:#1565c0;}
+.lb-avatar.p{background:#e65100;}
+.lb-body{flex:1;min-width:0;}
+.lb-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-detail{font-size:10px;color:#94a3b8;margin-top:1px;}
+.lb-time{text-align:right;flex-shrink:0;}
+.lb-points{font-weight:800;font-size:16px;color:#d97706;}
+.lb-time-small{font-size:11px;color:#94a3b8;}
+.pill{display:inline-block;font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;vertical-align:middle;margin-left:3px;text-transform:uppercase;}
+.pill-k{background:#1565c0;color:#fff;}
+.pill-p{background:#e65100;color:#fff;}
+.pill-live{background:#16a34a;color:#fff;}
+.pill-you{background:#0f1923;color:#fff;}
+.pill-verify{background:#7c3aed;color:#fff;}
+.pill-paused{background:#f59e0b;color:#fff;}
+.lb-empty{text-align:center;padding:2rem;color:#94a3b8;font-size:13px;}
+.chat-wrap{display:flex;flex-direction:column;height:320px;}
+.chat-feed{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:6px;}
+.chat-feed::-webkit-scrollbar{width:4px;}
+.chat-feed::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px;}
+.chat-msg{display:flex;align-items:flex-start;gap:8px;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.chat-msg.sys{justify-content:center;}
+.chat-sys{background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:3px 12px;font-size:11px;color:#94a3b8;font-weight:500;}
+.chat-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;}
+.chat-avatar.k{background:#1565c0;}
+.chat-avatar.p{background:#e65100;}
+.chat-avatar.sys{background:#94a3b8;}
+.chat-bubble-wrap{display:flex;flex-direction:column;gap:2px;max-width:calc(100% - 38px);}
+.chat-meta{display:flex;align-items:center;gap:5px;}
+.chat-sender{font-size:11px;font-weight:700;}
+.chat-sender.k{color:#1565c0;}
+.chat-sender.p{color:#e65100;}
+.chat-ts{font-size:10px;color:#94a3b8;}
+.chat-bubble{background:#f8fafc;border:1px solid #e2e8f0;border-radius:0 10px 10px 10px;padding:7px 10px;font-size:13px;color:#1a202c;line-height:1.45;font-weight:500;word-break:break-word;}
+.chat-bubble.k{background:#e3f2fd;border-color:rgba(21,101,192,.15);}
+.chat-bubble.p{background:#fff3e0;border-color:rgba(230,81,0,.15);}
+.chat-input-row{border-top:1px solid #e2e8f0;padding:.75rem;display:flex;gap:8px;align-items:center;background:#fff;}
+.chat-input{flex:1;height:36px;border:1.5px solid #e2e8f0;border-radius:20px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;}
+.chat-input:focus{border-color:#1565c0;}
+.chat-send{width:36px;height:36px;border-radius:50%;border:none;background:#1565c0;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s;}
+.chat-send:hover{background:#0d47a1;}
+.chat-send svg{width:14px;height:14px;}
+.quick-reacts{display:flex;gap:6px;padding:.5rem .75rem;border-top:1px solid #e2e8f0;background:#f8fafc;flex-wrap:wrap;}
+.react-btn{height:28px;padding:0 10px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;color:#64748b;transition:all .12s;}
+.react-btn:hover{border-color:#1565c0;color:#1565c0;transform:scale(1.05);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:#0f1923;color:#fff;border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 20px 25px -5px rgba(0,0,0,.1);z-index:999;opacity:0;transition:all .26s;pointer-events:none;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.back-link{background:none;border:none;font-size:12px;color:#94a3b8;cursor:pointer;font-family:inherit;padding:0;margin-bottom:1rem;display:inline-flex;align-items:center;gap:4px;font-weight:600;}
+.back-link:hover{color:#1565c0;}
+.info-box{background:#e3f2fd;border:1px solid #42a5f5;border-radius:8px;padding:12px;margin-bottom:1rem;}
+.info-box .title{font-size:12px;font-weight:700;color:#1565c0;margin-bottom:4px;}
+.info-box .text{font-size:12px;color:#334155;line-height:1.6;}
+.verify-box{background:#ede9fe;border:2px solid #a78bfa;border-radius:12px;padding:16px;text-align:center;margin-bottom:1rem;}
+.verify-box .title{font-weight:800;font-size:14px;color:#6d28d9;}
+.verify-box .timer{font-size:32px;font-weight:800;color:#7c3aed;margin:8px 0;}
+.verify-box .btn{height:48px;font-size:16px;}
+.session-save{background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#15803d;text-align:center;margin-bottom:1rem;}
+.step-counter{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.step-pill{background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:6px 14px;font-size:11px;font-weight:600;color:#64748b;}
+.step-pill.active{background:#1565c0;color:#fff;border-color:#1565c0;}
+.live-count{font-size:11px;color:#94a3b8;font-weight:600;}
+.online-count{font-size:10px;font-weight:600;color:#16a34a;background:#dcfce7;padding:2px 8px;border-radius:10px;}
+footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;margin-top:2rem;font-weight:500;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.session-actions{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;}
+.session-actions .btn{flex:1;min-width:120px;}
+.delete-btn{background:#dc2626;color:#fff;}
+.delete-btn:hover:not(:disabled){background:#b91c1c;}
+.pause-btn{background:#f59e0b;color:#fff;}
+.pause-btn:hover:not(:disabled){background:#d97706;}
+.resume-btn{background:#16a34a;color:#fff;}
+.resume-btn:hover:not(:disabled){background:#15803d;}
+.delete-session-card{background:#fee2e2;border:2px solid #fca5a5;border-radius:12px;padding:16px;text-align:center;margin-bottom:1rem;}
+.delete-session-card .title{font-weight:800;font-size:14px;color:#dc2626;margin-bottom:8px;}
+@media(max-width:520px){.scoreboard{gap:6px;}.two-col{grid-template-columns:1fr;}.session-actions .btn{min-width:100%;}}
+</style>
 </head>
 <body>
 
-<!-- ========== NAVBAR ========== -->
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="#">
-      Cake <span>&amp;</span> Bake
-    </a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" 
-            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mainNav">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1">
-        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#services">Our Services</a></li>
-        <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
-        <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
-        <li class="nav-item"><a class="nav-link" href="#menu">Menu</a></li>
-        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Pages</a></li>
-      </ul>
-    </div>
+<div class="toast" id="toast"></div>
+
+<nav class="navbar">
+  <div class="nb-logo">OhOh <span>Fandom</span> · Stream Battle</div>
+  <div class="nb-right">
+    <span class="status waiting" id="status">⏳ Connecting...</span>
+    <div class="live-chip"><span class="live-dot"></span>LIVE</div>
   </div>
 </nav>
 
-<!-- ========== HERO ========== -->
-<section class="hero-section">
-  <div class="container position-relative">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6">
-        <span class="text-uppercase small fw-semibold text-secondary" style="letter-spacing: 3px; color: #b13e3e !important;">
-          <i class="bi bi-star-fill gold me-1"></i> Artisanal bakery
-        </span>
-        <h1 class="hero-title mt-3">
-          Welcome to <br />
-          <span class="gold">Cake &amp; Bake</span>
-        </h1>
-        <p class="lead mt-3" style="color: #4a3530; max-width: 90%;">
-          We offer high quality, delicious, <span class="fw-bold">"from scratch"</span> cakes!
-        </p>
-        <p class="mb-4" style="color: #5f463e;">See our menu for more information</p>
-        <a href="#menu" class="btn btn-gold btn-lg">
-          <i class="bi bi-cup-hot me-2"></i>OUR MENU
-        </a>
-        <div class="mt-4 d-flex flex-wrap gap-3">
-          <div><i class="bi bi-geo-alt gold me-2"></i> Street name 123 - New York</div>
-          <div><i class="bi bi-telephone gold me-2"></i> (901) 123-45678</div>
-          <div><i class="bi bi-clock gold me-2"></i> Mon-Sat: 9am-5pm</div>
-        </div>
+<div class="hero">
+  <div class="hero-inner">
+    <h1><span class="k">Team Khem</span> 💙 vs 🧡 <span class="p">Team Pharan</span></h1>
+    <div class="scoreboard">
+      <div class="score-panel k">
+        <div class="label">Team</div>
+        <div class="name">Khem 💙</div>
+        <div class="points" id="k-points">0</div>
+        <div class="time" id="k-time">0:00:00</div>
+        <div class="meta" id="k-meta">0 streamers</div>
       </div>
-      <div class="col-lg-6 text-center text-lg-end">
-        <div class="position-relative d-inline-block">
-          <img src="https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=600&h=500&fit=crop&crop=center&auto=format" 
-               alt="Cake display" class="img-fluid rounded-4 warm-shadow" style="max-height: 420px; object-fit: cover;" />
-          <div class="position-absolute bottom-0 start-0 translate-middle-y bg-white p-3 rounded-4 warm-shadow" style="left: 10%;">
-            <span class="d-block gold fw-bold" style="font-size: 1.6rem;">★ 4.9</span>
-            <span class="small text-secondary">120+ reviews</span>
-          </div>
+      <div><div class="vs">VS</div></div>
+      <div class="score-panel p">
+        <div class="label">Team</div>
+        <div class="name">Pharan 🧡</div>
+        <div class="points" id="p-points">0</div>
+        <div class="time" id="p-time">0:00:00</div>
+        <div class="meta" id="p-meta">0 streamers</div>
+      </div>
+    </div>
+    <div style="max-width:800px;margin:0 auto;">
+      <div class="progress"><div class="k" id="bp-k" style="width:50%"></div><div class="p" id="bp-p" style="width:50%"></div></div>
+      <div class="verdict tie" id="verdict">⚔️ Ready for battle!</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- REGISTER STEP -->
+<div id="s-reg" class="step on">
+  <div class="card">
+    <div class="card-header">📋 How It Works</div>
+    <div class="step-counter">
+      <span class="step-pill active">1️⃣ Register</span>
+      <span class="step-pill">2️⃣ Add Accounts</span>
+      <span class="step-pill">3️⃣ Pick Team</span>
+      <span class="step-pill">4️⃣ Stream!</span>
+    </div>
+    <div class="info-box">
+      <div class="title">🌐 Online Mode — Real-Time!</div>
+      <div class="text"><strong>Everyone can see each other in real-time!</strong><br>• Live leaderboard • Global chat • See who's LIVE<br><span style="background:#dcfce7;padding:2px 10px;border-radius:4px;font-weight:700;color:#15803d;" id="fb-badge">⏳ Connecting to Firebase...</span></div>
+    </div>
+    <div class="info-box" style="background:#f0fdf4;border-color:#86efac;">
+      <div class="title" style="color:#16a34a;">🎯 Points: 1 point = 5 minutes</div>
+      <div class="text">• Each account = multiplied points • Example: 2 accounts × 10 min = 4 points • <strong>VERIFY every 15 min</strong></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">👤 Your Profile</div>
+    <div class="field-group">
+      <label class="label">Your username</label>
+      <input type="text" class="input" id="username-input" placeholder="e.g. KengFan_Pro"/>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">📺 Your Accounts</div>
+    <div class="acc-list" id="acc-list">
+      <div class="acc-item">
+        <div class="row">
+          <input type="text" class="input input-sm acc-name" placeholder="Account name (e.g. @KengFan1)"/>
+          <button class="rm-btn" onclick="rmAcc(this)">×</button>
         </div>
+        <input type="text" class="input input-sm acc-url" placeholder="YouTube link"/>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addAcc()">+ Add another account</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Choose Your Team</div>
+    <div class="team-grid">
+      <button class="team-btn" id="team-khem" onclick="pickTeam('khem')">
+        <span class="icon">💙</span>
+        <span class="tname k">Team Khem</span>
+        <span class="count" id="k-count">0 members</span>
+      </button>
+      <button class="team-btn" id="team-pharan" onclick="pickTeam('pharan')">
+        <span class="icon">🧡</span>
+        <span class="tname p">Team Pharan</span>
+        <span class="count" id="p-count">0 members</span>
+      </button>
+    </div>
+    <div class="err" id="reg-err"></div>
+    <button class="btn btn-primary" id="go-btn" onclick="goStream()">🎬 Start Streaming Battle!</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🏆 Global Leaderboard <span class="live-count" id="live-count">👀 0 live</span></div>
+    <div class="lb-team-header">
+      <div class="lb-team-box" id="team-k-box"><div class="tb-name">💙 Khem</div><div class="tb-points k" id="team-k-points">0</div></div>
+      <div class="lb-team-box" id="team-p-box"><div class="tb-name">🧡 Pharan</div><div class="tb-points p" id="team-p-points">0</div></div>
+    </div>
+    <div class="lb-tabs">
+      <button class="lb-tab on" onclick="lbSwitch(this,'all','lb-reg')">All</button>
+      <button class="lb-tab" onclick="lbSwitch(this,'khem','lb-reg')">💙 Khem</button>
+      <button class="lb-tab" onclick="lbSwitch(this,'pharan','lb-reg')">🧡 Pharan</button>
+    </div>
+    <div id="lb-reg"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">💬 Global Chat <span class="online-count" id="online-count-reg">● Live</span></div>
+    <div class="chat-wrap">
+      <div class="chat-feed" id="chat-feed-reg"></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chat-input-reg" placeholder="Chat with everyone..." onkeydown="if(event.key==='Enter')sendMsg('reg')"/>
+        <button class="chat-send" onclick="sendMsg('reg')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- ========== ABOUT / SERVICES ========== -->
-<section id="about" class="py-5 cream-bg">
-  <div class="container py-4">
-    <div class="row g-5 align-items-center">
-      <div class="col-md-6">
-        <span class="badge red-bg text-white px-3 py-2 rounded-pill mb-3">About Us</span>
-        <h2 class="section-title">Baked with <span class="pink">love</span> &amp; tradition</h2>
-        <p class="mt-3" style="color: #3d2b25;">
-          Aliquam erat volutpat in id fermentum augue, ut pellentesque leo. Maecenas at arcu risus. 
-          Donec commodo sodales ex, scelerisque laoreet nibh hendrerit id. In aliquet magna nec lobortis maximus. 
-          Etiam rhoncus leo a dolor placerat, nec elementum ipsum convall.
-        </p>
-        <div class="row mt-4 g-3">
-          <div class="col-6"><i class="bi bi-check-circle-fill gold me-2"></i> 100% fresh ingredients</div>
-          <div class="col-6"><i class="bi bi-check-circle-fill gold me-2"></i> Custom orders</div>
-          <div class="col-6"><i class="bi bi-check-circle-fill gold me-2"></i> Family recipe</div>
-          <div class="col-6"><i class="bi bi-check-circle-fill gold me-2"></i> Gluten-free options</div>
-        </div>
-        <a href="#gallery" class="btn btn-outline-gold mt-4">Explore gallery <i class="bi bi-arrow-right ms-2"></i></a>
+<!-- STREAM STEP -->
+<div id="s-stream" class="step">
+  <div class="session-save">💾 Auto-saves to Firebase! Everyone sees your progress!</div>
+  <button class="back-link" onclick="goBack()">← Back</button>
+
+  <div class="sess-hero k" id="sess-hero">
+    <div class="eyebrow" id="sh-eye">⏳ Ready to stream</div>
+    <div class="timer" id="sh-timer">0:00:00</div>
+    <div class="pts" id="sh-points">🏆 0 points</div>
+    <div class="accs" id="sh-accs"></div>
+    <div class="team" id="sh-team"></div>
+  </div>
+
+  <div class="status-bar sb-wait" id="status-bar">⏳ Open tabs, log in, then Start Timer</div>
+
+  <div class="verify-box" id="verify-box" style="display:none;">
+    <div class="title">📸 Verification Required</div>
+    <div class="timer" id="verify-timer">15:00</div>
+    <button class="btn btn-warning" onclick="verifyStream()">✅ I'm Still Streaming!</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🔗 Open Your Tabs</div>
+    <div class="open-tabs" id="open-tabs"></div>
+    <button class="btn btn-dark" onclick="openAllTabs()">🔗 Open All Tabs</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">▶️ Start Timer</div>
+    <button class="btn btn-success" id="timer-btn" onclick="startTimer()" style="font-size:16px;height:50px;">▶ START TIMER</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">⏱️ Your Streaming Time</div>
+    <div class="acc-live" id="acc-live"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🎖 Badges</div>
+    <div class="badges">
+      <div class="badge" id="b15">⏱ 15 min</div>
+      <div class="badge" id="b30">🔥 30 min</div>
+      <div class="badge" id="b60">👑 1 hour</div>
+      <div class="badge" id="bmulti">🖥 Multi</div>
+      <div class="badge" id="bverify">✅ Verified</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🛠 Session Controls</div>
+    <div class="session-actions">
+      <button class="btn pause-btn" id="pause-btn" onclick="pauseSession()">⏸ Pause</button>
+      <button class="btn resume-btn" id="resume-btn" onclick="resumeSession()" style="display:none;">▶️ Resume</button>
+      <button class="btn btn-outline" onclick="saveSessionProgress()">💾 Save Progress</button>
+      <button class="btn delete-btn" onclick="deleteSession()">🗑 Delete Session</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🏆 Live Leaderboard</div>
+    <div class="lb-team-header">
+      <div class="lb-team-box" id="team-k-box-live"><div class="tb-name">💙 Khem</div><div class="tb-points k" id="team-k-points-live">0</div></div>
+      <div class="lb-team-box" id="team-p-box-live"><div class="tb-name">🧡 Pharan</div><div class="tb-points p" id="team-p-points-live">0</div></div>
+    </div>
+    <div class="lb-tabs">
+      <button class="lb-tab on" onclick="lbSwitch(this,'all','lb-stream')">All</button>
+      <button class="lb-tab" onclick="lbSwitch(this,'khem','lb-stream')">💙 Khem</button>
+      <button class="lb-tab" onclick="lbSwitch(this,'pharan','lb-stream')">🧡 Pharan</button>
+    </div>
+    <div id="lb-stream"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">💬 Live Chat <span class="online-count">● Live</span></div>
+    <div class="chat-wrap">
+      <div class="quick-reacts">
+        <button class="react-btn" onclick="sendReact('💙 Team Khem fighting!')">💙 Khem!</button>
+        <button class="react-btn" onclick="sendReact('🧡 Team Pharan fighting!')">🧡 Pharan!</button>
+        <button class="react-btn" onclick="sendReact('🔥 Let\'s go!')">🔥 Go!</button>
+        <button class="react-btn" onclick="sendReact('👑 KengNamping!')">👑 KN</button>
+        <button class="react-btn" onclick="sendReact('✅ Verified!')">✅ Verified!</button>
       </div>
-      <div class="col-md-6">
-        <div class="row g-3">
-          <div class="col-6">
-            <img src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=300&h=350&fit=crop&crop=center&auto=format" 
-                 alt="cake slice" class="img-fluid rounded-4 warm-shadow" style="height: 250px; width: 100%; object-fit: cover;" />
-          </div>
-          <div class="col-6">
-            <img src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=300&h=350&fit=crop&crop=center&auto=format" 
-                 alt="cupcakes" class="img-fluid rounded-4 warm-shadow" style="height: 250px; width: 100%; object-fit: cover;" />
-          </div>
-          <div class="col-12">
-            <div class="info-block d-flex align-items-center">
-              <i class="bi bi-trophy-fill me-3"></i>
-              <div><span class="fw-bold gold">Award-winning bakery</span> — best cakes in NYC 2024</div>
-            </div>
-          </div>
-        </div>
+      <div class="chat-feed" id="chat-feed"></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Hype up your team..." onkeydown="if(event.key==='Enter')sendMsg('stream')"/>
+        <button class="chat-send" onclick="sendMsg('stream')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
     </div>
   </div>
-</section>
 
-<!-- ========== SERVICES ========== -->
-<section id="services" class="py-5">
-  <div class="container py-3">
-    <div class="text-center mb-5">
-      <span class="badge pink-bg text-white px-3 py-2 rounded-pill">Our Services</span>
-      <h2 class="section-title section-title-center mt-2">What we <span class="gold">offer</span></h2>
-      <p class="text-secondary mx-auto" style="max-width: 600px;">From birthday masterpieces to everyday indulgences</p>
-    </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card-bake p-4 text-center">
-          <div class="gold fs-1"><i class="bi bi-cake"></i></div>
-          <h4 class="mt-3">Custom Cakes</h4>
-          <p class="text-secondary">Tailored designs for weddings, birthdays &amp; more</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-bake p-4 text-center">
-          <div class="gold fs-1"><i class="bi bi-cup-straw"></i></div>
-          <h4 class="mt-3">Cupcakes</h4>
-          <p class="text-secondary">Perfect mini treats, available in 12+ flavors</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-bake p-4 text-center">
-          <div class="gold fs-1"><i class="bi bi-box-seam"></i></div>
-          <h4 class="mt-3">Delivery</h4>
-          <p class="text-secondary">Fresh delivery to your door, same-day available</p>
-        </div>
-      </div>
+  <div class="delete-session-card" id="delete-session-card" style="display:none;">
+    <div class="title">⚠️ Delete Session Confirmation</div>
+    <p style="font-size:13px;color:#64748b;margin:8px 0;">This will permanently delete your current session progress and return you to the registration page.</p>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('delete-session-card').style.display='none'">Cancel</button>
+      <button class="btn delete-btn btn-sm" onclick="confirmDeleteSession()">🗑 Yes, Delete</button>
     </div>
   </div>
-</section>
 
-<!-- ========== GALLERY ========== -->
-<section id="gallery" class="py-5 cream-bg">
-  <div class="container py-3">
-    <div class="text-center mb-5">
-      <span class="badge red-bg text-white px-3 py-2 rounded-pill">Gallery</span>
-      <h2 class="section-title section-title-center mt-2">Our <span class="pink">image</span> gallery</h2>
-      <p class="text-secondary mx-auto" style="max-width: 660px;">
-        Aliquam erat volutpat in id fermentum augue, ut pellentesque leo. Maecenas at arcu risus. 
-        Donec commodo sodales ex, scelerisque laoreet nibh hendrerit id.
-      </p>
-    </div>
+  <button class="btn btn-danger" style="margin-top:.5rem;" onclick="stopStream()">⏹ Stop & Save Session</button>
+</div>
 
-    <!-- filter tabs -->
-    <div class="d-flex flex-wrap justify-content-center gap-2 gallery-filter mb-4">
-      <button class="btn active" data-filter="all">All</button>
-      <button class="btn" data-filter="birthday">Birthday Cakes</button>
-      <button class="btn" data-filter="special">Special Cakes</button>
-      <button class="btn" data-filter="cupcake">Cupcakes</button>
-    </div>
+</div>
 
-    <div class="row g-4" id="galleryGrid">
-      <div class="col-md-4 gallery-item" data-category="birthday">
-        <div class="gallery-img"><img src="https://images.unsplash.com/photo-1535254973040-607b474cb50d?w=400&h=300&fit=crop&crop=center&auto=format" alt="birthday cake" /></div>
-      </div>
-      <div class="col-md-4 gallery-item" data-category="cupcake">
-        <div class="gallery-img"><img src="https://images.unsplash.com/photo-1614707267537-b85a5e6e6de8?w=400&h=300&fit=crop&crop=center&auto=format" alt="cupcakes" /></div>
-      </div>
-      <div class="col-md-4 gallery-item" data-category="special">
-        <div class="gallery-img"><img src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=400&h=300&fit=crop&crop=center&auto=format" alt="special cake" /></div>
-      </div>
-      <div class="col-md-4 gallery-item" data-category="birthday">
-        <div class="gallery-img"><img src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=400&h=300&fit=crop&crop=center&auto=format" alt="birthday cake 2" /></div>
-      </div>
-      <div class="col-md-4 gallery-item" data-category="cupcake">
-        <div class="gallery-img"><img src="https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=400&h=300&fit=crop&crop=center&auto=format" alt="cupcake display" /></div>
-      </div>
-      <div class="col-md-4 gallery-item" data-category="special">
-        <div class="gallery-img"><img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop&crop=center&auto=format" alt="wedding cake" /></div>
-      </div>
-    </div>
-  </div>
-</section>
+<footer>Made with 💙🧡 · 5 min = 1 point · 🌐 Live on Firebase!</footer>
 
-<!-- ========== MENU PREVIEW ========== -->
-<section id="menu" class="py-5">
-  <div class="container py-3">
-    <div class="text-center mb-5">
-      <span class="badge gold-bg text-white px-3 py-2 rounded-pill">Menu</span>
-      <h2 class="section-title section-title-center mt-2">Sweet <span class="red">selection</span></h2>
-    </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card-bake">
-          <img src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=400&h=220&fit=crop&crop=center&auto=format" alt="red velvet" />
-          <div class="card-body">
-            <h5 class="card-title">Red Velvet Dream</h5>
-            <p class="text-secondary small">Cream cheese frosting, rich cocoa</p>
-            <span class="price-tag">$38</span>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-bake">
-          <img src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=400&h=220&fit=crop&crop=center&auto=format" alt="chocolate fudge" />
-          <div class="card-body">
-            <h5 class="card-title">Chocolate Fudge</h5>
-            <p class="text-secondary small">Triple chocolate, ganache drizzle</p>
-            <span class="price-tag">$42</span>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-bake">
-          <img src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=400&h=220&fit=crop&crop=center&auto=format" alt="lemon blueberry" />
-          <div class="card-body">
-            <h5 class="card-title">Lemon Blueberry</h5>
-            <p class="text-secondary small">Zesty lemon, fresh blueberries</p>
-            <span class="price-tag">$36</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="text-center mt-4">
-      <a href="#" class="btn btn-gold">Full menu <i class="bi bi-arrow-right ms-2"></i></a>
-    </div>
-  </div>
-</section>
-
-<!-- ========== CONTACT / INFO ========== -->
-<section id="contact" class="py-5 cream-bg">
-  <div class="container py-3">
-    <div class="row g-5">
-      <div class="col-md-6">
-        <span class="badge pink-bg text-white px-3 py-2 rounded-pill">Contact</span>
-        <h2 class="section-title mt-2">Let’s <span class="gold">bake</span> together</h2>
-        <p class="text-secondary">Reach out for custom orders, questions or just to say hi.</p>
-        <div class="mt-4">
-          <div class="d-flex mb-3"><i class="bi bi-geo-alt gold fs-4 me-3"></i> <span>Street name 123 - New York</span></div>
-          <div class="d-flex mb-3"><i class="bi bi-telephone gold fs-4 me-3"></i> <span>(901) 123-45678</span></div>
-          <div class="d-flex mb-3"><i class="bi bi-envelope gold fs-4 me-3"></i> <span>hello@cakeandbake.com</span></div>
-          <div class="d-flex"><i class="bi bi-clock gold fs-4 me-3"></i> <span>Mon-Sat: 9am-5pm</span></div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-4 border-0 warm-shadow rounded-4">
-          <h5 class="fw-bold">Send a message</h5>
-          <form>
-            <div class="mb-3"><input type="text" class="form-control" placeholder="Your name" /></div>
-            <div class="mb-3"><input type="email" class="form-control" placeholder="Email address" /></div>
-            <div class="mb-3"><textarea class="form-control" rows="3" placeholder="Tell us about your cake dream..."></textarea></div>
-            <button class="btn btn-gold w-100">Send <i class="bi bi-send ms-2"></i></button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ========== FOOTER ========== -->
-<footer class="footer-custom">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <h4 class="logo-font gold">Cake &amp; Bake</h4>
-        <p class="mt-2" style="color: #cbb3a5; font-size: 0.95rem;">Artisanal cakes made from scratch with love and the finest ingredients.</p>
-        <div class="d-flex gap-3 mt-3">
-          <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-          <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="social-icon"><i class="bi bi-pinterest"></i></a>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <h6 class="fw-bold gold">Quick</h6>
-        <ul class="list-unstyled">
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Gallery</a></li>
-          <li><a href="#">Menu</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">Pages</a></li>
-        </ul>
-      </div>
-      <div class="col-md-3">
-        <h6 class="fw-bold gold">Visit us</h6>
-        <p><i class="bi bi-geo-alt me-2"></i> Street name 123 - New York</p>
-        <p><i class="bi bi-telephone me-2"></i> (901) 123-45678</p>
-        <p><i class="bi bi-clock me-2"></i> Mon-Sat: 9am-5pm</p>
-      </div>
-      <div class="col-md-3">
-        <h6 class="fw-bold gold">Newsletter</h6>
-        <p style="font-size: 0.9rem;">Subscribe for sweet updates &amp; offers.</p>
-        <div class="input-group">
-          <input type="email" class="form-control" placeholder="Email" style="background: #3f2c26; border: none; color: white;" />
-          <button class="btn gold-bg text-white" type="button"><i class="bi bi-arrow-right"></i></button>
-        </div>
-      </div>
-    </div>
-    <hr class="mt-4" style="border-color: #4d3630;" />
-    <div class="text-center small" style="color: #a5877b;">
-      &copy; 2026 Cake &amp; Bake · Responsive HTML Template
-    </div>
-  </div>
-</footer>
-
-<!-- Bootstrap JS + gallery filter -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  (function() {
-    const filterBtns = document.querySelectorAll('.gallery-filter .btn');
-    const items = document.querySelectorAll('.gallery-item');
+// ============================================================
+// 🔥 FIREBASE CONFIG
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
+  authDomain: "ohoh-stream-battle.firebaseapp.com",
+  projectId: "ohoh-stream-battle",
+  storageBucket: "ohoh-stream-battle.firebasestorage.app",
+  messagingSenderId: "882579620540",
+  appId: "1:882579620540:web:b3a37322c60421120b06b9"
+};
 
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        const filter = this.dataset.filter;
-        items.forEach(item => {
-          if (filter === 'all' || item.dataset.category === filter) {
-            item.style.display = 'block';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-      });
+let dbFirestore = null;
+try {
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  dbFirestore = firebase.firestore();
+  dbFirestore.settings({ experimentalForceLongPolling: true });
+} catch(e) {
+  console.error('Firebase init error:', e);
+}
+
+// ============================================================
+// 📦 STATE — declared first, before ANY function calls
+// ============================================================
+const LS_DATA    = 'ohoh_data';
+const LS_CHAT    = 'ohoh_chat';
+const LS_SESSION = 'ohoh_session';
+
+let db = {};
+let chat = [];
+let myTeam = null;
+let myAccs = [];
+let myUsername = '';
+let sessStart = null;
+let sessSecs = 0;
+let ticker = null;
+let timerGoing = false;
+let paused = false;
+let lbFilter = {'lb-reg':'all','lb-stream':'all'};
+let earnedSet = new Set();
+let verifyInterval = null;
+let verifyTimeLeft = 900;
+let verified = false;
+let isOnline = false;
+let firebaseReady = false;
+
+// ============================================================
+// 🛠 UTILS
+// ============================================================
+function fmt(s) {
+  if (s < 0) s = 0;
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function fmtTime(s) {
+  if (s < 0) s = 0;
+  const m = Math.floor(s/60), sec = s%60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function initials(n) { return (n||'?').replace(/^@/,'').slice(0,2).toUpperCase() || '??'; }
+function tsNow() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+function safe(n) { return (n||'').replace(/\W/g,'_'); }
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function getPoints(secs) { return Math.floor(secs / 300); }
+
+let toastTimer;
+function toast(msg, ms=3500) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg; el.style.display = msg ? 'block' : 'none';
+}
+
+function scrollChats() {
+  ['chat-feed-reg','chat-feed'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.scrollTop = el.scrollHeight;
+  });
+}
+
+// ============================================================
+// 📡 STATUS
+// ============================================================
+function updateStatus(s, msg) {
+  const el = document.getElementById('status');
+  if (el) { el.className = 'status ' + s; el.textContent = msg; }
+  const badge = document.getElementById('fb-badge');
+  if (badge) {
+    if (s === 'on') { badge.textContent = '✅ Connected to Firebase'; badge.style.background = '#dcfce7'; badge.style.color = '#15803d'; }
+    else if (s === 'off') { badge.textContent = '🔴 Offline — local only'; badge.style.background = '#fee2e2'; badge.style.color = '#dc2626'; }
+  }
+}
+
+// ============================================================
+// 💾 STORAGE
+// ============================================================
+function saveLocal() {
+  try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {}
+}
+function saveLocalChat() {
+  try { localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); } catch(e) {}
+}
+function saveSession() {
+  try {
+    localStorage.setItem(LS_SESSION, JSON.stringify({
+      active: true, username: myUsername, team: myTeam, accounts: myAccs,
+      timerGoing, paused, sessSecs, verified, verifyTimeLeft
+    }));
+  } catch(e) {}
+}
+function save() {
+  saveLocal();
+  saveSession();
+  if (firebaseReady && myUsername) syncUserToFirebase(db[myUsername.toLowerCase()]);
+}
+
+function load() {
+  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
+  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
+  renderAll();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+}
+
+// ============================================================
+// 🔄 SESSION RESTORE
+// ============================================================
+function restoreSession() {
+  try {
+    const session = JSON.parse(localStorage.getItem(LS_SESSION));
+    if (!session?.active || !session.username) return;
+    myUsername    = session.username;
+    myTeam        = session.team;
+    myAccs        = session.accounts || [];
+    timerGoing    = session.timerGoing || false;
+    paused        = session.paused || false;
+    sessSecs      = session.sessSecs || 0;
+    verified      = session.verified || false;
+    verifyTimeLeft = session.verifyTimeLeft ?? 900;
+
+    // Show stream step
+    document.getElementById('s-reg').classList.remove('on');
+    document.getElementById('s-stream').classList.add('on');
+    setupStreamUI();
+
+    if (timerGoing && !paused) {
+      sessStart = Date.now() - sessSecs * 1000;
+      resumeTimers();
+    } else if (timerGoing && paused) {
+      // Session is paused
+      updatePauseUI();
+    }
+  } catch(e) {
+    console.warn('Could not restore session:', e);
+  }
+}
+
+// ============================================================
+// 🔥 FIREBASE SYNC
+// ============================================================
+async function syncUserToFirebase(userData) {
+  if (!firebaseReady || !dbFirestore || !userData) return;
+  try {
+    const key = (userData.name || myUsername).toLowerCase();
+    await dbFirestore.collection('users').doc(key).set({
+      ...userData,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch(e) { console.warn('Sync error:', e); }
+}
+
+async function pushChatMsg(msg) {
+  if (!firebaseReady || !dbFirestore) return;
+  try {
+    await dbFirestore.collection('chat').add({
+      ...msg,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-  })();
+  } catch(e) { console.warn('Chat push error:', e); }
+}
+
+function startListeners() {
+  if (!dbFirestore) return;
+
+  // Listen to users collection for live leaderboard updates
+  dbFirestore.collection('users').onSnapshot(snap => {
+    snap.forEach(doc => {
+      const data = doc.data();
+      const key = doc.id;
+      // Don't overwrite current user's live session with stale Firebase data
+      if (key === myUsername.toLowerCase() && timerGoing) return;
+      db[key] = { ...db[key], ...data };
+    });
+    saveLocal();
+    renderAll();
+  }, err => console.warn('Users listener error:', err));
+
+  // Listen to chat
+  dbFirestore.collection('chat')
+    .orderBy('timestamp', 'desc')
+    .limit(60)
+    .onSnapshot(snap => {
+      const msgs = [];
+      snap.forEach(doc => msgs.unshift(doc.data()));
+      // Merge: keep local messages not yet in Firebase
+      const fbTexts = new Set(msgs.map(m => m.text + m.ts + m.sender));
+      const localOnly = chat.filter(m => !fbTexts.has(m.text + m.ts + m.sender));
+      chat = [...msgs, ...localOnly].sort((a,b) => (a.ts||'').localeCompare(b.ts||''));
+      saveLocalChat();
+      renderChat('chat-feed-reg');
+      renderChat('chat-feed');
+      scrollChats();
+
+      const count = Object.values(db).filter(u => u.isLive).length;
+      const el = document.getElementById('online-count');
+      if (el) el.textContent = count + ' online';
+    }, err => console.warn('Chat listener error:', err));
+}
+
+async function loadFromFirebase() {
+  if (!dbFirestore) return;
+  try {
+    const snap = await dbFirestore.collection('users').get();
+    snap.forEach(doc => {
+      const key = doc.id;
+      if (key === myUsername.toLowerCase() && timerGoing) return; // don't overwrite live session
+      db[key] = { ...(db[key]||{}), ...doc.data() };
+    });
+    saveLocal();
+    renderAll();
+    startListeners();
+  } catch(e) {
+    console.warn('loadFromFirebase error:', e);
+  }
+}
+
+// ============================================================
+// 👥 TEAM PICK
+// ============================================================
+function pickTeam(team) {
+  myTeam = team;
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
+  const btn = document.getElementById('go-btn');
+  if (team === 'khem') {
+    document.getElementById('team-khem').classList.add('sel-k');
+    btn.className = 'btn btn-primary';
+    btn.textContent = '💙 Join Team Khem';
+  } else {
+    document.getElementById('team-pharan').classList.add('sel-p');
+    btn.className = 'btn btn-ora';
+    btn.textContent = '🧡 Join Team Pharan';
+  }
+  showErr('reg-err','');
+}
+
+// ============================================================
+// ➕ ADD / REMOVE ACCOUNTS
+// ============================================================
+function addAcc() {
+  const list = document.getElementById('acc-list');
+  const n = list.children.length + 1;
+  const d = document.createElement('div');
+  d.className = 'acc-item';
+  d.innerHTML = `
+    <div class="row">
+      <input type="text" class="input input-sm acc-name" placeholder="Account ${n} (e.g. @KengFan${n})"/>
+      <button class="rm-btn" onclick="rmAcc(this)">×</button>
+    </div>
+    <input type="text" class="input input-sm acc-url" placeholder="YouTube link"/>
+  `;
+  list.appendChild(d);
+}
+
+function rmAcc(btn) {
+  const list = document.getElementById('acc-list');
+  if (list.children.length > 1) btn.closest('.acc-item').remove();
+}
+
+// ============================================================
+// 🎬 GO TO STREAM PAGE
+// ============================================================
+function goStream() {
+  const username = document.getElementById('username-input').value.trim().replace(/^@/,'');
+  if (!username) { showErr('reg-err','Enter your username!'); return; }
+  if (!myTeam)   { showErr('reg-err','Choose your team first!'); return; }
+
+  const names = [...document.querySelectorAll('.acc-name')].map(i => i.value.trim().replace(/^@/,''));
+  const urls  = [...document.querySelectorAll('.acc-url')].map(i => i.value.trim());
+  const accs  = names.map((n,i) => ({name:n, url:urls[i]||''})).filter(a => a.name);
+  if (!accs.length) { showErr('reg-err','Add at least one account!'); return; }
+  showErr('reg-err','');
+
+  myUsername = username;
+  myAccs = accs;
+  timerGoing = false;
+  paused = false;
+  sessSecs = 0;
+  earnedSet = new Set();
+  verified = false;
+  verifyTimeLeft = 900;
+
+  const key = username.toLowerCase();
+  if (!db[key]) db[key] = {name:username, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+  db[key].name = username;
+  db[key].team = myTeam;
+  db[key].accounts = [...new Set([...(db[key].accounts||[]), ...accs.map(a=>a.name)])];
+  save();
+
+  document.getElementById('s-reg').classList.remove('on');
+  document.getElementById('s-stream').classList.add('on');
+  window.scrollTo(0,0);
+  setupStreamUI();
+  renderAll();
+  postSysMsg(`🎬 @${username} joined Team ${myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡'} with ${accs.length} account${accs.length>1?'s':''}!`);
+}
+
+// ============================================================
+// 🖥 STREAM UI SETUP
+// ============================================================
+function setupStreamUI() {
+  const hero = document.getElementById('sess-hero');
+  if (!hero) return;
+  hero.className = 'sess-hero ' + (myTeam === 'khem' ? 'k' : 'p');
+
+  const shTimer = document.getElementById('sh-timer');
+  const shPoints = document.getElementById('sh-points');
+  const shAccs = document.getElementById('sh-accs');
+  const shTeam = document.getElementById('sh-team');
+  const shEye = document.getElementById('sh-eye');
+
+  if (shTimer) shTimer.textContent = fmt(sessSecs);
+  if (shPoints) shPoints.textContent = '🏆 ' + getPoints(sessSecs) + ' points';
+  if (shAccs) shAccs.textContent = myAccs.map(a => '@'+a.name).join(' · ');
+  if (shTeam) shTeam.textContent = 'Team ' + (myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
+
+  const timerBtn = document.getElementById('timer-btn');
+  const statusBar = document.getElementById('status-bar');
+  const verifyBox = document.getElementById('verify-box');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resumeBtn = document.getElementById('resume-btn');
+
+  if (timerGoing && !paused) {
+    if (shEye) shEye.textContent = '🔴 LIVE';
+    if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '🔴 Timer running! Verify every 15 min!'; }
+    if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏱ RUNNING...'; }
+    if (verifyBox) { verifyBox.style.display = 'block'; }
+    if (pauseBtn) pauseBtn.style.display = 'block';
+    if (resumeBtn) resumeBtn.style.display = 'none';
+    const vt = document.getElementById('verify-timer');
+    if (vt) vt.textContent = fmtTime(Math.max(0, verifyTimeLeft));
+  } else if (timerGoing && paused) {
+    if (shEye) shEye.textContent = '⏸ PAUSED';
+    if (statusBar) { statusBar.className = 'status-bar sb-paused'; statusBar.textContent = '⏸ Timer paused — click Resume to continue!'; }
+    if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏸ PAUSED'; }
+    if (verifyBox) { verifyBox.style.display = 'block'; }
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    if (resumeBtn) resumeBtn.style.display = 'block';
+    const vt = document.getElementById('verify-timer');
+    if (vt) vt.textContent = fmtTime(Math.max(0, verifyTimeLeft));
+  } else {
+    if (shEye) shEye.textContent = '⏳ Ready';
+    if (statusBar) { statusBar.className = 'status-bar sb-wait'; statusBar.textContent = '⏳ Open tabs, log in, then click Start Timer'; }
+    if (timerBtn) { timerBtn.disabled = false; timerBtn.textContent = '▶ START TIMER'; }
+    if (verifyBox) verifyBox.style.display = 'none';
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    if (resumeBtn) resumeBtn.style.display = 'none';
+  }
+
+  // Open-tabs list — event delegation to avoid inline onclick with URLs
+  const ot = document.getElementById('open-tabs');
+  if (ot) {
+    ot.innerHTML = myAccs.map((a,i) => `
+      <div class="open-row" id="otr-${i}">
+        <div>
+          <div class="acc">@${escHtml(a.name)}</div>
+          <div class="url">${escHtml(a.url || 'No link')}</div>
+        </div>
+        <div>${a.url
+          ? `<button class="btn btn-dark btn-xs open-btn" data-url="${escHtml(a.url)}">Open ↗</button>`
+          : '<span style="font-size:11px;color:#94a3b8;">No link</span>'}</div>
+      </div>
+    `).join('');
+
+    ot.onclick = function(e) {
+      const btn = e.target.closest('.open-btn');
+      if (!btn) return;
+      const url = btn.dataset.url;
+      if (url) {
+        window.open(url, '_blank', 'noopener');
+        btn.outerHTML = '<span style="font-size:11px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:2px 8px;">✅ Opened</span>';
+        toast('🔗 Tab opened!', 1800);
+      }
+    };
+  }
+
+  const al = document.getElementById('acc-live');
+  if (al) {
+    al.innerHTML = myAccs.map(a => `
+      <div class="acc-live-row">
+        <div class="left">
+          <div class="avatar ${myTeam==='khem'?'k':'p'}">${initials(a.name)}</div>
+          <div class="name">@${escHtml(a.name)}</div>
+        </div>
+        <div class="time" id="alt-${safe(a.name)}">${fmt(sessSecs)}</div>
+      </div>
+    `).join('');
+  }
+
+  ['b15','b30','b60','bmulti','bverify'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) earnedSet.has(id) ? el.classList.add('got') : el.classList.remove('got');
+  });
+
+  // Hide delete confirmation card
+  document.getElementById('delete-session-card').style.display = 'none';
+}
+
+// ============================================================
+// 🔗 OPEN ALL TABS
+// ============================================================
+function openAllTabs() {
+  const btns = document.querySelectorAll('#open-tabs .open-btn');
+  if (!btns.length) { toast('No links to open!', 2000); return; }
+  btns.forEach(btn => {
+    const url = btn.dataset.url;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
+  toast(`🔗 ${btns.length} tab${btns.length>1?'s':''} opened!`, 2000);
+}
+
+// ============================================================
+// ▶ TIMER
+// ============================================================
+function startTimer() {
+  if (timerGoing && !paused) return;
+  if (timerGoing && paused) {
+    resumeSession();
+    return;
+  }
+  timerGoing = true;
+  paused = false;
+  sessStart = Date.now() - sessSecs * 1000;
+  verified = false;
+  verifyTimeLeft = 900;
+
+  const shEye = document.getElementById('sh-eye');
+  const statusBar = document.getElementById('status-bar');
+  const timerBtn = document.getElementById('timer-btn');
+  const verifyBox = document.getElementById('verify-box');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resumeBtn = document.getElementById('resume-btn');
+
+  if (shEye) shEye.textContent = '🔴 LIVE';
+  if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '🔴 Timer running! Verify every 15 min!'; }
+  if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏱ RUNNING...'; }
+  if (verifyBox) { verifyBox.style.display = 'block'; }
+  if (pauseBtn) pauseBtn.style.display = 'block';
+  if (resumeBtn) resumeBtn.style.display = 'none';
+  const vt = document.getElementById('verify-timer');
+  if (vt) vt.textContent = '15:00';
+
+  resumeTimers();
+  save();
+  toast('🎬 Timer started! Keep streaming!');
+  postSysMsg(`⏱ @${myUsername} started streaming!`);
+}
+
+function resumeTimers() {
+  if (ticker) clearInterval(ticker);
+  if (verifyInterval) clearInterval(verifyInterval);
+  ticker = setInterval(tick, 1000);
+  verifyInterval = setInterval(verifyTick, 1000);
+}
+
+function verifyTick() {
+  if (!timerGoing || paused) return;
+  verifyTimeLeft = Math.max(0, verifyTimeLeft - 1);
+  const vt = document.getElementById('verify-timer');
+  if (vt) vt.textContent = fmtTime(verifyTimeLeft);
+  if (verifyTimeLeft === 0) {
+    const statusBar = document.getElementById('status-bar');
+    const verifyBox = document.getElementById('verify-box');
+    if (statusBar) { statusBar.className = 'status-bar sb-verify'; statusBar.textContent = '⏰ VERIFY NOW — click the button below!'; }
+    if (verifyBox) { verifyBox.style.borderColor = '#dc2626'; verifyBox.style.background = '#fee2e2'; }
+    toast('⏰ VERIFY NOW!', 5000);
+  }
+}
+
+function verifyStream() {
+  if (!timerGoing || paused) return;
+  verified = true; verifyTimeLeft = 900;
+  const vt = document.getElementById('verify-timer');
+  if (vt) vt.textContent = '15:00';
+  const verifyBox = document.getElementById('verify-box');
+  if (verifyBox) { verifyBox.style.borderColor = '#a78bfa'; verifyBox.style.background = '#ede9fe'; }
+  const statusBar = document.getElementById('status-bar');
+  if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '✅ Verified! Next check in 15 min.'; }
+  tryBadge('bverify','✅ Verified streamer');
+  const key = myUsername.toLowerCase();
+  if (db[key]) { db[key].verifications = (db[key].verifications||0) + 1; save(); }
+  toast('✅ Verified! Keep streaming!', 2000);
+  postSysMsg(`✅ @${myUsername} verified they're still streaming!`);
+}
+
+function tick() {
+  if (!timerGoing || paused) return;
+  if (verified || verifyTimeLeft > 0) {
+    sessSecs = Math.floor((Date.now() - sessStart) / 1000);
+    const shTimer = document.getElementById('sh-timer');
+    const shPoints = document.getElementById('sh-points');
+    if (shTimer) shTimer.textContent = fmt(sessSecs);
+    if (shPoints) shPoints.textContent = '🏆 ' + getPoints(sessSecs) + ' points';
+    myAccs.forEach(a => {
+      const el = document.getElementById('alt-' + safe(a.name));
+      if (el) el.textContent = fmt(sessSecs);
+    });
+    if (sessSecs >= 900)  tryBadge('b15','⏱ 15 min warrior');
+    if (sessSecs >= 1800) tryBadge('b30','🔥 30 min streamer');
+    if (sessSecs >= 3600) tryBadge('b60','👑 1 hour legend');
+    if (myAccs.length >= 2) tryBadge('bmulti','🖥 Multi-account pro');
+    if (sessSecs % 20 === 0) { saveLive(); renderAll(); }
+    if (sessSecs % 30 === 0) save();
+  }
+}
+
+function tryBadge(id, msg) {
+  if (!earnedSet.has(id)) {
+    earnedSet.add(id);
+    const el = document.getElementById(id);
+    if (el) el.classList.add('got');
+    save();
+    toast(`🎖 ${msg}!`, 4000);
+    postSysMsg(`🎖 @${myUsername} earned the "${msg}" badge!`);
+  }
+}
+
+function saveLive() {
+  const key = myUsername.toLowerCase();
+  if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+  db[key].liveSecs = paused ? 0 : sessSecs;
+  db[key].isLive = timerGoing && !paused;
+  save();
+}
+
+// ============================================================
+// 🛠 SESSION CONTROLS - PAUSE, RESUME, SAVE, DELETE
+// ============================================================
+function pauseSession() {
+  if (!timerGoing || paused) return;
+  paused = true;
+  if (ticker) clearInterval(ticker);
+  if (verifyInterval) clearInterval(verifyInterval);
+  ticker = null;
+  verifyInterval = null;
+
+  const shEye = document.getElementById('sh-eye');
+  const statusBar = document.getElementById('status-bar');
+  const timerBtn = document.getElementById('timer-btn');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resumeBtn = document.getElementById('resume-btn');
+
+  if (shEye) shEye.textContent = '⏸ PAUSED';
+  if (statusBar) { statusBar.className = 'status-bar sb-paused'; statusBar.textContent = '⏸ Timer paused — click Resume to continue!'; }
+  if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏸ PAUSED'; }
+  if (pauseBtn) pauseBtn.style.display = 'none';
+  if (resumeBtn) resumeBtn.style.display = 'block';
+
+  // Update live status
+  const key = myUsername.toLowerCase();
+  if (db[key]) { db[key].isLive = false; db[key].liveSecs = 0; }
+  save();
+  renderAll();
+  toast('⏸ Session paused!', 2000);
+  postSysMsg(`⏸ @${myUsername} paused their stream`);
+}
+
+function resumeSession() {
+  if (!timerGoing || !paused) return;
+  paused = false;
+  sessStart = Date.now() - sessSecs * 1000;
+  resumeTimers();
+
+  const shEye = document.getElementById('sh-eye');
+  const statusBar = document.getElementById('status-bar');
+  const timerBtn = document.getElementById('timer-btn');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resumeBtn = document.getElementById('resume-btn');
+  const verifyBox = document.getElementById('verify-box');
+
+  if (shEye) shEye.textContent = '🔴 LIVE';
+  if (statusBar) { statusBar.className = 'status-bar sb-live'; statusBar.textContent = '🔴 Timer running! Verify every 15 min!'; }
+  if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏱ RUNNING...'; }
+  if (pauseBtn) pauseBtn.style.display = 'block';
+  if (resumeBtn) resumeBtn.style.display = 'none';
+  if (verifyBox) verifyBox.style.display = 'block';
+
+  // Update live status
+  const key = myUsername.toLowerCase();
+  if (db[key]) { db[key].isLive = true; db[key].liveSecs = sessSecs; }
+  save();
+  renderAll();
+  toast('▶️ Session resumed!', 2000);
+  postSysMsg(`▶️ @${myUsername} resumed their stream`);
+}
+
+function saveSessionProgress() {
+  if (!timerGoing) {
+    toast('No active session to save', 2000);
+    return;
+  }
+  const elapsed = sessSecs;
+  if (elapsed > 0) {
+    const key = myUsername.toLowerCase();
+    if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+    db[key].totalSecs = (db[key].totalSecs||0) + elapsed;
+    db[key].sessions = (db[key].sessions||0) + 1;
+    if (!paused) {
+      db[key].isLive = true;
+      db[key].liveSecs = elapsed;
+    }
+    save();
+    const pts = getPoints(elapsed);
+    toast(`💾 Progress saved! ${fmt(elapsed)} (${pts} pts)`, 3000);
+    postSysMsg(`💾 @${myUsername} saved their progress (${fmt(elapsed)}, ${pts} pts)`);
+    // Reset session counter after saving
+    sessSecs = 0;
+    if (!paused) {
+      sessStart = Date.now();
+    }
+    earnedSet = new Set();
+    renderAll();
+    setupStreamUI();
+  } else {
+    toast('No progress to save yet', 2000);
+  }
+}
+
+function deleteSession() {
+  document.getElementById('delete-session-card').style.display = 'block';
+}
+
+function confirmDeleteSession() {
+  document.getElementById('delete-session-card').style.display = 'none';
+  // Clear session data
+  clearTimers();
+  const key = myUsername.toLowerCase();
+  if (db[key]) {
+    db[key].isLive = false;
+    db[key].liveSecs = 0;
+    save();
+  }
+  // Remove session from localStorage
+  try { localStorage.removeItem(LS_SESSION); } catch(e) {}
+  // Reset state
+  timerGoing = false;
+  paused = false;
+  sessSecs = 0;
+  myTeam = null;
+  myAccs = [];
+  myUsername = '';
+  earnedSet = new Set();
+  verified = false;
+  verifyTimeLeft = 900;
+  
+  // Hide delete confirmation
+  document.getElementById('delete-session-card').style.display = 'none';
+  
+  // Return to registration
+  document.getElementById('s-stream').classList.remove('on');
+  document.getElementById('s-reg').classList.add('on');
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
+  const btn = document.getElementById('go-btn');
+  if (btn) { btn.className = 'btn btn-primary'; btn.textContent = '🎬 Start Streaming Battle!'; }
+  renderAll();
+  window.scrollTo(0,0);
+  toast('🗑 Session deleted!', 3000);
+  postSysMsg(`🗑 @${myUsername} deleted their session`);
+}
+
+function updatePauseUI() {
+  const shEye = document.getElementById('sh-eye');
+  const statusBar = document.getElementById('status-bar');
+  const timerBtn = document.getElementById('timer-btn');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resumeBtn = document.getElementById('resume-btn');
+
+  if (shEye) shEye.textContent = '⏸ PAUSED';
+  if (statusBar) { statusBar.className = 'status-bar sb-paused'; statusBar.textContent = '⏸ Timer paused — click Resume to continue!'; }
+  if (timerBtn) { timerBtn.disabled = true; timerBtn.textContent = '⏸ PAUSED'; }
+  if (pauseBtn) pauseBtn.style.display = 'none';
+  if (resumeBtn) resumeBtn.style.display = 'block';
+}
+
+// ============================================================
+// ⏹ STOP / BACK / RESET
+// ============================================================
+function stopStream() {
+  if (!confirm('Stop your session and save your time?')) return;
+  clearTimers();
+  const elapsed = timerGoing ? sessSecs : 0;
+  if (elapsed > 0) {
+    const key = myUsername.toLowerCase();
+    if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+    db[key].totalSecs   = (db[key].totalSecs||0) + elapsed;
+    db[key].sessions    = (db[key].sessions||0) + 1;
+    db[key].isLive      = false;
+    db[key].liveSecs    = 0;
+    save();
+    const pts = getPoints(elapsed);
+    postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} (${pts} pts) — amazing!`);
+    toast(`✅ ${fmt(elapsed)} saved! 🏆 ${pts} points!`, 5000);
+  }
+  resetSession();
+}
+
+function goBack() {
+  if (timerGoing && !paused) {
+    if (!confirm('Pause timer and go back? Your progress is saved.')) return;
+    pauseSession();
+  }
+  document.getElementById('s-stream').classList.remove('on');
+  document.getElementById('s-reg').classList.add('on');
+  renderAll();
+  window.scrollTo(0,0);
+}
+
+function clearTimers() {
+  if (ticker) clearInterval(ticker);
+  if (verifyInterval) clearInterval(verifyInterval);
+  ticker = null;
+  verifyInterval = null;
+}
+
+function resetSession() {
+  clearTimers();
+  timerGoing = false;
+  paused = false;
+  sessSecs = 0;
+  myTeam = null;
+  myAccs = [];
+  myUsername = '';
+  earnedSet = new Set();
+  verified = false;
+  verifyTimeLeft = 900;
+  try { localStorage.removeItem(LS_SESSION); } catch(e) {}
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
+  const btn = document.getElementById('go-btn');
+  if (btn) { btn.className = 'btn btn-primary'; btn.textContent = '🎬 Start Streaming Battle!'; }
+  const verifyBox = document.getElementById('verify-box');
+  if (verifyBox) verifyBox.style.display = 'none';
+  document.getElementById('s-stream').classList.remove('on');
+  document.getElementById('s-reg').classList.add('on');
+  renderAll();
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// 💬 CHAT
+// ============================================================
+function postSysMsg(txt) {
+  const m = {type:'sys', sender:'System', team:'system', text:txt, ts:tsNow()};
+  chat.push(m);
+  saveLocalChat();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+  pushChatMsg(m);
+}
+
+function sendMsg(source) {
+  const inputId = source === 'reg' ? 'chat-input-reg' : 'chat-input';
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  const txt = inp.value.trim();
+  if (!txt) return;
+  if (!myUsername) { toast('Register first to chat!'); return; }
+  inp.value = '';
+  const m = {type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()};
+  chat.push(m);
+  saveLocalChat();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+  pushChatMsg(m);
+}
+
+function sendReact(txt) {
+  if (!myUsername) { toast('Register first to react!'); return; }
+  const m = {type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()};
+  chat.push(m);
+  saveLocalChat();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+  pushChatMsg(m);
+}
+
+function renderChat(feedId) {
+  const feed = document.getElementById(feedId);
+  if (!feed) return;
+  const atBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 80;
+  const msgs = chat.slice(-60);
+  if (!msgs.length) {
+    feed.innerHTML = '<div class="chat-msg sys"><span class="chat-sys">🌐 Welcome to OhOh Stream Battle!</span></div>';
+    return;
+  }
+  feed.innerHTML = msgs.map(m => {
+    const isSys = m.type === 'sys' || m.team === 'system' || m.sender === 'System';
+    if (isSys) return `<div class="chat-msg sys"><span class="chat-sys">${escHtml(m.text)}</span></div>`;
+    const cls = m.team === 'khem' ? 'k' : 'p';
+    return `<div class="chat-msg">
+      <div class="chat-avatar ${cls}">${initials(m.sender)}</div>
+      <div class="chat-bubble-wrap">
+        <div class="chat-meta">
+          <span class="chat-sender ${cls}">@${escHtml(m.sender)}</span>
+          <span class="chat-ts">${m.ts || ''}</span>
+        </div>
+        <div class="chat-bubble ${cls}">${escHtml(m.text)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if (atBottom) feed.scrollTop = feed.scrollHeight;
+}
+
+// ============================================================
+// 🏆 RENDER SCOREBOARD + LEADERBOARD
+// ============================================================
+function renderVS() {
+  let ks=0,kn=0,kp=0,ps=0,pn=0,pp=0;
+  Object.values(db).forEach(u => {
+    let secs = (u.totalSecs||0) + (u.isLive ? (u.liveSecs||0) : 0);
+    if (u.team === 'khem') { ks+=secs; kn++; kp+=getPoints(secs); }
+    else                   { ps+=secs; pn++; pp+=getPoints(secs); }
+  });
+  if (timerGoing && myTeam && myUsername && !paused) {
+    if (myTeam === 'khem') kp += getPoints(sessSecs);
+    else                   pp += getPoints(sessSecs);
+  }
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('k-points', kp); set('p-points', pp);
+  set('k-time', fmt(ks)); set('p-time', fmt(ps));
+  set('k-meta', kn + ' streamer' + (kn!==1?'s':'')); set('p-meta', pn + ' streamer' + (pn!==1?'s':''));
+  set('k-count', kn + ' member' + (kn!==1?'s':'')); set('p-count', pn + ' member' + (pn!==1?'s':''));
+  ['team-k-points','team-k-points-live'].forEach(id => set(id, kp));
+  ['team-p-points','team-p-points-live'].forEach(id => set(id, pp));
+
+  ['team-k-box','team-p-box','team-k-box-live','team-p-box-live'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('lead-k','lead-p');
+  });
+  if      (kp > pp) { ['team-k-box','team-k-box-live'].forEach(id => document.getElementById(id)?.classList.add('lead-k')); }
+  else if (pp > kp) { ['team-p-box','team-p-box-live'].forEach(id => document.getElementById(id)?.classList.add('lead-p')); }
+
+  const liveCount = Object.values(db).filter(u => u.isLive).length;
+  set('live-count', '👀 ' + liveCount + ' live');
+
+  const total = ks + ps || 1;
+  const kpct  = Math.max(5, Math.min(95, Math.round(ks/total*100)));
+  const bpk = document.getElementById('bp-k'); if(bpk) bpk.style.width = kpct + '%';
+  const bpp = document.getElementById('bp-p'); if(bpp) bpp.style.width = (100-kpct) + '%';
+
+  const vd = document.getElementById('verdict');
+  if (vd) {
+    if (ks===0 && ps===0)  { vd.className='verdict tie'; vd.textContent='⚔️ Ready for battle!'; }
+    else if (kp > pp)       { vd.className='verdict k';   vd.textContent=`💙 Team Khem leads by ${kp-pp} point${kp-pp!==1?'s':''}!`; }
+    else if (pp > kp)       { vd.className='verdict p';   vd.textContent=`🧡 Team Pharan leads by ${pp-kp} point${pp-kp!==1?'s':''}!`; }
+    else                    { vd.className='verdict tie'; vd.textContent='⚔️ Perfectly tied! Keep streaming!'; }
+  }
+}
+
+function renderLB(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const f = lbFilter[id] || 'all';
+  let entries = Object.entries(db).map(([k,u]) => {
+    const secs = (u.totalSecs||0) + (u.isLive ? (u.liveSecs||0) : 0);
+    return {...u, key:k, secs};
+  });
+  if (f === 'khem')   entries = entries.filter(u => u.team === 'khem');
+  if (f === 'pharan') entries = entries.filter(u => u.team === 'pharan');
+  entries.sort((a,b) => b.secs - a.secs);
+  if (!entries.length) { el.innerHTML = '<div class="lb-empty">No streamers yet — be the first! 🎬</div>'; return; }
+  const rk = ['r1','r2','r3'];
+  el.innerHTML = entries.slice(0,20).map((u,i) => {
+    const cls      = u.team === 'khem' ? 'k' : 'p';
+    const medal    = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    const tpill    = u.team==='khem'?'<span class="pill pill-k">KHEM</span>':'<span class="pill pill-p">PHARAN</span>';
+    const livepill = u.isLive ? '<span class="pill pill-live">LIVE</span>' : '';
+    const mepill   = (myUsername && u.key===myUsername.toLowerCase()) ? '<span class="pill pill-you">YOU</span>' : '';
+    const vpill    = u.verifications>0 ? `<span class="pill pill-verify">✅${u.verifications}</span>` : '';
+    const pausedpill = (myUsername && u.key===myUsername.toLowerCase() && paused) ? '<span class="pill pill-paused">⏸ PAUSED</span>' : '';
+    return `<div class="lb-entry ${cls}">
+      <div class="lb-rank ${i<3?rk[i]:''}">${medal}</div>
+      <div class="lb-avatar ${cls}">${initials(u.name||'')}</div>
+      <div class="lb-body">
+        <div class="lb-name">@${escHtml(u.name||'')}${tpill}${livepill}${mepill}${vpill}${pausedpill}</div>
+        <div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts · ${u.verifications||0} verifs</div>
+      </div>
+      <div class="lb-time">
+        <div class="lb-points">🏆 ${getPoints(u.secs)}</div>
+        <div class="lb-time-small">${fmt(u.secs)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAll() { renderVS(); renderLB('lb-reg'); renderLB('lb-stream'); }
+
+function lbSwitch(el, f, id) {
+  lbFilter[id] = f;
+  el.closest('.lb-tabs').querySelectorAll('.lb-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderLB(id);
+}
+
+// ============================================================
+// 🚀 BOOT — runs LAST, after all functions are defined
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
+  // 1. Load localStorage first — works offline immediately
+  load();
+
+  // 2. Restore any active session
+  restoreSession();
+
+  // 3. Initial render
+  renderAll();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+
+  // 4. Try Firebase — non-blocking
+  if (dbFirestore) {
+    dbFirestore.collection('users').limit(1).get()
+      .then(() => {
+        firebaseReady = true; isOnline = true;
+        updateStatus('on', '🟢 Online');
+        toast('🌐 Connected to Firebase!', 2000);
+        loadFromFirebase();
+      })
+      .catch(err => {
+        console.warn('Firebase offline:', err);
+        updateStatus('off', '🔴 Offline — using local data');
+      });
+  } else {
+    updateStatus('off', '🔴 Offline');
+  }
+
+  // 5. Save session on close
+  window.addEventListener('beforeunload', () => {
+    if (!timerGoing || !myUsername) return;
+    if (ticker) clearInterval(ticker);
+    const key = myUsername.toLowerCase();
+    if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+    db[key].totalSecs = (db[key].totalSecs||0) + sessSecs;
+    db[key].sessions  = (db[key].sessions||0) + 1;
+    db[key].isLive    = false; db[key].liveSecs = 0;
+    try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {}
+    try { localStorage.removeItem(LS_SESSION); } catch(e) {}
+  });
+});
 </script>
 </body>
 </html>
