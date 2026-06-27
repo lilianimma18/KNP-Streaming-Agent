@@ -105,7 +105,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a202
 .open-tabs{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;}
 .open-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;}
 .open-row .acc{font-weight:700;font-size:13px;}
-.open-row .url{font-size:10px;color:#94a3b8;margin-top:1px;}
+.open-row .url{font-size:10px;color:#94a3b8;margin-top:1px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .acc-live{display:flex;flex-direction:column;gap:6px;}
 .acc-live-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;}
 .acc-live-row .left{display:flex;align-items:center;gap:8px;}
@@ -151,7 +151,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a202
 .pill-you{background:#0f1923;color:#fff;}
 .pill-verify{background:#7c3aed;color:#fff;}
 .lb-empty{text-align:center;padding:2rem;color:#94a3b8;font-size:13px;}
-.chat-wrap{display:flex;flex-direction:column;height:300px;}
+.chat-wrap{display:flex;flex-direction:column;height:320px;}
 .chat-feed{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:6px;}
 .chat-feed::-webkit-scrollbar{width:4px;}
 .chat-feed::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px;}
@@ -162,6 +162,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a202
 .chat-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;}
 .chat-avatar.k{background:#1565c0;}
 .chat-avatar.p{background:#e65100;}
+.chat-avatar.sys{background:#94a3b8;}
 .chat-bubble-wrap{display:flex;flex-direction:column;gap:2px;max-width:calc(100% - 38px);}
 .chat-meta{display:flex;align-items:center;gap:5px;}
 .chat-sender{font-size:11px;font-weight:700;}
@@ -255,7 +256,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
     </div>
     <div class="info-box">
       <div class="title">🌐 Online Mode — Real-Time!</div>
-      <div class="text"><strong>Everyone can see each other in real-time!</strong><br>• Live leaderboard • Global chat • See who's LIVE<br><span style="background:#dcfce7;padding:2px 10px;border-radius:4px;font-weight:700;color:#15803d;">✅ Connected to Firebase</span></div>
+      <div class="text"><strong>Everyone can see each other in real-time!</strong><br>• Live leaderboard • Global chat • See who's LIVE<br><span style="background:#dcfce7;padding:2px 10px;border-radius:4px;font-weight:700;color:#15803d;" id="fb-badge">⏳ Connecting to Firebase...</span></div>
     </div>
     <div class="info-box" style="background:#f0fdf4;border-color:#86efac;">
       <div class="title" style="color:#16a34a;">🎯 Points: 1 point = 5 minutes</div>
@@ -305,8 +306,8 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 
   <div class="card">
     <div class="card-header">🏆 Global Leaderboard <span class="live-count" id="live-count">👀 0 live</span></div>
-    <div class="lb-team-header" id="team-header">
-      <div class="lb-team-box lead-k" id="team-k-box"><div class="tb-name">💙 Khem</div><div class="tb-points k" id="team-k-points">0</div></div>
+    <div class="lb-team-header">
+      <div class="lb-team-box" id="team-k-box"><div class="tb-name">💙 Khem</div><div class="tb-points k" id="team-k-points">0</div></div>
       <div class="lb-team-box" id="team-p-box"><div class="tb-name">🧡 Pharan</div><div class="tb-points p" id="team-p-points">0</div></div>
     </div>
     <div class="lb-tabs">
@@ -318,11 +319,9 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
   </div>
 
   <div class="card">
-    <div class="card-header">💬 Global Chat <span class="online-count">● Live</span></div>
+    <div class="card-header">💬 Global Chat <span class="online-count" id="online-count-reg">● Live</span></div>
     <div class="chat-wrap">
-      <div class="chat-feed" id="chat-feed-reg">
-        <div class="chat-msg sys"><span class="chat-sys">🌐 Welcome to the OhOh Stream Battle!</span></div>
-      </div>
+      <div class="chat-feed" id="chat-feed-reg"></div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chat-input-reg" placeholder="Chat with everyone..." onkeydown="if(event.key==='Enter')sendMsg('reg')"/>
         <button class="chat-send" onclick="sendMsg('reg')">
@@ -383,8 +382,8 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 
   <div class="card">
     <div class="card-header">🏆 Live Leaderboard</div>
-    <div class="lb-team-header" id="team-header-live">
-      <div class="lb-team-box lead-k" id="team-k-box-live"><div class="tb-name">💙 Khem</div><div class="tb-points k" id="team-k-points-live">0</div></div>
+    <div class="lb-team-header">
+      <div class="lb-team-box" id="team-k-box-live"><div class="tb-name">💙 Khem</div><div class="tb-points k" id="team-k-points-live">0</div></div>
       <div class="lb-team-box" id="team-p-box-live"><div class="tb-name">🧡 Pharan</div><div class="tb-points p" id="team-p-points-live">0</div></div>
     </div>
     <div class="lb-tabs">
@@ -415,7 +414,7 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
     </div>
   </div>
 
-  <button class="btn btn-danger" onclick="stopStream()">⏹ Stop & save</button>
+  <button class="btn btn-danger" style="margin-top:.5rem;" onclick="stopStream()">⏹ Stop & Save Session</button>
 </div>
 
 </div>
@@ -424,72 +423,85 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG
+// 🔥 FIREBASE CONFIG — real credentials, not env vars
 // ============================================================
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
+  apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
+  authDomain: "ohoh-stream-battle.firebaseapp.com",
+  projectId: "ohoh-stream-battle",
+  storageBucket: "ohoh-stream-battle.firebasestorage.app",
+  messagingSenderId: "882579620540",
+  appId: "1:882579620540:web:b3a37322c60421120b06b9"
 };
 
-// Initialize Firebase with error handling
 let dbFirestore;
 try {
-  firebase.initializeApp(firebaseConfig);
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   dbFirestore = firebase.firestore();
-  console.log('🔥 Firebase initialized successfully');
-} catch (e) {
-  console.error('❌ Firebase init error:', e);
+  dbFirestore.settings({ experimentalForceLongPolling: true }); // helps in some envs
+} catch(e) {
+  console.error('Firebase init error:', e);
 }
 
 // ============================================================
-// 📡 CONNECTION STATUS
+// 📡 STATUS
 // ============================================================
 let isOnline = false;
 let firebaseReady = false;
 
-function updateStatus(status, msg) {
+function updateStatus(s, msg) {
   const el = document.getElementById('status');
-  if (el) {
-    el.className = 'status ' + status;
-    el.textContent = msg;
+  if (el) { el.className = 'status ' + s; el.textContent = msg; }
+  const badge = document.getElementById('fb-badge');
+  if (badge) {
+    if (s === 'on') { badge.textContent = '✅ Connected to Firebase'; badge.style.background = '#dcfce7'; badge.style.color = '#15803d'; }
+    else if (s === 'off') { badge.textContent = '🔴 Offline — local only'; badge.style.background = '#fee2e2'; badge.style.color = '#dc2626'; }
   }
 }
 
-// Try to connect to Firebase
+// Always restore session and render immediately (works offline too)
+restoreSession();
+renderAll();
+renderChat('chat-feed-reg');
+renderChat('chat-feed');
+scrollChats();
+
 if (dbFirestore) {
-  dbFirestore.collection('users').limit(1).onSnapshot(
-    () => {
-      if (!firebaseReady) {
-        firebaseReady = true;
-        isOnline = true;
-        updateStatus('on', '🟢 Online');
-        toast('🌐 Connected to Firebase!', 2000);
-        loadFromFirebase();
-      }
-    },
-    (error) => {
-      isOnline = false;
-      firebaseReady = false;
+  // Ping using users collection (more likely to exist and pass security rules)
+  dbFirestore.collection('users').limit(1).get()
+    .then(() => {
+      firebaseReady = true; isOnline = true;
+      updateStatus('on', '🟢 Online');
+      toast('🌐 Connected to Firebase!', 2000);
+      loadFromFirebase();
+    })
+    .catch(err => {
+      console.warn('Firebase connection failed:', err);
+      isOnline = false; firebaseReady = false;
       updateStatus('off', '🔴 Offline');
-      console.warn('Firebase connection error:', error);
-      // Still load local data
-      load();
-    }
-  );
+      // load local data (session already restored above)
+      try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
+      try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
+      renderAll();
+      renderChat('chat-feed-reg');
+      renderChat('chat-feed');
+      scrollChats();
+    });
 } else {
   updateStatus('off', '🔴 Offline');
-  load();
+  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
+  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
+  renderAll();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
 }
 
 // ============================================================
-// 📡 SYNC FUNCTIONS
+// 📡 SYNC USER
 // ============================================================
 async function syncUserToFirebase(userData) {
-  if (!firebaseReady || !isOnline || !dbFirestore || !userData?.name) return;
+  if (!dbFirestore || !userData?.name) return;
   try {
     await dbFirestore.collection('users').doc(userData.name.toLowerCase()).set({
       name: userData.name,
@@ -502,89 +514,93 @@ async function syncUserToFirebase(userData) {
       accounts: userData.accounts || [],
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
-  } catch(e) { console.error('Sync user error:', e); }
+  } catch(e) { console.warn('Sync user error:', e); }
 }
 
-async function syncChatToFirebase(chatData) {
-  if (!firebaseReady || !isOnline || !dbFirestore || !chatData?.text) return;
+// ============================================================
+// 📡 SYNC CHAT MESSAGE — called immediately on send
+// ============================================================
+async function pushChatMsg(msg) {
+  if (!dbFirestore) return;
   try {
     await dbFirestore.collection('chat').add({
-      sender: chatData.sender || 'System',
-      team: chatData.team || 'system',
-      text: chatData.text,
+      type: msg.type || 'msg',
+      sender: msg.sender || 'System',
+      team: msg.team || 'system',
+      text: msg.text,
+      ts: msg.ts || tsNow(),
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-  } catch(e) { console.error('Sync chat error:', e); }
+  } catch(e) { console.warn('Push chat error:', e); }
 }
 
 // ============================================================
 // 📡 REAL-TIME LISTENERS
 // ============================================================
+let unsubUsers = null, unsubChat = null;
+
 function startListeners() {
   if (!dbFirestore) return;
-  dbFirestore.collection('users').onSnapshot((snapshot) => {
-    let changed = false;
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (!db[doc.id] || JSON.stringify(db[doc.id]) !== JSON.stringify(data)) {
-        db[doc.id] = data;
-        changed = true;
-      }
-    });
-    if (changed) { save(); renderAll(); }
-  }, (error) => {
-    console.warn('User listener error:', error);
-  });
 
-  dbFirestore.collection('chat').orderBy('timestamp', 'desc').limit(50).onSnapshot((snapshot) => {
-    const messages = [];
-    snapshot.forEach(doc => messages.push(doc.data()));
-    const newMessages = messages.reverse();
-    if (newMessages.length > chat.length) {
-      chat = newMessages;
-      saveChat();
+  // Users — update db and re-render when anything changes
+  if (unsubUsers) unsubUsers();
+  unsubUsers = dbFirestore.collection('users').onSnapshot(snap => {
+    snap.forEach(doc => { db[doc.id] = doc.data(); });
+    saveLocal();
+    renderAll();
+  }, err => console.warn('User listener:', err));
+
+  // Chat — always replace local chat with Firestore truth
+  if (unsubChat) unsubChat();
+  unsubChat = dbFirestore.collection('chat')
+    .orderBy('timestamp', 'asc')
+    .limitToLast(80)
+    .onSnapshot(snap => {
+      const msgs = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (d.text) msgs.push(d);
+      });
+      chat = msgs;
+      saveLocalChat();
       renderChat('chat-feed-reg');
       renderChat('chat-feed');
-      setTimeout(() => {
-        ['chat-feed-reg', 'chat-feed'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.scrollTop = el.scrollHeight;
-        });
-      }, 100);
-    }
-  }, (error) => {
-    console.warn('Chat listener error:', error);
-  });
+      scrollChats();
+    }, err => console.warn('Chat listener:', err));
 }
 
 // ============================================================
-// 📡 LOAD FROM FIREBASE
+// 📡 INITIAL LOAD FROM FIREBASE
 // ============================================================
 async function loadFromFirebase() {
-  if (!firebaseReady || !isOnline || !dbFirestore) return;
+  if (!dbFirestore) return;
   try {
-    const userSnap = await dbFirestore.collection('users').get();
+    const [userSnap, chatSnap] = await Promise.all([
+      dbFirestore.collection('users').get(),
+      dbFirestore.collection('chat').orderBy('timestamp', 'asc').limitToLast(80).get()
+    ]);
     userSnap.forEach(doc => { db[doc.id] = doc.data(); });
-    save();
-
-    const chatSnap = await dbFirestore.collection('chat').orderBy('timestamp', 'desc').limit(50).get();
-    const messages = [];
-    chatSnap.forEach(doc => messages.push(doc.data()));
-    chat = messages.reverse();
-    saveChat();
-
+    const msgs = [];
+    chatSnap.forEach(doc => { const d = doc.data(); if (d.text) msgs.push(d); });
+    chat = msgs;
+    saveLocal();
+    saveLocalChat();
     startListeners();
     renderAll();
     renderChat('chat-feed-reg');
     renderChat('chat-feed');
-  } catch(e) { console.error('Load error:', e); }
+    scrollChats();
+  } catch(e) {
+    console.warn('loadFromFirebase error:', e);
+    load(); // fallback to local
+  }
 }
 
 // ============================================================
-// 📦 LOCAL DATA
+// 📦 LOCAL STATE
 // ============================================================
-const LS_DATA = 'ohoh_data';
-const LS_CHAT = 'ohoh_chat';
+const LS_DATA    = 'ohoh_data';
+const LS_CHAT    = 'ohoh_chat';
 const LS_SESSION = 'ohoh_session';
 let db = {};
 let chat = [];
@@ -601,115 +617,128 @@ let verifyInterval = null;
 let verifyTimeLeft = 900;
 let verified = false;
 
-function load(){
-  try{ const r=localStorage.getItem(LS_DATA); if(r) db=JSON.parse(r); }catch(e){ db={}; }
-  try{ const r=localStorage.getItem(LS_CHAT); if(r) chat=JSON.parse(r); }catch(e){ chat=[]; }
-  try{
+// Full load (offline fallback) — restoreSession already called at boot
+function load() {
+  try { const r = localStorage.getItem(LS_DATA); if (r) db = JSON.parse(r); } catch(e) { db = {}; }
+  try { const r = localStorage.getItem(LS_CHAT); if (r) chat = JSON.parse(r); } catch(e) { chat = []; }
+  renderAll();
+  renderChat('chat-feed-reg');
+  renderChat('chat-feed');
+  scrollChats();
+}
+
+function restoreSession() {
+  try {
     const session = JSON.parse(localStorage.getItem(LS_SESSION));
-    if(session?.active && session.username){
-      myUsername = session.username;
-      myTeam = session.team;
-      myAccs = session.accounts || [];
-      timerGoing = session.timerGoing || false;
-      sessSecs = session.sessSecs || 0;
-      verified = session.verified || false;
-      verifyTimeLeft = session.verifyTimeLeft || 900;
-      earnedSet = new Set(session.earnedSet || []);
-      if(timerGoing){
-        const elapsed = Math.floor((Date.now() - session.timestamp) / 1000);
-        sessSecs += elapsed;
-        sessStart = Date.now() - (sessSecs * 1000);
-        timerGoing = true;
-        document.getElementById('s-reg').classList.remove('on');
-        document.getElementById('s-stream').classList.add('on');
-        setupStreamUI();
-        startTimerFromRestore();
-      }
+    if (!session?.active || !session.username) return;
+    myUsername = session.username;
+    myTeam = session.team;
+    myAccs = session.accounts || [];
+    timerGoing = session.timerGoing || false;
+    sessSecs = session.sessSecs || 0;
+    verified = session.verified || false;
+    verifyTimeLeft = session.verifyTimeLeft ?? 900;
+    earnedSet = new Set(session.earnedSet || []);
+    if (timerGoing) {
+      const elapsed = Math.floor((Date.now() - session.timestamp) / 1000);
+      sessSecs += elapsed;
+      sessStart = Date.now() - sessSecs * 1000;
+      document.getElementById('s-reg').classList.remove('on');
+      document.getElementById('s-stream').classList.add('on');
+      setupStreamUI();
+      resumeTimers();
     }
   } catch(e) {}
-  renderAll(); renderChat('chat-feed-reg'); renderChat('chat-feed');
 }
 
-function save(){
-  try{ localStorage.setItem(LS_DATA, JSON.stringify(db)); }catch(e){}
-  if(myUsername){
-    try{
-      const session = {
-        active: true,
-        username: myUsername,
-        team: myTeam,
-        accounts: myAccs,
-        timerGoing: timerGoing,
-        sessSecs: sessSecs,
-        verified: verified,
-        verifyTimeLeft: verifyTimeLeft,
-        earnedSet: Array.from(earnedSet),
+function saveLocal() {
+  try { localStorage.setItem(LS_DATA, JSON.stringify(db)); } catch(e) {}
+}
+
+function saveLocalChat() {
+  try { localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); } catch(e) {}
+}
+
+function save() {
+  saveLocal();
+  if (myUsername) {
+    try {
+      localStorage.setItem(LS_SESSION, JSON.stringify({
+        active: true, username: myUsername, team: myTeam,
+        accounts: myAccs, timerGoing, sessSecs, verified,
+        verifyTimeLeft, earnedSet: Array.from(earnedSet),
         timestamp: Date.now()
-      };
-      localStorage.setItem(LS_SESSION, JSON.stringify(session));
-    } catch(e){}
-  }
-  if(myUsername && db[myUsername.toLowerCase()]){
-    syncUserToFirebase(db[myUsername.toLowerCase()]);
+      }));
+    } catch(e) {}
+    const u = db[myUsername.toLowerCase()];
+    if (u) syncUserToFirebase(u);
   }
 }
 
-function saveChat(){
-  try{ localStorage.setItem(LS_CHAT, JSON.stringify(chat.slice(-200))); }catch(e){}
-  if(chat.length > 0){
-    const last = chat[chat.length - 1];
-    if(last && last.type === 'msg'){
-      syncChatToFirebase({ sender: last.sender, team: last.team, text: last.text });
-    }
-  }
+// ============================================================
+// 🛠 HELPERS
+// ============================================================
+function fmt(s) {
+  if (s < 0) s = 0;
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
-
-function fmt(s){ if(s<0)s=0; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60; return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
-function fmtTime(s){ const m=Math.floor(s/60),sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
-function initials(n){ return n.replace(/^@/,'').slice(0,2).toUpperCase()||'??'; }
-function tsNow(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
-function safe(n){ return n.replace(/\W/g,'_'); }
+function fmtTime(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function initials(n) { return (n||'?').replace(/^@/,'').slice(0,2).toUpperCase() || '??'; }
+function tsNow() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+function safe(n) { return (n||'').replace(/\W/g,'_'); }
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function getPoints(secs) { return Math.floor(secs / 300); }
 
 let toastTimer;
-function toast(msg, ms=3500){
+function toast(msg, ms = 3500) {
   const el = document.getElementById('toast');
-  if(!el) return;
+  if (!el) return;
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
 
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function scrollChats() {
+  setTimeout(() => {
+    ['chat-feed-reg','chat-feed'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, 80);
+}
+
 // ============================================================
-// 🎯 TEAM SELECTION - FIXED!
+// 🎯 TEAM SELECTION
 // ============================================================
 function pickTeam(team) {
-  console.log('Team selected:', team);
   myTeam = team;
-  
-  // Remove selection from all team buttons
-  document.querySelectorAll('.team-btn').forEach(b => {
-    b.classList.remove('sel-k', 'sel-p');
-  });
-  
-  // Add selection to the right button
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
+  const btn = document.getElementById('go-btn');
   if (team === 'khem') {
     document.getElementById('team-khem').classList.add('sel-k');
-    const btn = document.getElementById('go-btn');
     btn.className = 'btn btn-primary';
     btn.textContent = '💙 Join Team Khem';
   } else {
     document.getElementById('team-pharan').classList.add('sel-p');
-    const btn = document.getElementById('go-btn');
     btn.className = 'btn btn-ora';
     btn.textContent = '🧡 Join Team Pharan';
   }
-  
-  // Clear any previous errors
-  showErr('reg-err', '');
+  showErr('reg-err','');
 }
 
-function addAcc(){
+function addAcc() {
   const list = document.getElementById('acc-list');
   const n = list.children.length + 1;
   const d = document.createElement('div');
@@ -724,27 +753,56 @@ function addAcc(){
   list.appendChild(d);
 }
 
-function rmAcc(btn){
+function rmAcc(btn) {
   const list = document.getElementById('acc-list');
-  if(list.children.length > 1) btn.closest('.acc-item').remove();
+  if (list.children.length > 1) btn.closest('.acc-item').remove();
 }
 
-function showErr(id, msg){
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
+// ============================================================
+// 🎬 GO TO STREAM PAGE
+// ============================================================
+function goStream() {
+  const username = document.getElementById('username-input').value.trim();
+  if (!username) { showErr('reg-err','Enter your username!'); return; }
+  if (!myTeam)   { showErr('reg-err','Choose your team!'); return; }
+  const names = [...document.querySelectorAll('.acc-name')].map(i => i.value.trim().replace(/^@/,''));
+  const urls  = [...document.querySelectorAll('.acc-url')].map(i => i.value.trim());
+  const accs  = names.map((n,i) => ({name:n, url:urls[i]||''})).filter(a => a.name);
+  if (!accs.length) { showErr('reg-err','Add at least one account!'); return; }
+  showErr('reg-err','');
+
+  myUsername = username;
+  myAccs = accs;
+  timerGoing = false; sessSecs = 0; earnedSet = new Set();
+  verified = false; verifyTimeLeft = 900;
+
+  const key = username.toLowerCase();
+  if (!db[key]) db[key] = {name:username, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+  db[key].name = username;
+  db[key].team = myTeam;
+  db[key].accounts = [...new Set([...(db[key].accounts||[]), ...accs.map(a=>a.name)])];
+  save();
+
+  document.getElementById('s-reg').classList.remove('on');
+  document.getElementById('s-stream').classList.add('on');
+  window.scrollTo(0,0);
+  setupStreamUI();
+  renderAll();
+  postSysMsg(`🎬 @${username} joined Team ${myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡'} with ${accs.length} account${accs.length>1?'s':''}!`);
 }
 
-function setupStreamUI(){
+// ============================================================
+// 🖥 STREAM UI SETUP
+// ============================================================
+function setupStreamUI() {
   const hero = document.getElementById('sess-hero');
   hero.className = 'sess-hero ' + (myTeam === 'khem' ? 'k' : 'p');
   document.getElementById('sh-timer').textContent = fmt(sessSecs);
-  document.getElementById('sh-points').textContent = '🏆 ' + Math.floor(sessSecs/300) + ' points';
+  document.getElementById('sh-points').textContent = '🏆 ' + getPoints(sessSecs) + ' points';
   document.getElementById('sh-accs').textContent = myAccs.map(a => '@'+a.name).join(' · ');
   document.getElementById('sh-team').textContent = 'Team ' + (myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡');
 
-  if(timerGoing){
+  if (timerGoing) {
     document.getElementById('sh-eye').textContent = '🔴 LIVE';
     document.getElementById('status-bar').className = 'status-bar sb-live';
     document.getElementById('status-bar').textContent = '🔴 Timer running! Verify every 15 min!';
@@ -761,20 +819,34 @@ function setupStreamUI(){
     document.getElementById('verify-box').style.display = 'none';
   }
 
+  // Open-tabs list — use data-url + event delegation (no inline onclick with URLs)
   const ot = document.getElementById('open-tabs');
   ot.innerHTML = myAccs.map((a,i) => `
     <div class="open-row" id="otr-${i}">
-      <div><div class="acc">@${a.name}</div><div class="url">${a.url || 'No link'}</div></div>
-      <div>${a.url ? `<button class="btn btn-dark btn-xs open-btn" data-url="${a.url}">Open ↗</button>` : '<span style="font-size:11px;color:#94a3b8;">No link</span>'}</div>
+      <div>
+        <div class="acc">@${escHtml(a.name)}</div>
+        <div class="url">${escHtml(a.url || 'No link')}</div>
+      </div>
+      <div>${a.url
+        ? `<button class="btn btn-dark btn-xs open-btn" data-url="${escHtml(a.url)}">Open ↗</button>`
+        : '<span style="font-size:11px;color:#94a3b8;">No link</span>'}</div>
     </div>
   `).join('');
+
+  // Event delegation for open-tab buttons
+  ot.onclick = function(e) {
+    const btn = e.target.closest('.open-btn');
+    if (!btn) return;
+    const url = btn.dataset.url;
+    if (url) { window.open(url, '_blank', 'noopener'); toast('🔗 Tab opened!', 1800); }
+  };
 
   const al = document.getElementById('acc-live');
   al.innerHTML = myAccs.map(a => `
     <div class="acc-live-row">
       <div class="left">
-        <div class="avatar ${myTeam === 'khem' ? 'k' : 'p'}">${initials(a.name)}</div>
-        <div class="name">@${a.name}</div>
+        <div class="avatar ${myTeam==='khem'?'k':'p'}">${initials(a.name)}</div>
+        <div class="name">@${escHtml(a.name)}</div>
       </div>
       <div class="time" id="alt-${safe(a.name)}">${fmt(sessSecs)}</div>
     </div>
@@ -782,58 +854,31 @@ function setupStreamUI(){
 
   ['b15','b30','b60','bmulti','bverify'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) earnedSet.has(id) ? el.classList.add('got') : el.classList.remove('got');
+    if (el) earnedSet.has(id) ? el.classList.add('got') : el.classList.remove('got');
   });
 }
 
-function goStream(){
-  const err = document.getElementById('reg-err');
-  const username = document.getElementById('username-input').value.trim();
-  if(!username){ showErr('reg-err','Enter your username!'); return; }
-  if(!myTeam){ showErr('reg-err','Choose your team!'); return; }
-  const names = [...document.querySelectorAll('.acc-name')].map(i => i.value.trim().replace(/^@/,''));
-  const urls = [...document.querySelectorAll('.acc-url')].map(i => i.value.trim());
-  const accs = names.map((n,i) => ({name:n, url:urls[i]||''})).filter(a => a.name);
-  if(!accs.length){ showErr('reg-err','Add at least one account!'); return; }
-  showErr('reg-err','');
-
-  myUsername = username;
-  myAccs = accs;
-  timerGoing = false; sessSecs = 0; earnedSet = new Set();
-  verified = false; verifyTimeLeft = 900;
-
-  const key = username.toLowerCase();
-  if(!db[key]) db[key] = {name:username, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
-  db[key].name = username;
-  db[key].team = myTeam;
-  db[key].accounts = [...new Set([...(db[key].accounts||[]), ...accs.map(a=>a.name)])];
-  save();
-
-  document.getElementById('s-reg').classList.remove('on');
-  document.getElementById('s-stream').classList.add('on');
-  window.scrollTo(0,0);
-  setupStreamUI();
-  save();
-  postSysMsg(`🎬 @${username} joined Team ${myTeam === 'khem' ? 'Khem 💙' : 'Pharan 🧡'} with ${accs.length} account${accs.length>1?'s':''}!`);
-  renderAll();
-}
-
-function openAllTabs(){
-  const btns = document.querySelectorAll('.open-btn');
-  if(btns.length === 0){ toast('No links to open!', 2000); return; }
+// ============================================================
+// 🔗 OPEN ALL TABS
+// ============================================================
+function openAllTabs() {
+  const btns = document.querySelectorAll('#open-tabs .open-btn');
+  if (!btns.length) { toast('No links to open!', 2000); return; }
   btns.forEach(btn => {
     const url = btn.dataset.url;
-    if(url) window.open(url, '_blank');
+    if (url) window.open(url, '_blank', 'noopener');
   });
-  toast('🔗 Tabs opened!', 2000);
+  toast(`🔗 ${btns.length} tab${btns.length>1?'s':''} opened!`, 2000);
 }
 
-function startTimer(){
-  if(timerGoing) return;
+// ============================================================
+// ▶ TIMER
+// ============================================================
+function startTimer() {
+  if (timerGoing) return;
   timerGoing = true;
-  sessStart = Date.now() - (sessSecs * 1000);
-  verified = false;
-  verifyTimeLeft = 900;
+  sessStart = Date.now() - sessSecs * 1000;
+  verified = false; verifyTimeLeft = 900;
 
   document.getElementById('sh-eye').textContent = '🔴 LIVE';
   document.getElementById('status-bar').className = 'status-bar sb-live';
@@ -843,136 +888,136 @@ function startTimer(){
   document.getElementById('verify-box').style.display = 'block';
   document.getElementById('verify-timer').textContent = '15:00';
 
-  if(ticker) clearInterval(ticker);
-  ticker = setInterval(tick, 1000);
-  if(verifyInterval) clearInterval(verifyInterval);
-  verifyInterval = setInterval(verifyTick, 1000);
-
+  resumeTimers();
   save();
   toast('🎬 Timer started!');
   postSysMsg(`⏱ @${myUsername} started streaming!`);
 }
 
-function startTimerFromRestore(){
-  if(ticker) clearInterval(ticker);
+function resumeTimers() {
+  if (ticker) clearInterval(ticker);
+  if (verifyInterval) clearInterval(verifyInterval);
   ticker = setInterval(tick, 1000);
-  if(verifyInterval) clearInterval(verifyInterval);
   verifyInterval = setInterval(verifyTick, 1000);
-  toast('🔄 Session restored!', 2000);
 }
 
-function verifyTick(){
-  if(!timerGoing) return;
-  verifyTimeLeft--;
-  document.getElementById('verify-timer').textContent = fmtTime(Math.max(0, verifyTimeLeft));
-  if(verifyTimeLeft <= 0){
+function verifyTick() {
+  if (!timerGoing) return;
+  verifyTimeLeft = Math.max(0, verifyTimeLeft - 1);
+  document.getElementById('verify-timer').textContent = fmtTime(verifyTimeLeft);
+  if (verifyTimeLeft === 0) {
     document.getElementById('status-bar').className = 'status-bar sb-verify';
     document.getElementById('status-bar').textContent = '⏰ VERIFY NOW!';
     document.getElementById('verify-box').style.borderColor = '#dc2626';
     document.getElementById('verify-box').style.background = '#fee2e2';
     toast('⏰ VERIFY NOW!', 5000);
-    if(verified){ verified = false; save(); }
   }
 }
 
-function verifyStream(){
-  if(!timerGoing) return;
-  verified = true;
-  verifyTimeLeft = 900;
+function verifyStream() {
+  if (!timerGoing) return;
+  verified = true; verifyTimeLeft = 900;
   document.getElementById('verify-timer').textContent = '15:00';
   document.getElementById('verify-box').style.borderColor = '#a78bfa';
   document.getElementById('verify-box').style.background = '#ede9fe';
   document.getElementById('status-bar').className = 'status-bar sb-live';
   document.getElementById('status-bar').textContent = '✅ Verified! Next in 15 min.';
-  tryBadge('bverify', '✅ Verified badge!');
+  tryBadge('bverify','✅ Verified');
   const key = myUsername.toLowerCase();
-  if(db[key]) { db[key].verifications = (db[key].verifications||0) + 1; save(); }
+  if (db[key]) { db[key].verifications = (db[key].verifications||0) + 1; save(); }
   toast('✅ Verified!', 2000);
   postSysMsg(`✅ @${myUsername} verified!`);
 }
 
-function tick(){
-  if(!timerGoing) return;
-  if(verified || verifyTimeLeft > 0){
+function tick() {
+  if (!timerGoing) return;
+  // Timer only ticks when verified or within 15-min window
+  if (verified || verifyTimeLeft > 0) {
     sessSecs = Math.floor((Date.now() - sessStart) / 1000);
     document.getElementById('sh-timer').textContent = fmt(sessSecs);
-    document.getElementById('sh-points').textContent = '🏆 ' + Math.floor(sessSecs/300) + ' points';
+    document.getElementById('sh-points').textContent = '🏆 ' + getPoints(sessSecs) + ' points';
     myAccs.forEach(a => {
       const el = document.getElementById('alt-' + safe(a.name));
-      if(el) el.textContent = fmt(sessSecs);
+      if (el) el.textContent = fmt(sessSecs);
     });
-    if(sessSecs >= 900) tryBadge('b15','⏱ 15 min warrior');
-    if(sessSecs >= 1800) tryBadge('b30','🔥 30 min streamer');
-    if(sessSecs >= 3600) tryBadge('b60','👑 1 hour legend');
-    if(myAccs.length >= 2) tryBadge('bmulti','🖥 Multi-account pro');
-    if(sessSecs % 15 === 0){ saveLive(); renderAll(); }
-    save();
+    if (sessSecs >= 900)  tryBadge('b15','⏱ 15 min warrior');
+    if (sessSecs >= 1800) tryBadge('b30','🔥 30 min streamer');
+    if (sessSecs >= 3600) tryBadge('b60','👑 1 hour legend');
+    if (myAccs.length >= 2) tryBadge('bmulti','🖥 Multi-account pro');
+    if (sessSecs % 20 === 0) { saveLive(); renderAll(); }
+    if (sessSecs % 30 === 0) save();
   }
 }
 
-function tryBadge(id, msg){
-  if(!earnedSet.has(id)){
+function tryBadge(id, msg) {
+  if (!earnedSet.has(id)) {
     earnedSet.add(id);
     const el = document.getElementById(id);
-    if(el) el.classList.add('got');
+    if (el) el.classList.add('got');
     save();
     toast(`🎖 ${msg}!`, 4000);
-    postSysMsg(`🎖 @${myUsername} earned "${id.replace('b','')}" badge!`);
+    postSysMsg(`🎖 @${myUsername} earned "${msg}" badge!`);
   }
 }
 
-function saveLive(){
+function saveLive() {
   const key = myUsername.toLowerCase();
-  if(!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+  if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
   db[key].liveSecs = sessSecs;
   db[key].isLive = true;
   save();
 }
 
-function stopStream(){
-  if(!confirm('Stop your session and save?')) return;
-  if(ticker) clearInterval(ticker);
-  if(verifyInterval) clearInterval(verifyInterval);
+// ============================================================
+// ⏹ STOP / BACK
+// ============================================================
+function stopStream() {
+  if (!confirm('Stop your session and save to Firebase?')) return;
+  clearTimers();
   const elapsed = timerGoing ? sessSecs : 0;
-  if(elapsed > 0){
+  if (elapsed > 0) {
     const key = myUsername.toLowerCase();
-    if(!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
+    if (!db[key]) db[key] = {name:myUsername, team:myTeam, totalSecs:0, sessions:0, accounts:[], verifications:0};
     db[key].totalSecs = (db[key].totalSecs||0) + elapsed;
-    db[key].sessions = (db[key].sessions||0) + 1;
-    db[key].isLive = false;
-    db[key].liveSecs = 0;
+    db[key].sessions  = (db[key].sessions||0) + 1;
+    db[key].isLive = false; db[key].liveSecs = 0;
     save();
-    const pts = Math.floor(elapsed/300);
-    postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} added (${pts} points)!`);
+    const pts = getPoints(elapsed);
+    postSysMsg(`✅ @${myUsername} finished! ${fmt(elapsed)} (${pts} pts)!`);
     toast(`✅ ${fmt(elapsed)} saved! 🏆 ${pts} points!`, 5000);
   }
   resetSession();
 }
 
-function goBack(){
-  if(timerGoing){
-    if(!confirm('Pause timer? Your progress will be saved.')) return;
-    if(ticker) clearInterval(ticker);
-    if(verifyInterval) clearInterval(verifyInterval);
+function goBack() {
+  if (timerGoing) {
+    if (!confirm('Pause timer? Your progress is saved.')) return;
+    clearTimers();
     timerGoing = false;
     save();
-    toast('⏸️ Timer paused.', 2000);
-    document.getElementById('s-stream').classList.remove('on');
-    document.getElementById('s-reg').classList.add('on');
-    renderAll();
-    return;
+    toast('⏸ Timer paused.', 2000);
   }
-  resetSession();
+  document.getElementById('s-stream').classList.remove('on');
+  document.getElementById('s-reg').classList.add('on');
+  renderAll();
+  window.scrollTo(0,0);
 }
 
-function resetSession(){
-  if(ticker) clearInterval(ticker);
-  if(verifyInterval) clearInterval(verifyInterval);
+function clearTimers() {
+  if (ticker) clearInterval(ticker);
+  if (verifyInterval) clearInterval(verifyInterval);
+  ticker = null; verifyInterval = null;
+}
+
+function resetSession() {
+  clearTimers();
   timerGoing = false; sessSecs = 0; myTeam = null; myAccs = []; myUsername = '';
   earnedSet = new Set(); verified = false; verifyTimeLeft = 900;
+  try { localStorage.removeItem(LS_SESSION); } catch(e) {}
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('sel-k','sel-p'));
-  document.getElementById('go-btn').className = 'btn btn-primary';
-  document.getElementById('go-btn').textContent = '🎬 Start Streaming Battle!';
+  const btn = document.getElementById('go-btn');
+  btn.className = 'btn btn-primary';
+  btn.textContent = '🎬 Start Streaming Battle!';
   document.getElementById('s-stream').classList.remove('on');
   document.getElementById('s-reg').classList.add('on');
   document.getElementById('verify-box').style.display = 'none';
@@ -980,176 +1025,171 @@ function resetSession(){
   window.scrollTo(0,0);
 }
 
-function postSysMsg(txt){
-  chat.push({type:'sys', text:txt, ts:tsNow()});
-  saveChat();
+// ============================================================
+// 💬 CHAT
+// ============================================================
+function postSysMsg(txt) {
+  const m = {type:'sys', sender:'System', team:'system', text:txt, ts:tsNow()};
+  chat.push(m);
+  saveLocalChat();
   renderChat('chat-feed-reg');
   renderChat('chat-feed');
-  setTimeout(() => {
-    ['chat-feed-reg','chat-feed'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.scrollTop = el.scrollHeight;
-    });
-  }, 100);
+  scrollChats();
+  pushChatMsg(m);
 }
 
-function sendMsg(source){
+function sendMsg(source) {
   const inp = document.getElementById(source === 'reg' ? 'chat-input-reg' : 'chat-input');
   const txt = inp.value.trim();
-  if(!txt) return;
-  if(!myUsername){ toast('Register first to chat!'); return; }
+  if (!txt) return;
+  if (!myUsername) { toast('Register first to chat!'); return; }
   inp.value = '';
-  chat.push({type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()});
-  saveChat();
+  const m = {type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()};
+  chat.push(m);
+  saveLocalChat();
   renderChat('chat-feed-reg');
   renderChat('chat-feed');
-  setTimeout(() => {
-    ['chat-feed-reg','chat-feed'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.scrollTop = el.scrollHeight;
-    });
-  }, 100);
+  scrollChats();
+  pushChatMsg(m); // send directly to Firebase
 }
 
-function sendReact(txt){
-  if(!myUsername){ toast('Register first!'); return; }
-  chat.push({type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()});
-  saveChat();
+function sendReact(txt) {
+  if (!myUsername) { toast('Register first!'); return; }
+  const m = {type:'msg', sender:myUsername, team:myTeam, text:txt, ts:tsNow()};
+  chat.push(m);
+  saveLocalChat();
   renderChat('chat-feed-reg');
   renderChat('chat-feed');
+  scrollChats();
+  pushChatMsg(m);
 }
 
-function renderChat(feedId){
+function renderChat(feedId) {
   const feed = document.getElementById(feedId);
-  if(!feed) return;
-  const atBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 60;
-  feed.innerHTML = chat.slice(-50).map(m => {
-    if(m.type === 'sys') return `<div class="chat-msg sys"><span class="chat-sys">${escHtml(m.text)}</span></div>`;
-    const cls = m.team === 'khem' ? 'k' : 'p';
-    const bcls = m.team === 'khem' ? 'k' : 'p';
+  if (!feed) return;
+  const atBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 80;
+  const msgs = chat.slice(-60);
+  if (!msgs.length) {
+    feed.innerHTML = '<div class="chat-msg sys"><span class="chat-sys">🌐 Welcome to OhOh Stream Battle!</span></div>';
+    return;
+  }
+  feed.innerHTML = msgs.map(m => {
+    const isSys = m.type === 'sys' || m.team === 'system' || m.sender === 'System';
+    if (isSys) return `<div class="chat-msg sys"><span class="chat-sys">${escHtml(m.text)}</span></div>`;
+    const cls  = m.team === 'khem' ? 'k' : 'p';
     return `<div class="chat-msg">
       <div class="chat-avatar ${cls}">${initials(m.sender)}</div>
       <div class="chat-bubble-wrap">
-        <div class="chat-meta"><span class="chat-sender ${cls}">@${escHtml(m.sender)}</span><span class="chat-ts">${m.ts}</span></div>
-        <div class="chat-bubble ${bcls}">${escHtml(m.text)}</div>
+        <div class="chat-meta">
+          <span class="chat-sender ${cls}">@${escHtml(m.sender)}</span>
+          <span class="chat-ts">${m.ts || ''}</span>
+        </div>
+        <div class="chat-bubble ${cls}">${escHtml(m.text)}</div>
       </div>
     </div>`;
   }).join('');
-  if(atBottom || feed.scrollHeight < 400) feed.scrollTop = feed.scrollHeight;
+  if (atBottom) feed.scrollTop = feed.scrollHeight;
 }
 
-function escHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-function getPoints(secs){ return Math.floor(secs/300); }
-
-function renderVS(){
+// ============================================================
+// 🏆 RENDER SCOREBOARD + LEADERBOARD
+// ============================================================
+function renderVS() {
   let ks=0,kn=0,kp=0,ps=0,pn=0,pp=0;
   Object.values(db).forEach(u => {
-    let secs = u.totalSecs || 0;
-    if(u.isLive && u.liveSecs) secs += u.liveSecs;
-    if(u.team === 'khem'){ ks+=secs; kn++; kp+=getPoints(secs); }
-    else { ps+=secs; pn++; pp+=getPoints(secs); }
+    let secs = (u.totalSecs||0) + (u.isLive ? (u.liveSecs||0) : 0);
+    if (u.team === 'khem') { ks+=secs; kn++; kp+=getPoints(secs); }
+    else                   { ps+=secs; pn++; pp+=getPoints(secs); }
   });
-  if(timerGoing && myTeam){
-    if(myTeam === 'khem'){ ks+=sessSecs; kp+=getPoints(sessSecs); }
-    else { ps+=sessSecs; pp+=getPoints(sessSecs); }
+  // Add live session of current user
+  if (timerGoing && myTeam && myUsername) {
+    if (myTeam === 'khem') kp += getPoints(sessSecs);
+    else                   pp += getPoints(sessSecs);
   }
 
   document.getElementById('k-points').textContent = kp;
   document.getElementById('p-points').textContent = pp;
-  document.getElementById('k-time').textContent = fmt(ks);
-  document.getElementById('p-time').textContent = fmt(ps);
-  document.getElementById('k-meta').textContent = kn + ' streamer' + (kn!==1?'s':'');
-  document.getElementById('p-meta').textContent = pn + ' streamer' + (pn!==1?'s':'');
-  document.getElementById('k-count').textContent = kn + ' member' + (kn!==1?'s':'');
-  document.getElementById('p-count').textContent = pn + ' member' + (pn!==1?'s':'');
+  document.getElementById('k-time').textContent   = fmt(ks);
+  document.getElementById('p-time').textContent   = fmt(ps);
+  document.getElementById('k-meta').textContent   = kn + ' streamer' + (kn!==1?'s':'');
+  document.getElementById('p-meta').textContent   = pn + ' streamer' + (pn!==1?'s':'');
+  document.getElementById('k-count').textContent  = kn + ' member'   + (kn!==1?'s':'');
+  document.getElementById('p-count').textContent  = pn + ' member'   + (pn!==1?'s':'');
 
-  document.getElementById('team-k-points').textContent = kp;
-  document.getElementById('team-p-points').textContent = pp;
-  document.getElementById('team-k-points-live').textContent = kp;
-  document.getElementById('team-p-points-live').textContent = pp;
+  ['team-k-points','team-k-points-live'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=kp; });
+  ['team-p-points','team-p-points-live'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=pp; });
 
   ['team-k-box','team-p-box','team-k-box-live','team-p-box-live'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) el.classList.remove('lead-k','lead-p');
+    if (el) el.classList.remove('lead-k','lead-p');
   });
-  if(kp > pp){ document.getElementById('team-k-box')?.classList.add('lead-k'); document.getElementById('team-k-box-live')?.classList.add('lead-k'); }
-  else if(pp > kp){ document.getElementById('team-p-box')?.classList.add('lead-p'); document.getElementById('team-p-box-live')?.classList.add('lead-p'); }
+  if      (kp > pp) { document.getElementById('team-k-box')?.classList.add('lead-k'); document.getElementById('team-k-box-live')?.classList.add('lead-k'); }
+  else if (pp > kp) { document.getElementById('team-p-box')?.classList.add('lead-p'); document.getElementById('team-p-box-live')?.classList.add('lead-p'); }
 
   const liveCount = Object.values(db).filter(u => u.isLive).length;
   document.getElementById('live-count').textContent = '👀 ' + liveCount + ' live';
 
   const total = ks + ps || 1;
-  const kpct = Math.max(5, Math.min(95, Math.round(ks/total*100)));
+  const kpct  = Math.max(5, Math.min(95, Math.round(ks/total*100)));
   document.getElementById('bp-k').style.width = kpct + '%';
-  document.getElementById('bp-p').style.width = (100 - kpct) + '%';
+  document.getElementById('bp-p').style.width = (100-kpct) + '%';
 
   const vd = document.getElementById('verdict');
-  if(ks === 0 && ps === 0){ vd.className = 'verdict tie'; vd.textContent = '⚔️ Ready for battle!'; }
-  else if(kp > pp){ vd.className = 'verdict k'; vd.textContent = '💙 Team Khem leads by ' + (kp-pp) + ' points!'; }
-  else if(pp > kp){ vd.className = 'verdict p'; vd.textContent = '🧡 Team Pharan leads by ' + (pp-kp) + ' points!'; }
-  else { vd.className = 'verdict tie'; vd.textContent = '⚔️ Perfectly tied! Keep streaming!'; }
+  if (ks===0 && ps===0)    { vd.className='verdict tie'; vd.textContent='⚔️ Ready for battle!'; }
+  else if (kp > pp)         { vd.className='verdict k';   vd.textContent='💙 Team Khem leads by '+(kp-pp)+' points!'; }
+  else if (pp > kp)         { vd.className='verdict p';   vd.textContent='🧡 Team Pharan leads by '+(pp-kp)+' points!'; }
+  else                      { vd.className='verdict tie'; vd.textContent='⚔️ Perfectly tied! Keep streaming!'; }
 }
 
-function renderLB(id){
+function renderLB(id) {
   const el = document.getElementById(id);
-  if(!el) return;
+  if (!el) return;
   const f = lbFilter[id] || 'all';
   let entries = Object.entries(db).map(([k,u]) => {
-    let secs = u.totalSecs || 0;
-    if(u.isLive && u.liveSecs) secs += u.liveSecs;
-    return {...u, key:k, secs:secs};
+    const secs = (u.totalSecs||0) + (u.isLive ? (u.liveSecs||0) : 0);
+    return {...u, key:k, secs};
   });
-  if(f === 'khem') entries = entries.filter(u => u.team === 'khem');
-  if(f === 'pharan') entries = entries.filter(u => u.team === 'pharan');
+  if (f === 'khem')   entries = entries.filter(u => u.team === 'khem');
+  if (f === 'pharan') entries = entries.filter(u => u.team === 'pharan');
   entries.sort((a,b) => b.secs - a.secs);
-  if(!entries.length){ el.innerHTML = '<div class="lb-empty">No streamers yet — be the first! 🎬</div>'; return; }
+  if (!entries.length) { el.innerHTML = '<div class="lb-empty">No streamers yet — be the first! 🎬</div>'; return; }
   const rk = ['r1','r2','r3'];
   el.innerHTML = entries.slice(0,20).map((u,i) => {
-    const cls = u.team === 'khem' ? 'k' : 'p';
-    const avcls = u.team === 'khem' ? 'k' : 'p';
-    const rc = i < 3 ? rk[i] : '';
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
-    const tpill = u.team === 'khem' ? '<span class="pill pill-k">KHEM</span>' : '<span class="pill pill-p">PHARAN</span>';
-    const livepill = u.isLive ? '<span class="pill pill-live">LIVE</span>' : '';
-    const mepill = (myUsername && u.key === myUsername.toLowerCase()) ? '<span class="pill pill-you">YOU</span>' : '';
-    const verifypill = u.verifications > 0 ? '<span class="pill pill-verify">✅'+u.verifications+'</span>' : '';
-    const pts = getPoints(u.secs);
+    const cls     = u.team === 'khem' ? 'k' : 'p';
+    const medal   = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    const tpill   = u.team==='khem'?'<span class="pill pill-k">KHEM</span>':'<span class="pill pill-p">PHARAN</span>';
+    const livepill= u.isLive ? '<span class="pill pill-live">LIVE</span>' : '';
+    const mepill  = (myUsername && u.key===myUsername.toLowerCase()) ? '<span class="pill pill-you">YOU</span>' : '';
+    const vpill   = u.verifications>0 ? `<span class="pill pill-verify">✅${u.verifications}</span>` : '';
     return `<div class="lb-entry ${cls}">
-      <div class="lb-rank ${rc}">${medal}</div>
-      <div class="lb-avatar ${avcls}">${initials(u.name)}</div>
+      <div class="lb-rank ${i<3?rk[i]:''}">${medal}</div>
+      <div class="lb-avatar ${cls}">${initials(u.name)}</div>
       <div class="lb-body">
-        <div class="lb-name">@${u.name}${tpill}${livepill}${mepill}${verifypill}</div>
-        <div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accounts · ${u.verifications||0} verifications</div>
+        <div class="lb-name">@${escHtml(u.name||'')}${tpill}${livepill}${mepill}${vpill}</div>
+        <div class="lb-detail">${u.sessions||0} sessions · ${(u.accounts||[]).length} accts · ${u.verifications||0} verifs</div>
       </div>
       <div class="lb-time">
-        <div class="lb-points">🏆 ${pts}</div>
+        <div class="lb-points">🏆 ${getPoints(u.secs)}</div>
         <div class="lb-time-small">${fmt(u.secs)}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderAll(){ renderVS(); renderLB('lb-reg'); renderLB('lb-stream'); }
-function lbSwitch(el, f, id){ lbFilter[id] = f; el.closest('.lb-tabs').querySelectorAll('.lb-tab').forEach(t => t.classList.remove('on')); el.classList.add('on'); renderLB(id); }
+function renderAll() { renderVS(); renderLB('lb-reg'); renderLB('lb-stream'); }
 
-// Auto-save and sync
-setInterval(() => {
-  if(myUsername && document.getElementById('s-stream').classList.contains('on')) save();
-}, 10000);
+function lbSwitch(el, f, id) {
+  lbFilter[id] = f;
+  el.closest('.lb-tabs').querySelectorAll('.lb-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderLB(id);
+}
 
 // ============================================================
-// 🚀 START
+// 🚀 BOOT
 // ============================================================
-console.log('🔥 Stream Battle starting...');
-console.log('📡 Firebase config loaded');
-
-// Load data
-load();
-
-// Check if buttons are working
-console.log('✅ Page loaded! Click Team Khem or Team Pharan to select.');
-console.log('ℹ️ If buttons don\'t work, check the console for errors.');
+console.log('🔥 OhOh Stream Battle loading...');
+// Firebase connection attempt is already running above; load() is called as fallback.
 </script>
 </body>
 </html>
