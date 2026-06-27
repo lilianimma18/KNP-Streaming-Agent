@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>OhOh Fandom — Stream Battle</title>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDKs - Load from CDN -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -288,12 +288,12 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
   <div class="card">
     <div class="card-header">Choose Your Team</div>
     <div class="team-grid">
-      <button class="team-btn" onclick="pickTeam('khem',this)">
+      <button class="team-btn" id="team-khem-btn" onclick="pickTeam('khem')">
         <span class="icon">💙</span>
         <span class="tname k">Team Khem</span>
         <span class="count" id="k-count">0 members</span>
       </button>
-      <button class="team-btn" onclick="pickTeam('pharan',this)">
+      <button class="team-btn" id="team-pharan-btn" onclick="pickTeam('pharan')">
         <span class="icon">🧡</span>
         <span class="tname p">Team Pharan</span>
         <span class="count" id="p-count">0 members</span>
@@ -427,12 +427,12 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 // 🔥 FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
+  apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
+  authDomain: "ohoh-stream-battle.firebaseapp.com",
+  projectId: "ohoh-stream-battle",
+  storageBucket: "ohoh-stream-battle.firebasestorage.app",
+  messagingSenderId: "882579620540",
+  appId: "1:882579620540:web:b3a37322c60421120b06b9"
 };
 
 // Initialize Firebase
@@ -447,9 +447,10 @@ let firebaseReady = false;
 
 function updateStatus(status, msg) {
   const el = document.getElementById('status');
-  if (!el) return;
-  el.className = 'status ' + status;
-  el.textContent = msg;
+  if (el) {
+    el.className = 'status ' + status;
+    el.textContent = msg;
+  }
 }
 
 dbFirestore.collection('users').limit(1).onSnapshot(
@@ -667,8 +668,8 @@ function toast(msg, ms=3500){
 // ============================================================
 // 🎯 TEAM SELECTION - FIXED!
 // ============================================================
-function pickTeam(team, el) {
-  console.log('Team selected:', team); // Debug log
+function pickTeam(team) {
+  console.log('Team selected:', team);
   myTeam = team;
   
   // Remove selection from all team buttons
@@ -676,19 +677,15 @@ function pickTeam(team, el) {
     b.classList.remove('sel-k', 'sel-p');
   });
   
-  // Add selection to clicked button
+  // Add selection to the right button
   if (team === 'khem') {
-    el.classList.add('sel-k');
-  } else {
-    el.classList.add('sel-p');
-  }
-  
-  // Update the Start Streaming button
-  const btn = document.getElementById('go-btn');
-  if (team === 'khem') {
+    document.getElementById('team-khem-btn').classList.add('sel-k');
+    const btn = document.getElementById('go-btn');
     btn.className = 'btn btn-primary';
     btn.textContent = '💙 Join Team Khem';
   } else {
+    document.getElementById('team-pharan-btn').classList.add('sel-p');
+    const btn = document.getElementById('go-btn');
     btn.className = 'btn btn-ora';
     btn.textContent = '🧡 Join Team Pharan';
   }
@@ -1130,12 +1127,13 @@ setInterval(() => {
 // 🚀 START
 // ============================================================
 console.log('🔥 Stream Battle starting...');
+console.log('📡 Firebase config loaded');
 load();
 
 // ============================================================
-// 🔧 DEBUG - Test team selection
+// 🔧 DEBUG - Log when page loads
 // ============================================================
-console.log('✅ Team buttons should work now! Click on Khem or Pharan.');
+console.log('✅ Page loaded! Click Team Khem or Team Pharan to select.');
 </script>
 </body>
 </html>
