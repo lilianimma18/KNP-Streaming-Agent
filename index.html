@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>OhOh Fandom — Stream Battle</title>
 
-<!-- Firebase SDKs - Load from CDN -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -54,10 +54,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a202
 .input-sm{height:36px;font-size:12px;}
 .label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;}
 .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
-.team-btn{border:2px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;cursor:pointer;background:#fff;font-family:inherit;transition:all .15s;}
-.team-btn:hover{transform:translateY(-2px);}
-.team-btn.sel-k{border-color:#1565c0;background:#e3f2fd;}
-.team-btn.sel-p{border-color:#e65100;background:#fff3e0;}
+.team-btn{border:2px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;cursor:pointer;background:#fff;font-family:inherit;transition:all .15s;font-size:16px;}
+.team-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.team-btn.sel-k{border-color:#1565c0;background:#e3f2fd;box-shadow:0 0 0 3px rgba(21,101,192,.2);}
+.team-btn.sel-p{border-color:#e65100;background:#fff3e0;box-shadow:0 0 0 3px rgba(230,81,0,.2);}
 .team-btn .icon{font-size:28px;display:block;margin-bottom:4px;}
 .team-btn .tname{font-weight:700;font-size:14px;display:block;}
 .team-btn .tname.k{color:#1565c0;}
@@ -288,12 +288,12 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
   <div class="card">
     <div class="card-header">Choose Your Team</div>
     <div class="team-grid">
-      <button class="team-btn" id="team-khem-btn" onclick="pickTeam('khem')">
+      <button class="team-btn" id="team-khem" onclick="pickTeam('khem')">
         <span class="icon">💙</span>
         <span class="tname k">Team Khem</span>
         <span class="count" id="k-count">0 members</span>
       </button>
-      <button class="team-btn" id="team-pharan-btn" onclick="pickTeam('pharan')">
+      <button class="team-btn" id="team-pharan" onclick="pickTeam('pharan')">
         <span class="icon">🧡</span>
         <span class="tname p">Team Pharan</span>
         <span class="count" id="p-count">0 members</span>
@@ -427,17 +427,23 @@ footer{text-align:center;padding:2rem 1rem;font-size:11px;color:#94a3b8;border-t
 // 🔥 FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
+  apiKey: "AIzaSyAtaP4ZVzWGNk_YERJBg9D6jwlgxuAvFOE",
+  authDomain: "ohoh-stream-battle.firebaseapp.com",
+  projectId: "ohoh-stream-battle",
+  storageBucket: "ohoh-stream-battle.firebasestorage.app",
+  messagingSenderId: "882579620540",
+  appId: "1:882579620540:web:b3a37322c60421120b06b9"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const dbFirestore = firebase.firestore();
+// Initialize Firebase with error handling
+let dbFirestore;
+try {
+  firebase.initializeApp(firebaseConfig);
+  dbFirestore = firebase.firestore();
+  console.log('🔥 Firebase initialized successfully');
+} catch (e) {
+  console.error('❌ Firebase init error:', e);
+}
 
 // ============================================================
 // 📡 CONNECTION STATUS
@@ -453,29 +459,37 @@ function updateStatus(status, msg) {
   }
 }
 
-dbFirestore.collection('users').limit(1).onSnapshot(
-  () => {
-    if (!firebaseReady) {
-      firebaseReady = true;
-      isOnline = true;
-      updateStatus('on', '🟢 Online');
-      toast('🌐 Connected to Firebase!', 2000);
-      loadFromFirebase();
+// Try to connect to Firebase
+if (dbFirestore) {
+  dbFirestore.collection('users').limit(1).onSnapshot(
+    () => {
+      if (!firebaseReady) {
+        firebaseReady = true;
+        isOnline = true;
+        updateStatus('on', '🟢 Online');
+        toast('🌐 Connected to Firebase!', 2000);
+        loadFromFirebase();
+      }
+    },
+    (error) => {
+      isOnline = false;
+      firebaseReady = false;
+      updateStatus('off', '🔴 Offline');
+      console.warn('Firebase connection error:', error);
+      // Still load local data
+      load();
     }
-  },
-  (error) => {
-    isOnline = false;
-    firebaseReady = false;
-    updateStatus('off', '🔴 Offline');
-    console.warn('Firebase connection error:', error);
-  }
-);
+  );
+} else {
+  updateStatus('off', '🔴 Offline');
+  load();
+}
 
 // ============================================================
 // 📡 SYNC FUNCTIONS
 // ============================================================
 async function syncUserToFirebase(userData) {
-  if (!firebaseReady || !isOnline || !userData?.name) return;
+  if (!firebaseReady || !isOnline || !dbFirestore || !userData?.name) return;
   try {
     await dbFirestore.collection('users').doc(userData.name.toLowerCase()).set({
       name: userData.name,
@@ -492,7 +506,7 @@ async function syncUserToFirebase(userData) {
 }
 
 async function syncChatToFirebase(chatData) {
-  if (!firebaseReady || !isOnline || !chatData?.text) return;
+  if (!firebaseReady || !isOnline || !dbFirestore || !chatData?.text) return;
   try {
     await dbFirestore.collection('chat').add({
       sender: chatData.sender || 'System',
@@ -507,6 +521,7 @@ async function syncChatToFirebase(chatData) {
 // 📡 REAL-TIME LISTENERS
 // ============================================================
 function startListeners() {
+  if (!dbFirestore) return;
   dbFirestore.collection('users').onSnapshot((snapshot) => {
     let changed = false;
     snapshot.forEach(doc => {
@@ -546,7 +561,7 @@ function startListeners() {
 // 📡 LOAD FROM FIREBASE
 // ============================================================
 async function loadFromFirebase() {
-  if (!firebaseReady || !isOnline) return;
+  if (!firebaseReady || !isOnline || !dbFirestore) return;
   try {
     const userSnap = await dbFirestore.collection('users').get();
     userSnap.forEach(doc => { db[doc.id] = doc.data(); });
@@ -679,12 +694,12 @@ function pickTeam(team) {
   
   // Add selection to the right button
   if (team === 'khem') {
-    document.getElementById('team-khem-btn').classList.add('sel-k');
+    document.getElementById('team-khem').classList.add('sel-k');
     const btn = document.getElementById('go-btn');
     btn.className = 'btn btn-primary';
     btn.textContent = '💙 Join Team Khem';
   } else {
-    document.getElementById('team-pharan-btn').classList.add('sel-p');
+    document.getElementById('team-pharan').classList.add('sel-p');
     const btn = document.getElementById('go-btn');
     btn.className = 'btn btn-ora';
     btn.textContent = '🧡 Join Team Pharan';
@@ -1128,12 +1143,13 @@ setInterval(() => {
 // ============================================================
 console.log('🔥 Stream Battle starting...');
 console.log('📡 Firebase config loaded');
+
+// Load data
 load();
 
-// ============================================================
-// 🔧 DEBUG - Log when page loads
-// ============================================================
+// Check if buttons are working
 console.log('✅ Page loaded! Click Team Khem or Team Pharan to select.');
+console.log('ℹ️ If buttons don\'t work, check the console for errors.');
 </script>
 </body>
 </html>
